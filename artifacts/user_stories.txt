@@ -1,4 +1,1 @@
-EPIC - Graphics
-  1. As a user, I want a consistent , clean graphical style because it is aesthetically pleasing.
-  2. As a user I want the option to view only my territory to avoid confusion on the big map.
-  3. As a user, I want to be able to see where I am in relation to the rest of the map, because if the map is shrinking I don't want to waste my time getting bad territory.
+
