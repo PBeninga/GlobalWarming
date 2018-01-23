@@ -141,7 +141,7 @@
 
 ## Release Goals
 
-### Minimum Viable Product
+### Minimum Viable Product:
  - Full server client <br>
  - Server API <br>
  - Basic GUI <br>
@@ -162,7 +162,7 @@
  - Finalize Graphics
  - Sound
 
-### Final Release
+### Final Release:
  - Start advertising, in app purchases
  - Make money
  - Retire to mansion
