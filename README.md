@@ -34,5 +34,10 @@ User Stories and Epics
 * As a user I want to be able to turn sound on and off, so I can listen to music as I play.
 * As a user I want to be able to get into a game by tapping fast because I am an impatient user.
 
-
+#### Users
+* As a user, I want to be able to play as a guest, so that I can quickly try the game out before committing my information.
+* As a user, I want to stay logged in on exit of the app as to reduce the time before I can start playing next.
+* As a user, I want to be able to view statistics about my gameplay in order to view my progress.
+* As a user, I want to be able to log in with facebook or google, so I don't have to remember a distinct username and password.
+* As a user, I want to be able to make an account in order to track my progress and stats.
 
