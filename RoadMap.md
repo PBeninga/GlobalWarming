@@ -3,8 +3,7 @@
 
 | Week of 1/22 | Week of 1/29 | Week of 2/5  | Week of 2/12 | Week of 2/19 | Week of 2/26 | Week of 3/5  | Week of 3/12 | Week of 3/19 | Week of 3/26 |
 | ------------ | ------------ | ------------ | ------------ | ------------ | ------------ | ------------ | ------------ | ------------ | ------------ |
-|              |              |              |              |              |              |              | MVP release  | *FINALS*     |*SPRING BREAK*|
-|              |              |              |              |              |              |              | +Basic GUI +Acounts |              |              |
+|              |              |              |              |              |              |              | +MVP release +Basic GUI +Acounts | *FINALS*     |*SPRING BREAK*|
 
 
 | Week of 4/2  | Week of 4/9  | Week of 4/16 | Week of 4/23 | Week of 4/30 | Week of 5/7  | Week of 5/14 | Week of 5/21 | Week of 5/28 | Week of 6/4  |
