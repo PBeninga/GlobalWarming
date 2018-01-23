@@ -1,6 +1,5 @@
-#Road map
-* Planning out the time line *
-
+# Road map
+*Rough timeline with goals to measure progress*
 
 <table>
   <tr>
