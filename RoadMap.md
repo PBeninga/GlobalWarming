@@ -28,6 +28,8 @@
    </tr> 
    <tr>
      <td>
+         - Choose an engine <br>
+         - Choose a language
      </td>
      <td>
      </td>
@@ -70,25 +72,20 @@
    </tr> 
    <tr>
      <td>
-        MVP Release:<br>
-        - Full server client <br>
-        - Server API <br>
-        - Basic GUI <br>
-        - Accounts <br>
-        - Weak AI <br>
-        - Single Player <br>
+        <b>MVP Release</b>
      </td>
      <td>
-          <i> Finals <i>
+          <i> Finals </i>
      </td>   
      <td>
-          <i> SPRANG BREAK <i>
+          <i> SPRANG BREAK </i>
      </td>
      <td>
      </td>
      <td>
      </td>
      <td>
+         <b>Second Release</b>
      </td>
      <td>
      </td>
@@ -115,6 +112,9 @@
     <th>
     Week of 6/4
     </th>
+    <th>
+    Week of 6/11
+    </th>
    </tr>  
    <tr>
      <td>
@@ -124,11 +124,47 @@
      <td>
      </td>
      <td>
+        <b>Third Release</b>
      </td>
      <td>
+         - Testing<br>
+         - Bug fixing
      </td>
      <td>
+       <b><u>Final Release</u></b>
+     </td>
+     <td>
+        <i> Finals <i>
      </td>
    </tr>
 </table>
 
+## Release Goals
+
+### Minimum Viable Product
+ - Full server client <br>
+ - Server API <br>
+ - Basic GUI <br>
+ - Accounts <br>
+ - Weak AI <br>
+ - Single Player <br>
+ 
+### Second Release:
+ - Multiplayer<br>
+ - Accounts<br>
+ - Improve Graphics<br>
+ - Basic map generation
+
+### Third Release:
+ - Migrate to production server
+ - AI difficulty levels
+ - Matchmaking
+ - Finalize Graphics
+ - Sound
+
+### Final Release
+ - Start advertising, in app purchases
+ - Make money
+ - Retire to mansion
+ 
+ 
