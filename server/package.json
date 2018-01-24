@@ -1,0 +1,22 @@
+{
+  "name": "global-warming",
+  "version": "1.0.0",
+  "description": "rts server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PBeninga/GlobalWarming.git"
+  },
+  "author": "Patrick Beninga",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.9.8"
+  },
+  "bugs": {
+    "url": "https://github.com/PBeninga/GlobalWarming/issues"
+  },
+  "homepage": "https://github.com/PBeninga/GlobalWarming#readme"
+}
