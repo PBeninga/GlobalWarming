@@ -139,6 +139,13 @@
    </tr>
 </table>
 
+## Accomplished after first week:
+Desicions:
+*Language: javascript
+*Database: MongoDB
+*Server: Heroku
+*Engine: TBD
+
 ## Release Goals
 
 ### Minimum Viable Product:
