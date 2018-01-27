@@ -7,12 +7,12 @@ User Stories and Epics
 -------------
 
 #### Game Play
-* As a user, I want to be able to move my units from node to node with a swipe for easy to learn gameplay.
+* As a user, I want to be able to move my units from node to node with a swipe for easy to learn gameplay. 13 hours
 
 #### Single Player
 
-* As a user, I want to be able to play against bots, because I want to be able to play offline.
-* As a user, I want to be able to play as a guest, so that I can quickly try the game out before committing my information
+* As a user, I want to be able to play against simple bots, because I want to be able to play offline.  20 hours
+* As a user, I want to be able to play as a guest, so that I can quickly try the game out before committing my information 1 hour
 
 #### Multi Player
 
