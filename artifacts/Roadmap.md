@@ -78,7 +78,7 @@
           <i> Finals </i>
      </td>   
      <td>
-          <i> SPRANG BREAK </i>
+          <i> SPRING BREAK TU </i>
      </td>
      <td>
      </td>
