@@ -139,14 +139,9 @@
    </tr>
 </table>
 
-## Accomplished after first week:
-Desicions:
-*Language: javascript
-*Database: MongoDB
-*Server: Heroku
-*Engine: TBD
+# Release Goals
 
-## Release Goals
+---
 
 ### Minimum Viable Product:
  - Full server client <br>
@@ -175,3 +170,136 @@ Desicions:
  - Retire to mansion
  
  
+# Accomplishments:
+
+---
+<table>
+  <tr>
+    <th>
+    Week of 1/22
+    </th>
+    <th>
+    Week of 1/29
+    </th>
+    <th>
+    Week of 2/5
+    </th>
+    <th>
+    Week of 2/12
+    </th>
+    <th>
+    Week of 2/19
+    </th>
+    <th>
+    Week of 2/26
+    </th>
+    <th>
+    Week of 3/5
+    </th>
+   </tr> 
+   <tr>
+     <td>
+       Desicions: <br>
+        - Language: javascript <br>
+        - Database: MongoDB <br>
+        - Server: Heroku <br>
+        - Engine: TBD <br>
+     </td>
+     <td>
+     </td>
+     <td>
+     </td>
+     <td>
+     </td>
+     <td>
+     </td>
+     <td>
+     </td>
+     <td>
+     </td>
+   </tr>
+</table>
+
+<table>
+  <tr>
+    <th>
+    Week of 3/12
+    </th>
+    <th>
+    Week of 3/19
+    </th>
+    <th>
+    Week of 3/26
+    </th>
+    <th>
+    Week of 4/2
+    </th>
+    <th>
+    Week of 4/9
+    </th>
+    <th>
+    Week of 4/16
+    </th>
+    <th>
+    Week of 4/23
+    </th>
+   </tr> 
+   <tr>
+     <td>
+     </td>
+     <td>
+     </td>   
+     <td>
+     </td>
+     <td>
+     </td>
+     <td>
+     </td>
+     <td>
+     </td>
+     <td>
+     </td>
+   </tr>
+</table>
+
+<table>
+  <tr>
+    <th>
+    Week of 4/30
+    </th>
+    <th>
+    Week of 5/7
+    </th>
+    <th>
+    Week of 5/14
+    </th>
+    <th>
+    Week of 5/21
+    </th>
+    <th>
+    Week of 5/28
+    </th>
+    <th>
+    Week of 6/4
+    </th>
+    <th>
+    Week of 6/11
+    </th>
+   </tr>  
+   <tr>
+     <td>
+     </td>
+     <td>
+     </td>
+     <td>
+     </td>
+     <td>
+     </td>
+     <td>
+     </td>
+     <td>
+     </td>
+     <td>
+     </td>
+   </tr>
+</table>
