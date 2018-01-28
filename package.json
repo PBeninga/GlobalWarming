@@ -13,7 +13,9 @@
   "author": "Patrick Beninga",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.9.8"
+    "express": "^4.9.8",
+    "p2": "^0.7.1",
+    "socket.io": "^2.0.4"
   },
   "bugs": {
     "url": "https://github.com/PBeninga/GlobalWarming/issues"
