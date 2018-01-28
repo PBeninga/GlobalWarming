@@ -12,8 +12,6 @@ git commit -m "your commit message here"
 git pull //so you don't cause merge conflicts trying to push
 git push
 
-git merge master //merge branch locally to double check there are no conflicts
-
 go to git hub
 and make a pull request
 
