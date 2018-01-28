@@ -18,4 +18,8 @@ go to git hub
 and make a pull request
 
 
+http://gojasonyang.com/post/phaserMultiplayerGamePart1.html
+##Client explanation
 
+
+##Server explanation
