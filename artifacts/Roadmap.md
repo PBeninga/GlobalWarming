@@ -40,6 +40,7 @@
      <td>
      </td>
      <td>
+       feb. 26, sprint review
      </td>
      <td>
      </td>
@@ -72,7 +73,8 @@
    </tr> 
    <tr>
      <td>
-        <b>MVP Release</b>
+        <b>MVP Release</b> <br>
+       -group presentations this week
      </td>
      <td>
           <i> Finals </i>
