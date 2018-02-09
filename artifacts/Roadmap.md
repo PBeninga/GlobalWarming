@@ -201,7 +201,7 @@
    </tr> 
    <tr>
      <td>
-       Desicions: <br>
+       Decisions <br>
         - Language: javascript <br>
         - Database: MongoDB <br>
         - Server: Heroku <br>
