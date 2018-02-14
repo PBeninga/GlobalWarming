@@ -1,6 +1,7 @@
 var boot = {
 
   create: function() {
+      console.log("Reached Boot");
       game.stage.disableVisibilityChange = true;
       game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
       game.world.setBounds(0, 0, gameProperties.gameWidth, gameProperties.gameHeight, false, false, false, false);

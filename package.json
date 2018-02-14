@@ -13,7 +13,7 @@
   "author": "Patrick Beninga",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.9.8",
+    "express": "^4.16.2",
     "p2": "^0.7.1",
     "socket.io": "^2.0.4"
   },
