@@ -1,15 +1,7 @@
 var mainmenu = {
   create: function(game) {
-    this.createButton(game, "Flavor Text", game.world.centerX, game.world.centerY + 100, 300, 100,
-      function() {
-        game.state.start('main');
-      }
-    );
-  }
-
-  update: function(game) {
-
-  }
+    this.createButton(game, "Flavor Text", game.world.centerX, game.world.centerY + 100, 300, 100, this.start(game));
+  },
 
   createButton: function(game, string, x, y, w, h, callback) {
     var tempButton = game.add.button(x, y, 'button', callback, this, 2, 1, 0);
@@ -23,5 +15,9 @@ var mainmenu = {
       align: "center"
     });
     text.anchor.setTo(0.5, 0.5);
+  },
+
+  start: function(game) {
+    game.state.start('main');
   }
 }
