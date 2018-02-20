@@ -40,7 +40,10 @@ class Map{
 }
 
 class MapNode{
-   constructor(){
+   constructor(x,y){
+      this.x = x;
+      this.y = y;
+      this.adj = null;
       this.army = null;
    }
 
@@ -85,3 +88,9 @@ class Army{
       this.buff = "swole";
    }
 }
+module.exports = {
+    MapNode:MapNode,
+    Game:Game,
+    Path:Path,
+    Army:Army
+};

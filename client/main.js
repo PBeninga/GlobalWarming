@@ -18,8 +18,8 @@ var main = function(game){
 
 function onsocketConnected (data) {
 	console.log("connected to server");
-   console.log(this.id+" "+data.id)
-   enemies = data.players.slice();
+   	console.log(this.id+" "+data.id)
+   	enemies = data.players.slice();
 	gameProperties.in_game = true;
 	// send the server our initial position and tell it we are connected
 }
@@ -74,29 +74,17 @@ function findplayerbyid (id) {
 		}
 	}
 }
+function onEnemyMove(data){
+
+	
+}
 main.prototype = {
 
 	create: function () {
 		game.stage.backgroundColor = 0xE1A193;;
 		console.log("client started");
-      socket.emit("client_started",{});
-      socket.on('connected', onsocketConnected);
-		var testdata =
-		{
-			nodes: [
-				{
-					x: 100,
-					y: 100,
-					adj: [1],
-				},
-				{
-					x: 500,
-					y: 500,
-					adj: [0],
-				},
-			]
-		};
-		createNodes(testdata);
+      	socket.emit("client_started",{});
+      	socket.on('connected', onsocketConnected);
 		/*
 			get initial positions of nodes.
 			data sent:

@@ -11,6 +11,8 @@ class MapNode {
   display(game) {
     this.graphics = game.add.sprite(this.x, this.y, 'node_img');
     this.graphics.anchor.setTo(0.5,0.5);
+    this.graphics.height = 50;
+    this.graphics.width = 50;
 /*
     this.graphics.inputEnabled = true;
     this.graphics.events.onInputDown.add(console.log("clicked"), this);
