@@ -19,7 +19,6 @@ function onsocketConnected () {
 	createPlayer();
 	gameProperties.in_game = true;
 	// send the server our initial position and tell it we are connected
-	socket.emit('new_player', {x: 0, y: 0, angle: 0});
 }
 
 // When the server notifies us of client disconnection, we find the disconnected
@@ -144,19 +143,21 @@ function findplayerbyid (id) {
 		}
 	}
 }
-
+function getID(data){
+}
 main.prototype = {
 
 	create: function () {
 		game.stage.backgroundColor = 0xE1A193;;
 		console.log("client started");
 		socket.on("connect", onsocketConnected);
-
-		//listen to new enemy connections
-		socket.on("new_enemyPlayer", onNewPlayer);
-		//listen to enemy movement
-		socket.on("enemy_move", onEnemyMove);
-		//when received remove_player, remove the player passed;
+      
+      socket.on("id", function(data){
+      
+   console.log("here");
+   console.log(data.privateId);
+   console.log(data.publicId);
+      });
 		socket.on('remove_player', onRemovePlayer);
 		//when the player receives the new input
 		socket.on('input_recieved', onInputRecieved);
