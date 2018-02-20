@@ -10,6 +10,8 @@ class MapNode {
 
   display(game) {
     this.graphics = game.add.sprite(this.x, this.y, 'node_img');
+    this.graphics.scale.x = 0.1;
+    this.graphics.scale.y = 0.1;
     this.graphics.anchor.setTo(0.5,0.5);
     this.graphics.height = 50;
     this.graphics.width = 50;

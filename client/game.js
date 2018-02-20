@@ -1,5 +1,5 @@
-canvas_width = window.innerWidth * window.devicePixelRatio;
-canvas_height = window.innerHeight * window.devicePixelRatio;
+canvas_width = window.innerWidth;
+canvas_height = window.innerHeight;
 
 game = new Phaser.Game(canvas_width,canvas_height, Phaser.CANVAS, 'gameDiv');
 
