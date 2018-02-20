@@ -15,10 +15,15 @@ class MapNode {
     this.graphics.anchor.setTo(0.5,0.5);
     this.graphics.height = 50;
     this.graphics.width = 50;
-/*
     this.graphics.inputEnabled = true;
-    this.graphics.events.onInputDown.add(console.log("clicked"), this);
-*/
+    this.graphics.events.onInputDown.add(function(){console.log("clicked")}, this);
+
+    var text = game.add.text(this.graphics.x, this.graphics.y, "test", {
+      font: "14px Arial",
+      fill: "#000",
+      align: "center"
+    });
+    text.anchor.setTo(0.5, 0.5);
   }
 
   update() {
