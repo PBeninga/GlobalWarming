@@ -1,5 +1,6 @@
 var mainmenu = {
   create: function(game) {
+    console.log("Reached main menu");
     this.createButton(game, "Flavor Text", game.world.centerX, game.world.centerY + 100, 300, 100, this.start(game));
   },
 

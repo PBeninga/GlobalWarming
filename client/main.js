@@ -3,6 +3,8 @@ socket = io.connect();
 
 //the enemy player list
 var enemies = [];
+var nodes = [];
+var armies = [];
 
 var gameProperties = {
 	gameWidth: 4000,
@@ -36,7 +38,7 @@ function onRemovePlayer (data) {
 	enemies.splice(enemies.indexOf(removePlayer), 1);
 }
 
-function createPlayer () {
+function createPlayer (x, y) {
 	player = game.add.graphics(0, 0);
 	player.radius = 100;
 
@@ -53,6 +55,23 @@ function createPlayer () {
 	player.body.clearShapes();
 	player.body.addCircle(player.body_size, 0 , 0);
 	player.body.data.shapes[0].sensor = true;
+}
+
+function createNodes(data) {
+	for (var i = 0; i < data.nodes.length; i++) {
+		node_data = data.nodes[i];
+		let newNode = new MapNode(i, node_data.x, node_data.y);
+		nodes.push(newNode);
+		newNode.display(game);
+	}
+}
+
+function updateArmies(data) {
+	for (var i = 0; i < data.armies.length; i++) {
+		army_data = data.armies[i];
+		let newArmy = new Army(army_data.count, army_data.owner, army_data.node_id);
+		armies.push(newArmy);
+	}
 }
 
 // this is the enemy class.
@@ -150,14 +169,64 @@ main.prototype = {
 	create: function () {
 		game.stage.backgroundColor = 0xE1A193;;
 		console.log("client started");
+		var testdata =
+		{
+			nodes: [
+				{
+					x: 100,
+					y: 100,
+					adj: [1],
+				},
+				{
+					x: 500,
+					y: 500,
+					adj: [0],
+				},
+			]
+		};
+		createNodes(testdata);
+
 		socket.on("connect", onsocketConnected);
+
+		/*
+			get initial positions of nodes.
+			data sent:
+			{
+				{
+					int x: xcoord
+					int y: ycoord
+					int[] adj: list of nodes that can be accessed by this node. Corresponds to index.
+				},
+				...
+			}
+			ex. data.nodes[0].x
+		*/
+		socket.on('send_nodes', createNodes);
+
+		/*
+			update army information
+			data sent:
+			{
+				armies{
+					int count: new armycount of the node
+					player_id owner: who owns the node
+					int node_id: id of the node
+				},
+				...
+			}
+			ex. data.armies.count
+		*/
+		socket.on('update_armies', updateArmies);
 
 		//listen to new enemy connections
 		socket.on("new_enemyPlayer", onNewPlayer);
+
 		//listen to enemy movement
 		socket.on("enemy_move", onEnemyMove);
+
 		//when received remove_player, remove the player passed;
 		socket.on('remove_player', onRemovePlayer);
+
 		//when the player receives the new input
 		socket.on('input_recieved', onInputRecieved);
 	},

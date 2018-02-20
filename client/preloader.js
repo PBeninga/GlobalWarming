@@ -6,6 +6,7 @@ var preloader = {
   },
 
   create: function() {
+    console.log("Reached preloader");
     game.state.start('mainmenu');
   }
 }
