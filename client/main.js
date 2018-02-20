@@ -77,7 +77,7 @@ function findplayerbyid (id) {
 main.prototype = {
 
 	create: function () {
-		game.stage.backgroundColor = 0xE1A193;;
+		game.stage.backgroundColor = 0xE1A193;
 		console.log("client started");
       socket.emit("client_started",{});
       socket.on('connected', onsocketConnected);
@@ -126,8 +126,6 @@ main.prototype = {
 			ex. data.armies.count
 		*/
 		socket.on('update_armies', updateArmies);
-		//listen to enemy movement
-		socket.on("enemy_move", onEnemyMove);
 
 		//when received remove_player, remove the player passed;
 		socket.on('remove_player', onRemovePlayer);

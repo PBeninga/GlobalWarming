@@ -1,15 +1,28 @@
 var mainmenu = {
   create: function(game) {
     console.log("Reached main menu");
-    this.createButton(game, "Flavor Text", game.world.centerX, game.world.centerY + 100, 300, 100, this.start(game));
+    game.stage.backgroundColor = 0xADD8E6;
+
+    var background = game.add.graphics();
+    // colour
+    background.beginFill(0x0000FF);
+    // size
+    backWidth = 500;
+    backHeight = 200;
+    // opacity
+    background.alpha = 0.1;
+    // centering
+    background.drawRect((canvas_width/2)-(backWidth/2), (canvas_height/2)-(backHeight/2), backWidth, backHeight);
+
+    this.createButton(game, null, canvas_width/2, canvas_height/2, 0.4, function() {
+      game.state.start('main');
+    });
   },
 
-  createButton: function(game, string, x, y, w, h, callback) {
+  createButton: function(game, string, x, y, scale, callback) {
     var tempButton = game.add.button(x, y, 'button', callback, this, 2, 1, 0);
-
+    tempButton.scale.set(scale,scale);
     tempButton.anchor.setTo(0.5, 0.5);
-    tempButton.width = w;
-    tempButton.height = h;
     var text = game.add.text(tempButton.x, tempButton.y, string, {
       font: "14px Arial",
       fill: "#fff",
@@ -17,8 +30,4 @@ var mainmenu = {
     });
     text.anchor.setTo(0.5, 0.5);
   },
-
-  start: function(game) {
-    game.state.start('main');
-  }
 }

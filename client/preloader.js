@@ -4,6 +4,7 @@ var preloader = {
 
     // Load all assets.
     game.load.image('node_img', 'client/assets/circle.png');
+    game.load.image('button', 'client/assets/button.png');
   },
 
   create: function() {
