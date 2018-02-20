@@ -1,0 +1,18 @@
+{
+    height: 0,
+    width: 0,
+    nodes: [
+        {
+            x: 0,
+            y: 0,
+            adj: [0,1,2],
+            paths: [0,1,2]
+        }
+    ],
+    paths: [
+        {
+            distance: 0,
+            endPoints: [0,1,2]
+        }
+    ]
+}
