@@ -9,7 +9,7 @@ var armies = [];
 var gameProperties = {
 	gameWidth: 4000,
 	gameHeight: 4000,
-	game_elemnt: "gameDiv",
+	game_element: "gameDiv",
 	in_game: false,
 };
 
