@@ -1,14 +1,34 @@
+//MAP TEMPLATE
 {
+    //integers representing max pixel values
     height: 0,
     width: 0,
+    
+    //A list of ALL nodes
+    //Castle Nodes are included but unspecified
     nodes: [
         {
+            //Pixel location of node
             x: 0,
             y: 0,
+            
+            //lists that reference adjacent nodes and paths (respectively)
+            //by index
+            //Adjacency list will eventually be deleted
             adj: [0,1,2],
             paths: [0,1,2]
         }
     ],
+    
+    //A list of which nodes are castles based on index in node list
+    castles: [
+        {
+            nodeIndex: 0,
+            troopCount: 0
+        }
+    ],
+    
+    //A list of path objects
     paths: [
         {
             distance: 0,
