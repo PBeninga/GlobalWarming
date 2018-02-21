@@ -28,7 +28,6 @@ class Game{
 
       //find any army in a path that is owned by removed player
       //NOT IMPLEMENTED
-      }
    }
 
    addPlayer(id){
@@ -75,7 +74,7 @@ class Map{
             endNode.army.count += toMove;
          }else{ //battle
             //if enemy army is greater, decrease enemy army by your attacking army count
-            if(endNode.army.count >= toMove{
+            if(endNode.army.count >= toMove){
                endNode.army.count -= toMove;
             }else{//conquer the node with your remaning troops (the difference)
                endNode.army = new Army(player,toMove-endNode.army.count);
@@ -112,7 +111,7 @@ class Army{
    }
 }
 
-//NOT IMPLEMENTED 
+//NOT IMPLEMENTED
 /*
 class Path{
    constructor(nodeA,nodeB){
@@ -131,9 +130,11 @@ class Army{
       this.buff = "swole";
    }
 }
+*/
+
 module.exports = {
     MapNode:MapNode,
     Game:Game,
-    Path:Path,
+    //Path:Path,
     Army:Army
 };
