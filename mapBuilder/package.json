@@ -1,0 +1,9 @@
+{
+  "name": "mapBuilder",
+  "version": "1.0.0",
+  "main": "server.js",
+  "description": "Listens on port 5000",
+  "dependencies": {
+    "express": "^4.16.2"
+  }
+}
