@@ -16,7 +16,7 @@ git commit -m "your commit message here"
 
 git pull //so you don't cause merge conflicts trying to push
 
-git push
+git push origin YOURFEATUREBRANCH
 
 go to github and click new pull request
 
