@@ -196,9 +196,18 @@ class Path{
    //movements
 }
 
+class Army{
+   constructor(id,size){
+      this.player = id;
+      this.troops = size;
+      this.buff = "swole";
+   }
+}
+*/
+
 module.exports = {
     MapNode:MapNode,
     Game:Game,
-    Path:Path,
+    //Path:Path,
     Army:Army
-}; */
+};
