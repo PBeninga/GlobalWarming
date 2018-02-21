@@ -9,14 +9,21 @@ class MapNode {
   }
 
   display(game) {
-    this.graphics = game.add.graphics(this.x, this.y);
-    this.graphics.radius = 20;
-
-    this.graphics.beginFill(0x000000);
-    this.graphics.lineStyle(2, 0x000000, 1);
-    this.graphics.drawCircle(0, 0, this.graphics.radius * 2);
-    this.graphics.endFill();
+    this.graphics = game.add.sprite(this.x, this.y, 'node_img');
+    this.graphics.scale.x = 0.1;
+    this.graphics.scale.y = 0.1;
     this.graphics.anchor.setTo(0.5,0.5);
+    this.graphics.height = 50;
+    this.graphics.width = 50;
+    this.graphics.inputEnabled = true;
+    this.graphics.events.onInputDown.add(function(){console.log("clicked")}, this);
+
+    var text = game.add.text(this.graphics.x, this.graphics.y, "test", {
+      font: "14px Arial",
+      fill: "#000",
+      align: "center"
+    });
+    text.anchor.setTo(0.5, 0.5);
   }
 
   update() {

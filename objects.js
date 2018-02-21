@@ -86,10 +86,10 @@ class Map{
 }
 
 class MapNode{
-   constructor(x,y,adj){
+   constructor(x,y){
       this.x = x;
       this.y = y;
-      this.adj = adj;
+      this.adj = null;
       this.army = null;
    }
 }
@@ -123,4 +123,17 @@ class Path{
    }
    //movements
 }
-*/
+
+class Army{
+   constructor(id,size){
+      this.player = id;
+      this.troops = size;
+      this.buff = "swole";
+   }
+}
+module.exports = {
+    MapNode:MapNode,
+    Game:Game,
+    Path:Path,
+    Army:Army
+};
