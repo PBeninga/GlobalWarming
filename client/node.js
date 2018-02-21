@@ -5,6 +5,7 @@ class MapNode {
     this.y = y;
     this.army = null;
     this.adj = auxNodes;
+    this.owned = false;
     this.graphics = null;
   }
 
@@ -16,9 +17,9 @@ class MapNode {
     this.graphics.height = 50;
     this.graphics.width = 50;
     this.graphics.inputEnabled = true;
-    this.graphics.events.onInputDown.add(function(){console.log("clicked")}, this);
-
-    var text = game.add.text(this.graphics.x, this.graphics.y, "test", {
+    this.graphics.events.onInputDown.add(function(){console.log("clicked");this.update()}, this);
+    let string = this.army ? this.army.count : 0;
+    var text = game.add.text(this.graphics.x, this.graphics.y, string, {
       font: "14px Arial",
       fill: "#000",
       align: "center"
@@ -27,7 +28,30 @@ class MapNode {
   }
 
   update() {
-
+    this.graphics.destroy();
+    this.graphics = game.add.sprite(this.x, this.y, 'node_img');
+    this.graphics.scale.x = 0.1;
+    this.graphics.scale.y = 0.1;
+    this.graphics.anchor.setTo(0.5,0.5);
+    this.graphics.height = 50;
+    this.graphics.width = 50;
+    this.graphics.inputEnabled = true;
+    this.graphics.events.onInputDown.add(function(){console.log("clicked" +" "+this.owned);this.update()}, this);
+    let string = this.army ? this.army.count : 0;
+    if(!this.owned){
+      var text = game.add.text(this.graphics.x, this.graphics.y, string, {
+        font: "14px Arial",
+        fill: "#000",
+        align: "center"
+      });
+    }else{
+      var text = game.add.text(this.graphics.x, this.graphics.y, string, {
+        font: "14px Arial",
+        fill: "#F00",
+        align: "center"
+      });
+    }
+    text.anchor.setTo(0.5, 0.5);
   }
 
   updateArmy(army) {

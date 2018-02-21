@@ -18,8 +18,8 @@ var main = function(game){
 
 function onsocketConnected (data) {
 	console.log("connected to server");
-   console.log(this.id+" "+data.id)
-   enemies = data.players.slice();
+   	console.log(this.id+" "+data.id)
+   	enemies = data.players.slice();
 	gameProperties.in_game = true;
 	// send the server our initial position and tell it we are connected
 }
@@ -41,9 +41,15 @@ function onRemovePlayer (data) {
 function createNodes(data) {
 	for (var i = 0; i < data.nodes.length; i++) {
 		node_data = data.nodes[i];
-		let newNode = new MapNode(i, node_data.x, node_data.y);
+		let newNode = new MapNode(i, node_data.x, node_data.y, node_data.adj);
 		nodes.push(newNode);
 		newNode.display(game);
+	}
+	for(var i = 0; i < data.castles.length; i++){
+		nodes[data.castles[i]].updateArmy(data.nodes[data.castles[i]].army);
+		if(nodes[data.castles[i]].army.player == this.id){
+			nodes[data.castles[i]].owned = true;
+		}
 	}
 }
 
@@ -61,7 +67,7 @@ function updateArmies(data) {
 //We create a new enemy in our game.
 function onNewPlayer (data) {
 	//enemy object
-   console.log("added: "+data.id);
+   	console.log("added: "+data.id);
 	enemies.push(data.id);
 }
 
@@ -74,29 +80,17 @@ function findplayerbyid (id) {
 		}
 	}
 }
+function updateNodes(data){
+	//janky as fuck we gunna change
+	nodes[data.nodes[0]] = data.change;
+}
 main.prototype = {
 
 	create: function () {
 		game.stage.backgroundColor = 0xE1A193;
 		console.log("client started");
-      socket.emit("client_started",{});
-      socket.on('connected', onsocketConnected);
-		var testdata =
-		{
-			nodes: [
-				{
-					x: 100,
-					y: 100,
-					adj: [1],
-				},
-				{
-					x: 500,
-					y: 500,
-					adj: [0],
-				},
-			]
-		};
-		createNodes(testdata);
+      	socket.emit("client_started",{});
+     	socket.on('connected', onsocketConnected);
 		/*
 			get initial positions of nodes.
 			data sent:
@@ -126,7 +120,7 @@ main.prototype = {
 			ex. data.armies.count
 		*/
 		socket.on('update_armies', updateArmies);
-
+		socket.on('update_nodes', updateNodes);
 		//when received remove_player, remove the player passed;
 		socket.on('remove_player', onRemovePlayer);
       	socket.on('newPlayer', onNewPlayer)

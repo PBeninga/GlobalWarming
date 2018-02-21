@@ -57,6 +57,8 @@ class Game{
 class Map{
    constructor(){
       this.nodes = [];
+      this.castles = [];//which indicies of nodes are castles;
+      this.castlesChanged = [];
       //this.paths = [];
    }
 
@@ -209,5 +211,6 @@ module.exports = {
     MapNode:MapNode,
     Game:Game,
     //Path:Path,
-    Army:Army
+    Army:Army,
+    Castle:Castle
 };
