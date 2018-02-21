@@ -204,10 +204,10 @@ class Army{
    }
 }
 */
-/*
+
 module.exports = {
     MapNode:MapNode,
     Game:Game,
     //Path:Path,
     Army:Army
-}; */
+};
