@@ -85,6 +85,7 @@ function endSwipe() {
 		for(var i = 1; i < swipePath.length; i++) {
 			console.log(" " + swipePath[i].id);
 		}
+		socket.emit('input_fired', {nodes: [swipePath[0], swipePath[1]]});
 	}
 	else {
 		console.log("swipe failed");
@@ -144,20 +145,24 @@ main.prototype = {
 	create: function () {
 		game.stage.backgroundColor = 0xE1A193;
 		console.log("client started");
-      	socket.emit("client_started",{});
-     	socket.on('connected', onsocketConnected);
+    socket.emit("client_started",{});
+    socket.on('connected', onsocketConnected);
 		/*
 			get initial positions of nodes.
 			data sent:
 			{
-				{
+				nodes[
 					int x: xcoord
 					int y: ycoord
 					int[] adj: list of nodes that can be accessed by this node. Corresponds to index.
-				},
-				...
+					(optional)army army:
+					 	player: id of the player owning the army
+						count: amount of the army
+				]
+				castles[]: index of where the optional armies lie
 			}
 			ex. data.nodes[0].x
+					data.nodes[data.castles[0]].army.id
 		*/
 		socket.on('send_nodes', createNodes);
 
