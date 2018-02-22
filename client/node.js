@@ -7,6 +7,7 @@ class MapNode {
     this.adj = adj;
     this.owned = false;
     this.graphics = graphics;
+    this.graphics.text = null;
     this.graphics.scale.x = 0.1;
     this.graphics.scale.y = 0.1;
     this.graphics.anchor.setTo(0.5,0.5);
@@ -16,30 +17,31 @@ class MapNode {
 
   display(game) {
     let string = this.army ? this.army.count : 0;
-    var text = game.add.text(this.graphics.x, this.graphics.y, string, {
+    this.graphics.text = game.add.text(this.graphics.x, this.graphics.y, string, {
       font: "14px Arial",
       fill: "#000",
       align: "center"
     });
-    text.anchor.setTo(0.5, 0.5);
+    this.graphics.text.anchor.setTo(0.5, 0.5);
   }
 
   update() {
+    this.graphics.text.destroy();
     let string = this.army ? this.army.count : 0;
     if(!this.owned){
-      var text = game.add.text(this.graphics.x, this.graphics.y, string, {
+      this.graphics.text = game.add.text(this.graphics.x, this.graphics.y, string, {
         font: "14px Arial",
         fill: "#000",
         align: "center"
       });
     }else{
-      var text = game.add.text(this.graphics.x, this.graphics.y, string, {
+      this.graphics.text = game.add.text(this.graphics.x, this.graphics.y, string, {
         font: "14px Arial",
         fill: "#F00",
         align: "center"
       });
     }
-    text.anchor.setTo(0.5, 0.5);
+    this.graphics.text.anchor.setTo(0.5, 0.5);
   }
 
   updateArmy(army) {
