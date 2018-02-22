@@ -5,6 +5,7 @@ socket = io.connect();
 var enemies = [];
 var nodes = [];
 var armies = [];
+var swipePath = [];
 
 var gameProperties = {
 	gameWidth: 4000,
@@ -41,7 +42,11 @@ function onRemovePlayer (data) {
 function createNodes(data) {
 	for (var i = 0; i < data.nodes.length; i++) {
 		node_data = data.nodes[i];
-		let newNode = new MapNode(i, node_data.x, node_data.y, node_data.adj);
+		let newNode = new MapNode(i, node_data.x, node_data.y, node_data.adj, game.add.sprite(node_data.x, node_data.y, 'node_img'));
+		newNode.graphics.inputEnabled = true;
+		newNode.graphics.events.onInputDown.add(function(){swipe(newNode)});
+		newNode.graphics.events.onInputOver.add(function(){mouseOver(newNode)});
+		newNode.graphics.events.onInputUp.add(function(){endSwipe()});
 		nodes.push(newNode);
 		newNode.display(game);
 	}
@@ -51,6 +56,49 @@ function createNodes(data) {
 			nodes[data.castles[i]].owned = true;
 		}
 	}
+}
+
+function swipe(node) {
+	console.log("Reached Swipe");
+	swipePath.push(node);
+}
+
+
+
+function mouseOver(node) {
+	console.log("Mouse is over node " + node.id);
+	if(swipePath.length != 0) {
+		if(validNode(swipePath[swipePath.length-1], node)) {
+			swipePath.push(node);
+			console.log("Added node " + node.id);
+		}
+		else {
+			console.log(node.id + " not a valid node");
+		}
+	}
+}
+
+function endSwipe() {
+	console.log("Reached endSwipe");
+	if(swipePath.length > 1) {
+		console.log("Swiped from " + swipePath[0].id + " to ")
+		for(var i = 1; i < swipePath.length; i++) {
+			console.log(" " + swipePath[i].id);
+		}
+	}
+	else {
+		console.log("swipe failed");
+	}
+	swipePath = [];
+}
+
+function validNode(node1, node2) {
+	for(var i = 0; i < node1.adj.length; i++) {
+		if(node1.adj[i].id = node2.id) {
+			return true;
+		}
+	}
+	return false;
 }
 
 function updateArmies(data) {
@@ -80,10 +128,12 @@ function findplayerbyid (id) {
 		}
 	}
 }
+
 function updateNodes(data){
 	//janky as fuck we gunna change
 	nodes[data.nodes[0]] = data.change;
 }
+
 main.prototype = {
 
 	create: function () {
