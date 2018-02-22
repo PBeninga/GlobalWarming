@@ -5,7 +5,7 @@ class MapNode {
     this.y = y;
     this.army = null;
     this.adj = adj;
-    this.owned = false;
+    this.owner = null;
     this.graphics = graphics;
     this.graphics.text = null;
     this.graphics.scale.x = 0.1;
@@ -17,27 +17,35 @@ class MapNode {
 
   display(game) {
     let string = this.army ? this.army.count : 0;
-    this.graphics.text = game.add.text(this.graphics.x, this.graphics.y, string, {
-      font: "14px Arial",
-      fill: "#000",
-      align: "center"
-    });
+    if(this.owner != null) {
+      this.graphics.text = game.add.text(this.graphics.x, this.graphics.y, string, {
+        font: "14px Arial",
+        fill: this.owner.color,
+        align: "center"
+      });
+    } else {
+      this.graphics.text = game.add.text(this.graphics.x, this.graphics.y, string, {
+        font: "14px Arial",
+        fill: "#000000",
+        align: "center"
+      });
+    }
     this.graphics.text.anchor.setTo(0.5, 0.5);
   }
 
   update() {
     this.graphics.text.destroy();
     let string = this.army ? this.army.count : 0;
-    if(!this.owned){
+    if(this.owner != null) {
       this.graphics.text = game.add.text(this.graphics.x, this.graphics.y, string, {
         font: "14px Arial",
-        fill: "#000",
+        fill: this.owner.color,
         align: "center"
       });
-    }else{
+    } else {
       this.graphics.text = game.add.text(this.graphics.x, this.graphics.y, string, {
         font: "14px Arial",
-        fill: "#F00",
+        fill: "#000000",
         align: "center"
       });
     }
