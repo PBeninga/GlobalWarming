@@ -30,7 +30,11 @@ class Game{
          }
       }
       for(var i = 0; i < toRemove.length; i++){
-         this.map.nodes[toRemove[i]].army = new Army(null,50); // set to neutral castle
+         if(this.map.nodes[toRemove[i]] instanceof Castle){ 
+            this.map.nodes[toRemove[i]].army = new Army(null,50);
+         }else{
+             this.map.nodes[toRemove[i]].army = null;
+         } // set to neutral castle
       }
 
       this.players.splice(this.players.indexOf(id),1);

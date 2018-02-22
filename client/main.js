@@ -85,7 +85,8 @@ function endSwipe() {
 		for(var i = 1; i < swipePath.length; i++) {
 			console.log(" " + swipePath[i].id);
 		}
-		socket.emit('input_fired', {nodes: [swipePath[0], swipePath[1]]});
+		console.log("emitting: ["+swipePath[0] +", "+swipePath[1]+"]");
+		socket.emit('input_fired', {nodes: [swipePath[0].id, swipePath[1].id]});
 	}
 	else {
 		console.log("swipe failed");
@@ -132,9 +133,14 @@ function findplayerbyid (id) {
 
 function updateNodes(data){
 	for(var i = 0; i < nodes.length; i++){//manually do all changes that could happen;
-		if(nodes[i].army){
+		if(data.nodes[i].army){
+			if(!nodes[i].army){
+				nodes[i].army = new Army(0,0,i)
+			}
 			nodes[i].army.count = data.nodes[i].army.count;
 			nodes[i].army.player = data.nodes[i].army.player;
+		}else{
+			nodes[i].army = null;
 		}
 		nodes[i].update();
 	}
