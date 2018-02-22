@@ -133,7 +133,7 @@ function onNewClient(){
 
 io.sockets.on('connection', function(socket){
 	console.log("socket connected");
-   	socket.on("client_started", onNewClient);
+  socket.on("client_started", onNewClient);
 	// listen for disconnection;
 	socket.on('disconnect', onClientdisconnect);
 	//listen for new player inputs.
