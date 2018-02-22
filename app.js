@@ -66,7 +66,11 @@ function makeMap(game){
 	game.map.nodes = nodes;
 	game.map.castles = castles;
 }
-function onInputFired(){}
+function onInputFired(data){
+	if(games[0].map.nodes[data.nodes[0]].army && games[0].map.nodes[data.nodes[0]].army.count > 0 && games[0].map.nodes[data.nodes[0]].army.player == this.id){
+		games[0].map.moveArmy(data.nodes,this.id);
+	}
+}
 
 //call when a client disconnects and tell the clients except sender to remove the disconnected player
 //TODO have client send which game player is in, so we can remove them from it.
