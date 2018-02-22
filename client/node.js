@@ -1,12 +1,12 @@
 class MapNode {
-  constructor(node_id, x, y, adj, graphics) {
+  constructor(node_id, x, y, graphics) {
     this.id = node_id;
     this.x = x;
     this.y = y;
     this.army = null;
-    this.adj = adj;
+    this.paths = [];
     this.owner = null;
-    
+
     this.graphics = graphics;
     this.graphics.text = null;
     this.graphics.scale.x = 0.1;
@@ -51,6 +51,21 @@ class MapNode {
       });
     }
     this.graphics.text.anchor.setTo(0.5, 0.5);
+  }
+
+  addPath(path) {
+    if(path.start.id == this.id) {
+      this.paths.push(path);
+    }
+  }
+
+  pathTo(node) {
+    for(var i = 0; i < this.paths.length; i++) {
+      if(this.paths[i].end.id == node.id) {
+        return true;
+      }
+    }
+    return false;
   }
 
   updateArmy(army) {

@@ -42,17 +42,21 @@ function makeMap(game){
 			let x =  i*100;
 			let y =  j*100;
 			var adj = [];
+			// If the node isn't on the left layer, push the node on the left.
 			if(i != 1){
-				adj.push(count-1);
-			}
-			if(j != 1){
 				adj.push(count-5);
 			}
-			if(i < high){
-				adj.push(count+1);
+			// If the node isn't on the top layer, push the node on top.
+			if(j != 1){
+				adj.push(count-1);
 			}
-			if(j < high){
+			// If the node isn't on the right layer, push the node on the right.
+			if(i < high){
 				adj.push(count+5);
+			}
+			// If the node isn't on the bottom layer, push the node on bottom.
+			if(j < high){
+				adj.push(count+1);
 			}
 			if(x != 100){
 				nodes[count] = new gameObjects.MapNode(x,y,adj);

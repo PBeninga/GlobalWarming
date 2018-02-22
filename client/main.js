@@ -108,12 +108,11 @@ function swipe(node) {
 function mouseOver(node) {
 	console.log("Mouse is over node " + node.id);
 	if(swipePath.length != 0) {
-		if(validNode(swipePath[swipePath.length-1], node)) {
+		if(swipePath[swipePath.length-1].pathTo(node)) {
 			swipePath.push(node);
 			console.log("Added node " + node.id);
 		}
 		else {
-			console.log(node.id + " not a valid node");
 		}
 	}
 }
@@ -123,27 +122,13 @@ function mouseOver(node) {
 function endSwipe() {
 	console.log("Reached endSwipe");
 	if(swipePath.length > 1) {
-		console.log("Swiped from " + swipePath[0].id + " to ")
-		for(var i = 1; i < swipePath.length; i++) {
-			console.log(" " + swipePath[i].id);
-		}
-		console.log("emitting: ["+swipePath[0] +", "+swipePath[1]+"]");
+		console.log("emitting: ["+swipePath[0].id +", "+swipePath[1].id+"]");
 		socket.emit('input_fired', {nodes: [swipePath[0].id, swipePath[1].id]});
 	}
 	else {
 		console.log("swipe failed");
 	}
 	swipePath = [];
-}
-
-// Checks to see if node2 is on node1's adjacency list.
-function validNode(node1, node2) {
-	for(var i = 0; i < node1.adj.length; i++) {
-		if(node1.adj[i].id = node2.id) {
-			return true;
-		}
-	}
-	return false;
 }
 
 //Server will tell us when a new enemy player connects to the server.
@@ -164,12 +149,24 @@ function findplayerbyid (id) {
 	return null;
 }
 
+//Search through nodes list, and return the node with the id set
+function findnodebyid (id) {
+	for (var i = 0; i < nodes.length; i++) {
+		if (nodes[i].id == id) {
+			return nodes[i];
+		}
+	}
+	console.log("Failure to find id " + id);
+	return null;
+}
+
 // Called when the map is originated. Creates all the nodes with the data from the server.
 function createNodes(data) {
 	for (var i = 0; i < data.nodes.length; i++) {
 		// Creates a node from the data given and sets the callbacks for the node.
 		node_data = data.nodes[i];
-		let newNode = new MapNode(i, node_data.x, node_data.y, node_data.adj, game.add.sprite(node_data.x, node_data.y, 'node_img'));
+		let newNode = new MapNode(i, node_data.x, node_data.y, game.add.sprite(node_data.x, node_data.y, 'node_img'));
+
 		newNode.graphics.inputEnabled = true;
 		newNode.graphics.events.onInputDown.add(function(){swipe(newNode)});
 		newNode.graphics.events.onInputOver.add(function(){mouseOver(newNode)});
@@ -178,6 +175,15 @@ function createNodes(data) {
 		// Pushes the node into the node buffer and displays it.
 		nodes.push(newNode);
 		newNode.display(game);
+	}
+
+	// Adds all the paths from adjacency lists
+	for(var i = 0; i < nodes.length; i++) {
+		for(var j = 0; j < data.nodes[i].adj.length; j++) {
+			let newPath = new Path(nodes[i], findnodebyid(data.nodes[i].adj[j]));
+			newPath.display(game);
+			nodes[i].addPath(newPath);
+		}
 	}
 
 	// Iterates through all castles in the node list.
@@ -232,7 +238,7 @@ main.prototype = {
 		game.stage.backgroundColor = 0xE1A193;
 		console.log("client started");
     socket.emit("client_started",{});
-		
+
 		/*
 			sends the initial player data
 			data sent:
