@@ -1,8 +1,11 @@
+//import { setTimeout } from "timers";
+
 class Game{
    constructor(){
       this.players = [];
       this.time = 0;
       this.map = new Map(); //WHATS GONNA HAPPEN HERE
+      this.finished =  false;
    }
 
    incrementTroops(num){
@@ -51,6 +54,10 @@ class Game{
       }
       this.players.push(id);
       this.map.nodes[destination].assignPlayer(id);
+   }
+   tick(io){
+       this.incrementTroops(1);
+       io.local.emit('update_nodes', {nodes:this.map.nodes});
    }
 }
 

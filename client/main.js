@@ -81,8 +81,12 @@ function findplayerbyid (id) {
 	}
 }
 function updateNodes(data){
-	//janky as fuck we gunna change
-	nodes[data.nodes[0]] = data.change;
+	for(var i = 0; i < nodes.length; i++){//manually do all changes that could happen;
+		if(nodes[i].army){
+			nodes[i].army.count = data.nodes[i].army.count;
+		}
+		nodes[i].update();
+	}
 }
 main.prototype = {
 

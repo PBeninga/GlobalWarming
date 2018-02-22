@@ -12,15 +12,26 @@ app.use('/client',express.static(__dirname + '/client'));
 
 serv.listen(process.env.PORT || 2000);
 console.log("Server started.");
+// io connection
+var io = require('socket.io')(serv,{});
 var player_list = []; // all players connected across all games.
 var games = [];// all games;
 makeNewGame();
+tickGames();
 function makeNewGame(){
 	 var game  = new gameObjects.Game()
 	 makeMap(game); //should move into objects.js
 	 games.push(game);
 }
-
+function tickGames(){
+	for(var i = 0; i < games.length; i++){
+		games[i].tick(io);
+		if(games[i].finished){
+			games.splice(i,1);
+		}
+	}
+	setTimeout(tickGames, 500);
+}
 function makeMap(game){
 	var nodes = [];
 	var high = 5;
@@ -103,32 +114,18 @@ function find_playerid(id) {
 
 	return false;
 }
-function getStartingCastleToAssign(game, id){//should be in objects.js
-	for(var i = 0; i < game.map.castles.length; i++){
-		console.log(game.map.nodes[game.map.castles[i]].army.player);
-		if(game.map.nodes[game.map.castles[i]].army.player == null){
-			game.map.nodes[game.map.castles[i]].assignPlayer(id);
-			console.log("assigning: "+game.map.castles[i] +"To " + id);
-			game.map.castlesChanged = [];
-			game.map.castlesChanged.push(game.map.castles[i]);
-			return;
-		}
-	}
-}
 
 function onNewClient(){
    this.broadcast.emit('newPlayer',{id:this.id});
    this.emit('connected',{id:this.id, players:games[0].players});
    player_list.push(this.id);
-   games[0].players.push(this.id);
-   getStartingCastleToAssign(games[0], this.id);
+   games[0].addPlayer(this.id);
    this.emit('send_nodes', {nodes:games[0].map.nodes, castles:games[0].map.castles});
    //This is janky as fuck, just have it to prove a concept, needs to be cleanly reworked.
-   this.broadcast.emit('update_nodes',{nodes:games[0].map.castlesChanged, change: games[0].map.nodes[games[0].map.castlesChanged[0]]});
+   this.broadcast.emit('update_nodes', {nodes:games[0].map.nodes});
 
 }
-// io connection
-var io = require('socket.io')(serv,{});
+
 
 io.sockets.on('connection', function(socket){
 	console.log("socket connected");
