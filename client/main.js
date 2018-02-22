@@ -141,7 +141,7 @@ function validNode(node1, node2) {
 //We create a new enemy in our game.
 function onNewPlayer (data) {
 	//enemy object
-  console.log("added: "+data.id);
+  console.log("added: " + data.id);
 	addNewPlayer(data.id);
 }
 
