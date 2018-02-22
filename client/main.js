@@ -1,12 +1,19 @@
 var socket;
 socket = io.connect();
 
-//the enemy player list
-var enemies = [];
+//the player list
+var players = [];
 var nodes = [];
 var armies = [];
 var swipePath = [];
-
+var colors = ["#C0C0C0",	"#808080", "#000000",
+							"#FF0000", "#800000", "#FFFF00", "#808000",
+							"#00FF00", "#008000", "#00FFFF", "#008080",
+							"#0000FF", "#000080", "#FF00FF", "#800080"];
+var colorTaken = [false, false, false,
+									false, false, false, false,
+									false, false, false, false,
+									false, false, false, false];
 var gameProperties = {
 	gameWidth: 4000,
 	gameHeight: 4000,
@@ -19,8 +26,10 @@ var main = function(game){
 
 function onsocketConnected (data) {
 	console.log("connected to server");
-   	console.log(this.id+" "+data.id)
-   	enemies = data.players.slice();
+  console.log(this.id+" "+data.id);
+	for(var i = 0; i < data.players.length; i++) {
+		addNewPlayer(data.players[i]);
+	}
 	gameProperties.in_game = true;
 	// send the server our initial position and tell it we are connected
 }
@@ -34,7 +43,7 @@ function onRemovePlayer (data) {
 		console.log('Player not found: ', data.id)
 		return;
 	}
-	enemies.splice(enemies.indexOf(removePlayer), 1);
+	players.splice(removePlayer, 1);
 }
 
 
@@ -51,11 +60,42 @@ function createNodes(data) {
 		newNode.display(game);
 	}
 	for(var i = 0; i < data.castles.length; i++){
+		var included = false;
+		var player;
+		for(var j = 0; j < players.length; j++) {
+			if(data.nodes[data.castles[i]].army.player == players[j].id) {
+				included = true;
+				player = players[j];
+			}
+		}
+		if(!included) {
+			player = addNewPlayer(data.nodes[data.castles[i]].army.player);
+		}
 		nodes[data.castles[i]].updateArmy(data.nodes[data.castles[i]].army);
-		if(nodes[data.castles[i]].army.player == this.id){
-			nodes[data.castles[i]].owned = true;
+		nodes[data.castles[i]].owner = player;
+	}
+}
+
+function addNewPlayer(id) {
+	if(id == null) {
+		return;
+	}
+	player = new Player(id, getColor());
+	players.push(player);
+	return player;
+}
+
+function getColor() {
+	var index = Math.floor(Math.random() * colors.length);
+	var loopBreaker = 0;
+	while(colorTaken[index]) {
+		index++;
+		loopbreaker++;
+		if(loopbreaker > colors.length) {
+			return "#000000";
 		}
 	}
+	return colors[index];
 }
 
 function swipe(node) {
@@ -103,30 +143,20 @@ function validNode(node1, node2) {
 	return false;
 }
 
-function updateArmies(data) {
-	for (var i = 0; i < data.armies.length; i++) {
-		army_data = data.armies[i];
-		let newArmy = new Army(army_data.count, army_data.owner, army_data.node_id);
-		armies.push(newArmy);
-	}
-}
-
-// this is the enemy class.
-
 //Server will tell us when a new enemy player connects to the server.
 //We create a new enemy in our game.
 function onNewPlayer (data) {
 	//enemy object
-   	console.log("added: "+data.id);
-	enemies.push(data.id);
+  console.log("added: " + data.id);
+	addNewPlayer(data.id);
 }
 
 //This is where we use the socket id.
-//Search through enemies list to find the right enemy of the id.
+//Search through players list to find the right enemy of the id.
 function findplayerbyid (id) {
-	for (var i = 0; i < enemies.length; i++) {
-		if (enemies[i] == id) {
-			return enemies[i];
+	for (var i = 0; i < players.length; i++) {
+		if (players[i].id == id) {
+			return players[i];
 		}
 	}
 }
@@ -139,6 +169,7 @@ function updateNodes(data){
 			}
 			nodes[i].army.count = data.nodes[i].army.count;
 			nodes[i].army.player = data.nodes[i].army.player;
+			nodes[i].owner = findplayerbyid(data.nodes[i].army.player);
 		}else{
 			nodes[i].army = null;
 		}
@@ -171,21 +202,6 @@ main.prototype = {
 					data.nodes[data.castles[0]].army.id
 		*/
 		socket.on('send_nodes', createNodes);
-
-		/*
-			update army information
-			data sent:
-			{
-				armies{
-					int count: new armycount of the node
-					player_id owner: who owns the node
-					int node_id: id of the node
-				},
-				...
-			}
-			ex. data.armies.count
-		*/
-		socket.on('update_armies', updateArmies);
 		socket.on('update_nodes', updateNodes);
 		//when received remove_player, remove the player passed;
 		socket.on('remove_player', onRemovePlayer);
