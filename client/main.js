@@ -133,6 +133,7 @@ function updateNodes(data){
 	for(var i = 0; i < nodes.length; i++){//manually do all changes that could happen;
 		if(nodes[i].army){
 			nodes[i].army.count = data.nodes[i].army.count;
+			nodes[i].army.player = data.nodes[i].army.player;
 		}
 		nodes[i].update();
 	}
