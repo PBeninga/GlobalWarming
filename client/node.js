@@ -6,6 +6,7 @@ class MapNode {
     this.army = null;
     this.adj = adj;
     this.owner = null;
+    
     this.graphics = graphics;
     this.graphics.text = null;
     this.graphics.scale.x = 0.1;

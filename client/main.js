@@ -26,8 +26,10 @@ var main = function(game){
 
 function onsocketConnected (data) {
 	console.log("connected to server");
-   	console.log(this.id+" "+data.id)
-   	players = data.players.slice();
+  console.log(this.id+" "+data.id);
+	for(var i = 0; i < data.players.length; i++) {
+		addNewPlayer(data.players[i]);
+	}
 	gameProperties.in_game = true;
 	// send the server our initial position and tell it we are connected
 }
@@ -41,7 +43,7 @@ function onRemovePlayer (data) {
 		console.log('Player not found: ', data.id)
 		return;
 	}
-	players.splice(players.indexOf(removePlayer), 1);
+	players.splice(removePlayer, 1);
 }
 
 
@@ -75,6 +77,9 @@ function createNodes(data) {
 }
 
 function addNewPlayer(id) {
+	if(id == null) {
+		return;
+	}
 	player = new Player(id, getColor());
 	players.push(player);
 	return player;
@@ -150,7 +155,7 @@ function onNewPlayer (data) {
 //Search through players list to find the right enemy of the id.
 function findplayerbyid (id) {
 	for (var i = 0; i < players.length; i++) {
-		if (players[i] == id) {
+		if (players[i].id == id) {
 			return players[i];
 		}
 	}
