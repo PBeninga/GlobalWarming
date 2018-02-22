@@ -169,6 +169,7 @@ function updateNodes(data){
 			}
 			nodes[i].army.count = data.nodes[i].army.count;
 			nodes[i].army.player = data.nodes[i].army.player;
+			nodes[i].owner = findplayerbyid(data.nodes[i].army.player);
 		}else{
 			nodes[i].army = null;
 		}
