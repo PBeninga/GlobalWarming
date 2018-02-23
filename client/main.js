@@ -152,13 +152,8 @@ function endSwipe() {
                    }
                 }
                 startNode.update()
-                  endNode.update()
-      }
-
-
-  
-	}
-	else {
+                endNode.update()
+	}else {
 		if(swipePath.length == 1) {
 			console.log("swipe failed");
 		}
