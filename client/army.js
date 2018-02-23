@@ -18,7 +18,7 @@ class Army {
     this.graphics = null;
   }
 
-  display(game) {
+  display() {
     this.graphics = game.add.graphics();
     this.graphics.beginFill(this.color, 0.5);
     this.graphics.drawCircle(this.node.x, this.node.y, 25);

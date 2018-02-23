@@ -9,14 +9,10 @@ players.push(DummyPlayer);
 var nodes = [];
 var armies = [];
 var swipePath = [];
-var colors = [0xC0C0C0,	0x808080, 0x000000,
-							0xFF0000, 0x800000, 0xFFFF00, 0x808000,
-							0x00FF00, 0x008000, 0x00FFFF, 0x008080,
-							0x0000FF, 0x000080, 0xFF00FF, 0x800080];
-var colorTaken = [false, false, false,
-									false, false, false, false,
-									false, false, false, false,
-									false, false, false, false];
+var colors = [0xFF0000,	0xFF9F00, 0xF8FF00, 0x7AFF00, 0x00FFFF,
+							0x0000FF, 0x8900FF, 0xFF00F6, 0x097B00, 0x980842];
+var colorTaken = [false, false, false, false, false,
+									false, false, false, false, false];
 var gameProperties = {
 	gameWidth: 4000,
 	gameHeight: 4000,
@@ -87,11 +83,12 @@ function getColor() {
 	// Will iterate through all colours in the list. If none are available, you're gonna be black
 	while(colorTaken[index]) {
 		index++;
-		loopbreaker++;
-		if(loopbreaker > colors.length) {
-			return "#000000";
+		loopBreaker++;
+		if(loopBreaker > colors.length) {
+			return 0x000000;
 		}
 	}
+	colorTaken[index] = true;
 	return colors[index];
 }
 
@@ -169,7 +166,7 @@ function createNodes(data) {
 	for (var i = 0; i < data.nodes.length; i++) {
 		// Creates a node from the data given and sets the callbacks for the node.
 		node_data = data.nodes[i];
-		let newNode = new MapNode(i, node_data.x, node_data.y, game.add.sprite(node_data.x, node_data.y, 'node_img'));
+		let newNode = new MapNode(i, node_data.x, node_data.y);
 
 		newNode.graphics.inputEnabled = true;
 		newNode.graphics.events.onInputDown.add(function(){swipe(newNode)});
@@ -217,7 +214,6 @@ function createNodes(data) {
 
 function updateNodes(data){
 	var sentNodes = data.nodes;
-	// for every node in our client
 	for(var i = 0; i < nodes.length; i++){
 		// If the sent node has an army, update it.
 		if(sentNodes[i].army){
@@ -232,6 +228,7 @@ function updateNodes(data){
 			nodes[i].army.color = nodes[i].army.owner.color;
 			nodes[i].owner = findplayerbyid(currentArmy.player);
 		}
+		// If the sent node doesn't have an army, destroy any army in the client node
 		else {
 			if(nodes[i].army) {
 				nodes[i].army.destroyGraphics();
@@ -239,7 +236,7 @@ function updateNodes(data){
 			nodes[i].army = null;
 			nodes[i].owner = null;
 		}
-		// Update the node with the new values passed to it.
+		// Update the node and army with the new values passed to it.
 		nodes[i].update();
 		nodes[i].army ? nodes[i].army.update() : null;
 	}

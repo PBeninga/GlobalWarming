@@ -5,7 +5,7 @@ class Path {
     this.graphics = [];
   }
 
-  display(game) {
+  display() {
     this.graphics = game.add.graphics();
     this.graphics.beginFill(0xFF3300);
     this.graphics.lineStyle(10, 0xffd900, 1);

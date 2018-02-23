@@ -1,5 +1,5 @@
 class MapNode {
-  constructor(node_id, x, y, graphics) {
+  constructor(node_id, x, y) {
     this.id = node_id;
     this.x = x;
     this.y = y;
@@ -7,14 +7,14 @@ class MapNode {
     this.paths = [];
     this.owner = null;
 
-    this.graphics = graphics;
+    this.graphics = game.add.sprite(node_data.x, node_data.y, 'node_img');
     this.graphics.text = null;
     this.graphics.anchor.setTo(0.5,0.5);
     this.graphics.height = 50;
     this.graphics.width = 50;
   }
 
-  display(game) {
+  display() {
     let string = this.army ? this.army.count : 0;
     if(this.owner != null) {
       this.graphics.text = game.add.text(this.graphics.x, this.graphics.y, string, {
