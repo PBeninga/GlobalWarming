@@ -2,15 +2,17 @@ var socket;
 socket = io.connect();
 
 //the player list
-var ClientPlayer = null;
 var players = [];
+var ClientPlayer = null;
+var DummyPlayer = new Player(-1, 0x000000);
+players.push(DummyPlayer);
 var nodes = [];
 var armies = [];
 var swipePath = [];
-var colors = ["#C0C0C0",	"#808080", "#000000",
-							"#FF0000", "#800000", "#FFFF00", "#808000",
-							"#00FF00", "#008000", "#00FFFF", "#008080",
-							"#0000FF", "#000080", "#FF00FF", "#800080"];
+var colors = [0xC0C0C0,	0x808080, 0x000000,
+							0xFF0000, 0x800000, 0xFFFF00, 0x808000,
+							0x00FF00, 0x008000, 0x00FFFF, 0x008080,
+							0x0000FF, 0x000080, 0xFF00FF, 0x800080];
 var colorTaken = [false, false, false,
 									false, false, false, false,
 									false, false, false, false,
@@ -82,6 +84,7 @@ function clearColor(color) {
 function getColor() {
 	var index = Math.floor(Math.random() * colors.length);
 	var loopBreaker = 0;
+	// Will iterate through all colours in the list. If none are available, you're gonna be black
 	while(colorTaken[index]) {
 		index++;
 		loopbreaker++;
@@ -120,13 +123,14 @@ function mouseOver(node) {
 // Ends the current swipe. Is called when the mouse button is released.
 // Emits and 'input_fired' if the swipe has two or more nodes in it, otherwise it discards the swipe.
 function endSwipe() {
-	console.log("Reached endSwipe");
 	if(swipePath.length > 1) {
 		console.log("emitting: ["+swipePath[0].id +", "+swipePath[1].id+"]");
 		socket.emit('input_fired', {nodes: [swipePath[0].id, swipePath[1].id]});
 	}
 	else {
-		console.log("swipe failed");
+		if(swipePath.length == 1) {
+			console.log("swipe failed");
+		}
 	}
 	swipePath = [];
 }
@@ -146,7 +150,7 @@ function findplayerbyid (id) {
 			return players[i];
 		}
 	}
-	return null;
+	return DummyPlayer;
 }
 
 //Search through nodes list, and return the node with the id set
@@ -156,7 +160,7 @@ function findnodebyid (id) {
 			return nodes[i];
 		}
 	}
-	console.log("Failure to find id " + id);
+	console.log("Failure to find node id " + id);
 	return null;
 }
 
@@ -188,23 +192,26 @@ function createNodes(data) {
 
 	// Iterates through all castles in the node list.
 	for(var i = 0; i < data.castles.length; i++){
+		var castlePosition = data.castles[i];
+		var currentArmy = data.nodes[castlePosition].army;
 		var included = false;
 		var player;
 		// Checks the client player list to see if it contains the army owner specified in the data.
 		for(var j = 0; j < players.length; j++) {
-			if(data.nodes[data.castles[i]].army.player == players[j].id) {
+			if(currentArmy.player == players[j].id) {
 				included = true;
 				player = players[j];
 			}
 		}
 		// If no such player exists, it creates the player and pushes it to the list.
 		if(!included) {
-			player = addNewPlayer(data.nodes[data.castles[i]].army.player);
+			player = addNewPlayer(currentArmy.player);
 		}
 
 		// Updates the army counts and the new owners of the castles.
-		nodes[data.castles[i]].updateArmy(data.nodes[data.castles[i]].army);
-		nodes[data.castles[i]].owner = player;
+		console.log("Looking for player id: " + currentArmy.player + " from army " + currentArmy);
+		nodes[castlePosition].updateArmy(new Army(currentArmy.count, findplayerbyid(currentArmy.player), nodes[castlePosition]));
+		nodes[castlePosition].owner = player;
 	}
 }
 
@@ -217,20 +224,46 @@ function updateNodes(data){
 			var currentArmy = sentNodes[i].army;
 			// If our nodes didn't hold an army, initialize that node's army
 			if(!nodes[i].army){
-				nodes[i].army = new Army(0,0,i)
+				nodes[i].army = new Army(0,0,nodes[i]);
 			}
 			// Update our clients army variables
 			nodes[i].army.count = currentArmy.count;
-			nodes[i].army.player = currentArmy.player;
+			nodes[i].army.owner = findplayerbyid(currentArmy.player);
+			nodes[i].army.color = nodes[i].army.owner.color;
 			nodes[i].owner = findplayerbyid(currentArmy.player);
-		}else{
+		}
+		else {
+			if(nodes[i].army) {
+				nodes[i].army.destroyGraphics();
+			}
 			nodes[i].army = null;
 			nodes[i].owner = null;
 		}
 		// Update the node with the new values passed to it.
 		nodes[i].update();
+		nodes[i].army ? nodes[i].army.update() : null;
 	}
 }
+
+/*
+// Prints data passed to createnode
+function printCreateNodeData(data) {
+	for(var i = 0; i < data.nodes.length; i++) {
+		console.log("node " + i + ": {");
+		console.log("	x: " + data.nodes[i].x +  ", y: " + data.nodes[i].y);
+		var adj = "	adj:{";
+		for(var j = 0; j < data.nodes[i].adj.length - 1; j++) {
+			adj += data.nodes[i].adj[j] + ",";
+		}
+		console.log(adj + data.nodes[i].adj[data.nodes[i].adj.length - 1] + "}");
+		if(data.castles.includes(i)) {
+			console.log("	army: {");
+			console.log("		player: " + data.nodes[i].army.player);
+			console.log("		count: " + data.nodes[i].army.count);
+		}
+	}
+}
+*/
 
 main.prototype = {
 
@@ -266,7 +299,7 @@ main.prototype = {
 				castles[]: index of where the optional armies lie
 			}
 			ex. data.nodes[0].x
-					data.nodes[data.castles[0]].army.id
+					data.nodes[data.castles[0]].army.player
 		*/
 		socket.on('send_nodes', createNodes);
 

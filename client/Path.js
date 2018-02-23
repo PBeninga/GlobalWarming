@@ -25,6 +25,7 @@ class Path {
       this.graphics.drawRect(this.end.graphics.x, this.end.graphics.y,
                                                   this.end.width, ydistance(this.start, this.end));
     }
+    this.graphics.endFill();
   }
 }
 

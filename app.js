@@ -100,10 +100,7 @@ function onClientdisconnect() {
 
 // find player by the the unique socket id
 function find_playerid_in_game(id, game){
-
-
 	for (var i = 0; i < game.players.length; i++) {
-
 		if (game.players[i] == id) {
 			return game.players[i];
 		}
@@ -111,10 +108,9 @@ function find_playerid_in_game(id, game){
 
 	return false;
 }
+
 function find_playerid(id) {
-
 	for (var i = 0; i < player_list.length; i++) {
-
 		if (player_list[i] == id) {
 			return player_list[i];
 		}
