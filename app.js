@@ -4,6 +4,8 @@ var app = express();
 var serv = require('http').Server(app);
 //get the functions required to move players in the server.
 var gameObjects = require('./objects.js');
+//get the database manager object
+var database = require('./server/database/database.js');
 
 app.get('/',function(req, res) {
 	res.sendFile(__dirname + '/client/index.html');
