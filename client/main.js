@@ -123,6 +123,40 @@ function endSwipe() {
 	if(swipePath.length > 1) {
 		console.log("emitting: ["+swipePath[0].id +", "+swipePath[1].id+"]");
 		socket.emit('input_fired', {nodes: [swipePath[0].id, swipePath[1].id]});
+                
+                //RubberBanding
+
+                var startNode = swipePath[0];
+                var endNode = swipePath[1];
+                //if startNode is a castle only move half the troops
+                if(startNode instanceof Castle){
+                   var toMove = Math.floor(startNode.army.count/2);
+                   startNode.army.count -= toMove;
+                }else{ //move all the troops
+                   toMove = startNode.army.count;
+                   startNode.army = null;
+                }
+                //if end node is empty, add dummy army to be overwritten by moving troops
+                if(endNode.army == null){
+                   endNode.army = new Army(null,0);
+                }
+                //if end node contains your army, just combine armies
+                if(endNode.army.player == player){
+                   endNode.army.count += toMove;
+                }else{ //battle
+                   //if enemy army is greater, decrease enemy army by your attacking army count
+                   if(endNode.army.count >= toMove){
+                      endNode.army.count -= toMove;
+                   }else{//conquer the node with your remaning troops (the difference)
+                      endNode.army = new Army(player,toMove-endNode.army.count);
+                   }
+                }
+                startNode.update()
+                  endNode.update()
+      }
+
+
+  
 	}
 	else {
 		if(swipePath.length == 1) {
@@ -143,7 +177,7 @@ function onNewPlayer (data) {
 //Search through players list, and return the player with the id set
 function findplayerbyid (id) {
 	for (var i = 0; i < players.length; i++) {
-		if (players[i].id == id) {
+	        if (players[i].id == id) {
 			return players[i];
 		}
 	}
