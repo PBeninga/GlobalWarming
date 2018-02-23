@@ -1,22 +1,20 @@
 class MapNode {
-  constructor(node_id, x, y, adj, graphics) {
+  constructor(node_id, x, y) {
     this.id = node_id;
     this.x = x;
     this.y = y;
     this.army = null;
-    this.adj = adj;
+    this.paths = [];
     this.owner = null;
-    
-    this.graphics = graphics;
+
+    this.graphics = game.add.sprite(node_data.x, node_data.y, 'node_img');
     this.graphics.text = null;
-    this.graphics.scale.x = 0.1;
-    this.graphics.scale.y = 0.1;
     this.graphics.anchor.setTo(0.5,0.5);
     this.graphics.height = 50;
     this.graphics.width = 50;
   }
 
-  display(game) {
+  display() {
     let string = this.army ? this.army.count : 0;
     if(this.owner != null) {
       this.graphics.text = game.add.text(this.graphics.x, this.graphics.y, string, {
@@ -53,17 +51,34 @@ class MapNode {
     this.graphics.text.anchor.setTo(0.5, 0.5);
   }
 
+  addPath(path) {
+    if(path.start.id == this.id) {
+      this.paths.push(path);
+    }
+  }
+
+  pathTo(node) {
+    for(var i = 0; i < this.paths.length; i++) {
+      if(this.paths[i].end.id == node.id) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   updateArmy(army) {
     this.army = army;
+    army.update();
   }
 
   newArmy(new_army) {
     if(this.army == null) {
       this.army = new_army;
+      army.display(game);
       return;
     }
 
-    new_army.node_id = this.node_id;
+    new_army.node.id = this.node.id;
     if(this.army.player_id = new_army.player_id) {
       this.army = merge(this.army, new_army);
     }

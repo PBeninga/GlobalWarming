@@ -30,7 +30,7 @@ class Game{
          }
       }
       for(var i = 0; i < toRemove.length; i++){
-         if(this.map.nodes[toRemove[i]] instanceof Castle){ 
+         if(this.map.nodes[toRemove[i]] instanceof Castle){
             this.map.nodes[toRemove[i]].army = new Army(null,50);
          }else{
              this.map.nodes[toRemove[i]].army = null;
@@ -198,7 +198,7 @@ console.log(game.map.nodes[1]);
 */
 
 /*
-NOT IMPLEMENTED 
+NOT IMPLEMENTED
 class Path{
    constructor(nodeA,nodeB){
       this.nodes = [];

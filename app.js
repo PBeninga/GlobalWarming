@@ -42,17 +42,21 @@ function makeMap(game){
 			let x =  i*100;
 			let y =  j*100;
 			var adj = [];
+			// If the node isn't on the left layer, push the node on the left.
 			if(i != 1){
-				adj.push(count-1);
-			}
-			if(j != 1){
 				adj.push(count-5);
 			}
-			if(i < high){
-				adj.push(count+1);
+			// If the node isn't on the top layer, push the node on top.
+			if(j != 1){
+				adj.push(count-1);
 			}
-			if(j < high){
+			// If the node isn't on the right layer, push the node on the right.
+			if(i < high){
 				adj.push(count+5);
+			}
+			// If the node isn't on the bottom layer, push the node on bottom.
+			if(j < high){
+				adj.push(count+1);
 			}
 			if(x != 100){
 				nodes[count] = new gameObjects.MapNode(x,y,adj);
@@ -96,10 +100,7 @@ function onClientdisconnect() {
 
 // find player by the the unique socket id
 function find_playerid_in_game(id, game){
-
-
 	for (var i = 0; i < game.players.length; i++) {
-
 		if (game.players[i] == id) {
 			return game.players[i];
 		}
@@ -107,10 +108,9 @@ function find_playerid_in_game(id, game){
 
 	return false;
 }
+
 function find_playerid(id) {
-
 	for (var i = 0; i < player_list.length; i++) {
-
 		if (player_list[i] == id) {
 			return player_list[i];
 		}
@@ -133,7 +133,7 @@ function onNewClient(){
 
 io.sockets.on('connection', function(socket){
 	console.log("socket connected");
-   	socket.on("client_started", onNewClient);
+  socket.on("client_started", onNewClient);
 	// listen for disconnection;
 	socket.on('disconnect', onClientdisconnect);
 	//listen for new player inputs.
