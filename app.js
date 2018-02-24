@@ -108,7 +108,7 @@ function getStartingCastleToAssign(game, id){//should be in objects.js
 		console.log(game.map.nodes[game.map.castles[i]].army.player);
 		if(game.map.nodes[game.map.castles[i]].army.player == null){
 			game.map.nodes[game.map.castles[i]].assignPlayer(id);
-			console.log("assigning: "+game.map.castles[i] +"To " + id);
+			console.log("assigning: "+ game.map.castles[i] + "To " + id);
 			game.map.castlesChanged = [];
 			game.map.castlesChanged.push(game.map.castles[i]);
 			return;
