@@ -1,6 +1,6 @@
 var socket;
 socket = io.connect();
-
+var gameSocket;
 //the player list
 var players = [];
 var ClientPlayer = null;
@@ -9,6 +9,7 @@ players.push(DummyPlayer);
 var nodes = [];
 var armies = [];
 var swipePath = [];
+var gameId;
 var colors = [0xFF0000,	0xFF9F00, 0xF8FF00, 0x7AFF00, 0x00FFFF,
 							0x0000FF, 0x8900FF, 0xFF00F6, 0x097B00, 0x980842];
 var colorTaken = [false, false, false, false, false,
@@ -25,10 +26,42 @@ var main = function(game){
 
 function onsocketConnected (data) {
 	console.log("connected to server");
-  console.log(this.id + " " + data.id);
+ 	console.log(this.id + " " + data.id);
+	gameId = data.game
+	console.log(gameId);
+	gameSocket = io(gameId);
+		/*
+			Sends the data we will need to update the game, which is the armies and the owners.
+			data sent:
+			{
+				nodes[
+					army: Variable holding the army values.
+						count: Strength of the army.
+						player: ID of the player that owns it.
+				]
+			}
+			ex. data.nodes[0].army.count
+		*/
+		gameSocket.on('update_nodes', updateNodes);
+
+		/*
+			Sends the id of a player which has left the game
+			data sent:
+			{
+				id: ID of the player which has left.
+			}
+			ex. data.id
+		*/
+		gameSocket.on('remove_player', onRemovePlayer);
+
+   		gameSocket.on('newPlayer', onNewPlayer)
+
+		//when the player receives the new input
 	ClientPlayer = addNewPlayer(this.id);
 	for(var i = 0; i < data.players.length; i++) {
-		addNewPlayer(data.players[i]);
+		if(data.players[i] !=  this.id){
+			addNewPlayer(data.players[i]);
+		}
 	}
 	gameProperties.in_game = true;
 	// send the server our initial position and tell it we are connected
@@ -122,7 +155,7 @@ function mouseOver(node) {
 function endSwipe() {
 	if(swipePath.length > 1) {
 		console.log("emitting: ["+swipePath[0].id +", "+swipePath[1].id+"]");
-		socket.emit('input_fired', {nodes: [swipePath[0].id, swipePath[1].id]});
+		socket.emit('input_fired', {game:gameId, nodes: [swipePath[0].id, swipePath[1].id]});
 	}
 	else {
 		if(swipePath.length == 1) {
@@ -135,7 +168,10 @@ function endSwipe() {
 //Server will tell us when a new enemy player connects to the server.
 //We create a new enemy in our game.
 function onNewPlayer (data) {
-  console.log("added: " + data.id);
+	if(data.id == ClientPlayer.id){
+		return;
+	}
+  	console.log("added: " + data.id);
 	addNewPlayer(data.id);
 }
 
@@ -267,7 +303,7 @@ main.prototype = {
 	create: function () {
 		game.stage.backgroundColor = 0xE1A193;
 		console.log("client started");
-    socket.emit("client_started",{});
+    	socket.emit("client_started",{});
 
 		/*
 			sends the initial player data
@@ -279,8 +315,7 @@ main.prototype = {
 			ex. data.id -> Your player id.
 			ex. data.players[0] -> Other player ids
 		*/
-    socket.on('connected', onsocketConnected);
-
+		socket.on('connected', onsocketConnected);
 		/*
 			get initial positions of nodes.
 			data sent:
@@ -300,33 +335,8 @@ main.prototype = {
 		*/
 		socket.on('send_nodes', createNodes);
 
-		/*
-			Sends the data we will need to update the game, which is the armies and the owners.
-			data sent:
-			{
-				nodes[
-					army: Variable holding the army values.
-						count: Strength of the army.
-						player: ID of the player that owns it.
-				]
-			}
-			ex. data.nodes[0].army.count
-		*/
-		socket.on('update_nodes', updateNodes);
 
-		/*
-			Sends the id of a player which has left the game
-			data sent:
-			{
-				id: ID of the player which has left.
-			}
-			ex. data.id
-		*/
-		socket.on('remove_player', onRemovePlayer);
-
-    socket.on('newPlayer', onNewPlayer)
-
-		//when the player receives the new input
+		
 	},
 
 	update: function () {

@@ -1,21 +1,32 @@
 //import { setTimeout } from "timers";
 
 class Game{
-   constructor(){
+   constructor(room, roomid){
       this.players = [];
       this.time = 0;
+      this.room = room
       this.map = new Map(); //WHATS GONNA HAPPEN HERE
+      this.started = false;
+      this.roomid = roomid;
       this.finished =  false;
+      this.room.on('connection',function(socket){
+        socket.use('disconnect', this.onPlayerDisconnect);
+      });
    }
-
+   onInputFired(data, id){
+        if(this.map.nodes[data.nodes[0]].army && this.map.nodes[data.nodes[0]].army.count > 0 && this.map.nodes[data.nodes[0]].army.player == id){
+            this.map.moveArmy(data.nodes, id);
+        }
+   }
    incrementTroops(num){
       this.map.incrementAllTroops(num);
    }
-
    moveArmy(nodes,player){
       this.map.moveArmy(nodes,player);
    }
-
+   onPlayerDisconnect(){
+      this.removePlayer(this.id);
+   }
    removePlayer(id){
       if(!this.players.includes(id)){
          console.log("Attempting to remove player that doesn't exist.");
@@ -42,26 +53,32 @@ class Game{
       //find any army in a path that is owned by removed player
       //NOT IMPLEMENTED
    }
-
+   //return true on player succesfully added
    addPlayer(id){
       if(this.players.includes(id)){
          console.log("Attempting to add player that already exists.");
-         return;
+         return false;
       }
       //finds first node that is a castle, not owned by another player, and assigns it to the new player.
       //***need to check if castle is being attacked
-      for(var i = 0; i < this.map.nodes.length; i++){
-         if(this.map.nodes[i].buff != null && this.map.nodes[i].army.player == null){
+      var destination = -1;
+      for(var i = 0; i < this.map.castles.length; i++){
+         if(this.map.nodes[this.map.castles[i]].army.player == null){
             var destination = i;
             break;
          }
       }
+      if(destination == -1){
+          console.log("could not find a castle");
+          return false;
+      }
       this.players.push(id);
       this.map.nodes[destination].assignPlayer(id);
+      return true;
    }
-   tick(io){
+   tick(){
        this.incrementTroops(1);
-       io.local.emit('update_nodes', {nodes:this.map.nodes});
+       this.room.emit('update_nodes', {nodes:this.map.nodes});
    }
 }
 

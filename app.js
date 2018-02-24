@@ -15,21 +15,34 @@ console.log("Server started.");
 // io connection
 var io = require('socket.io')(serv,{});
 var player_list = []; // all players connected across all games.
-var games = [];// all games;
-makeNewGame();
+var gamesToRemove = [];// all games;
+var games = new Map();
 tickGames();
+
 function makeNewGame(){
-	 var game  = new gameObjects.Game()
+	 let id = "/"+generateID(20)
+	 let gameRoom = io.of(id);
+	 var game  = new gameObjects.Game(gameRoom, id);
 	 makeMap(game); //should move into objects.js
-	 games.push(game);
+	 games.set(id,game);
+	 console.log(game);
+	 return game;
 }
 function tickGames(){
-	for(var i = 0; i < games.length; i++){
-		games[i].tick(io);
-		if(games[i].finished){
-			games.splice(i,1);
+	gamesIter = games.values();
+	element = gamesIter.next();
+	while(!element.done){
+		game = element.value
+		game.tick(io);
+		if(game.finished){
+			gamesToRemove.push(game.roomid);
 		}
+		element = gamesIter.next();
 	}
+	for(var i = 0; i < gamesToRemove.length; i++){
+		games.delete(gamesToRemove[i]);
+	}
+	gamesToRemove = [];
 	setTimeout(tickGames, 500);
 }
 function makeMap(game){
@@ -70,32 +83,18 @@ function makeMap(game){
 	game.map.nodes = nodes;
 	game.map.castles = castles;
 }
-function onInputFired(data){
-	if(games[0].map.nodes[data.nodes[0]].army && games[0].map.nodes[data.nodes[0]].army.count > 0 && games[0].map.nodes[data.nodes[0]].army.player == this.id){
-		games[0].map.moveArmy(data.nodes,this.id);
-	}
-}
 
 //call when a client disconnects and tell the clients except sender to remove the disconnected player
 //TODO have client send which game player is in, so we can remove them from it.
-function onClientdisconnect() {
+function onClientdisconnect(data) {
 	console.log('disconnect');
 
 	var removePlayer = find_playerid(this.id);
-
 	if (removePlayer) {
 		player_list.splice(player_list.indexOf(removePlayer), 1);
 	}
-	removePlayer = find_playerid_in_game(this.id, games[0]);
-	if (removePlayer) {
-		games[0].removePlayer(removePlayer);
-	}
-
 	console.log("removing player " + this.id);
-
 	//send message to every connected client except the sender
-	this.broadcast.emit('remove_player', {id: this.id});
-
 }
 
 // find player by the the unique socket id
@@ -118,24 +117,52 @@ function find_playerid(id) {
 
 	return false;
 }
-
+function findGame(id){
+	gamesIter = games.values();
+	element = gamesIter.next();
+	while(!element.done){
+		game = element.value
+		if(!game.started && game.addPlayer(id)){
+			console.log("returning a game");
+			return game;
+		}
+		element = gamesIter.next();
+	}
+	//if there are no open games add the player.
+	console.log("made a new game");
+	game = makeNewGame();
+	game.addPlayer(id);
+	return game;
+}
 function onNewClient(){
-   this.broadcast.emit('newPlayer',{id:this.id});
-   this.emit('connected',{id:this.id, players:games[0].players});
-   player_list.push(this.id);
-   games[0].addPlayer(this.id);
-   this.emit('send_nodes', {nodes:games[0].map.nodes, castles:games[0].map.castles});
-   //This is janky as fuck, just have it to prove a concept, needs to be cleanly reworked.
-   this.broadcast.emit('update_nodes', {nodes:games[0].map.nodes});
+	game = findGame(this.id)
+	this.join(game.roomid)
+   	io.of(game.roomid).emit('newPlayer',{id:this.id});
+   	this.emit('connected',{id:this.id, players:game.players, game:game.roomid});//send the players id, the players, and the room id
+   	player_list.push(this.id);
+   	this.emit('send_nodes', {nodes:game.map.nodes, castles:game.map.castles});
+	io.of(game.roomid).emit('update_nodes', {nodes:game.map.nodes});
+	   
 
 }
+function generateID(length) {
+    let text = ""
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 
+    for(let i = 0; i < length; i++)  {
+        text += possible.charAt(Math.floor(Math.random() * possible.length))
+    }
 
+    return text
+}
+function onInputFired(data){
+	games.get(data.game).onInputFired(data, this.id);
+}
 io.sockets.on('connection', function(socket){
 	console.log("socket connected");
-  socket.on("client_started", onNewClient);
+  	socket.on("client_started", onNewClient);
 	// listen for disconnection;
+	socket.on('input_fired', onInputFired);
 	socket.on('disconnect', onClientdisconnect);
 	//listen for new player inputs.
-	socket.on("input_fired", onInputFired);
 });
