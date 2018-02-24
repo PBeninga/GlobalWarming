@@ -17,12 +17,14 @@ class MapNode {
   update() {
   }
 
+  // Adds a path from this node to the endNode, and displays it.
   addPath(endNode) {
     let newPath = new Path(this, endNode);
     newPath.display();
     this.paths.push(newPath);
   }
 
+  // Checks for a path between this node and the node parameter
   pathTo(node) {
     for(var i = 0; i < this.paths.length; i++) {
       if(this.paths[i].end.id == node.id) {

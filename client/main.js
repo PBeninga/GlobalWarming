@@ -6,20 +6,15 @@ var players = [];
 var ClientPlayer = null;
 var DummyPlayer = new Player(-1, 0x000000);
 players.push(DummyPlayer);
+
 var nodes = [];
-var armies = [];
 var swipePath = [];
 var lines = [];
+
 var colors = [0xFF0000,	0xFF9F00, 0xF8FF00, 0x7AFF00, 0x00FFFF,
 							0x0000FF, 0x8900FF, 0xFF00F6, 0x097B00, 0x980842];
 var colorTaken = [false, false, false, false, false,
 									false, false, false, false, false];
-var gameProperties = {
-	gameWidth: 4000,
-	gameHeight: 4000,
-	game_element: "gameDiv",
-	in_game: false,
-};
 
 var main = function(game){
 };
@@ -31,7 +26,6 @@ function onsocketConnected (data) {
 	for(var i = 0; i < data.players.length; i++) {
 		addNewPlayer(data.players[i]);
 	}
-	gameProperties.in_game = true;
 	// send the server our initial position and tell it we are connected
 }
 
@@ -43,6 +37,7 @@ function onRemovePlayer (data) {
 	}
 }
 
+// Removes the player from the players list and opens their color up for reassignment
 function removePlayer(id) {
 	if(!id) {
 		return false;
@@ -95,7 +90,7 @@ function getColor() {
 
 // Called when a user clicks on a node.
 function swipe() {
-	// If the node has no owner or if the node isn't owned by this client, do nothing.
+	// If the army isn't owned by this client, do nothing.
 	if(this.army.owner.id != ClientPlayer.id) {
 		console.log("That's not your army! Army at " + this.army.node.id + " is owned by " + this.army.owner.id);
 	}
@@ -115,7 +110,6 @@ function mouseOver(node) {
 			swipePath.push(node);
 			lines[lines.length-1].end = new Phaser.Point(node.x, node.y);
 			lines.push(new Phaser.Line(node.x, node.y, game.input.mousePointer.x, game.input.mousePointer.y));
-			console.log("Added node " + node.id);
 		}
 		else {
 		}
@@ -123,7 +117,7 @@ function mouseOver(node) {
 }
 
 // Ends the current swipe. Is called when the mouse button is released.
-// Emits and 'input_fired' if the swipe has two or more nodes in it, otherwise it discards the swipe.
+// Emits an 'input_fired' if the swipe has two or more nodes in it, otherwise it discards the swipe.
 function endSwipe() {
 	if(swipePath.length > 1) {
 		console.log("emitting: ["+swipePath[0].id +", "+swipePath[1].id+"]");
@@ -138,8 +132,8 @@ function endSwipe() {
 	swipePath = [];
 }
 
-//Server will tell us when a new enemy player connects to the server.
-//We create a new enemy in our game.
+// Server will tell us when a new enemy player connects to the server.
+// We create a new enemy in our game.
 function onNewPlayer (data) {
   console.log("added: " + data.id);
 	addNewPlayer(data.id);
@@ -197,6 +191,7 @@ function createNodes(data) {
 			if(currentArmy.player == players[j].id) {
 				included = true;
 				player = players[j];
+				break;
 			}
 		}
 		// If no such player exists, it creates the player and pushes it to the list.
@@ -289,6 +284,24 @@ main.prototype = {
 			}
 			ex. data.nodes[0].x
 					data.nodes[data.castles[0]].army.player
+
+			CHANGE TO
+			{
+				nodes[
+					x: xcoord
+					y: ycoord
+					adj[]: list of node ids that can be accessed by this node
+				]
+				players[
+					id: Player ID
+					armies[
+						count: Strength of the army
+						location: Where the army is located (currently x, y)
+					]
+				]
+			}
+			ex. data.nodes[0].adj[0]
+					data.players[0].armies[0].location.x
 		*/
 		socket.on('send_nodes', createNodes);
 
@@ -303,6 +316,18 @@ main.prototype = {
 				]
 			}
 			ex. data.nodes[0].army.count
+
+			CHANGE TO:
+			{
+				players[
+					id: Player ID
+					armies[
+						count: Strength of the army
+						location:	Where the army is located (currently x, y)
+					]
+				]
+			}
+			ex. data.players.armies[0].location.x
 		*/
 		socket.on('update_nodes', updateNodes);
 

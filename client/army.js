@@ -10,6 +10,7 @@ function merge(army1, army2) {
 }
 
 class Army {
+  // TODO: Eventually replace Node with a Location object
   constructor(count, owner, node) {
     this.count = count;
     this.owner = owner;
@@ -38,6 +39,7 @@ class Army {
     this.countGraphics.anchor.setTo(0.5, 0.5);
   }
 
+  // Destroys all graphics associated with this object
   destroyGraphics() {
     if(this.graphics != null) {
       this.graphics.destroy();
