@@ -60,7 +60,7 @@ function removePlayer(id) {
 // Adds a new player to the player list with the given id. Also gets a color from getColor.
 function addNewPlayer(id) {
 	if(id == null) {
-		return;
+		return DummyPlayer;
 	}
 	player = new Player(id, getColor());
 	players.push(player);
@@ -94,14 +94,15 @@ function getColor() {
 }
 
 // Called when a user clicks on a node.
-function swipe(node) {
+function swipe() {
 	// If the node has no owner or if the node isn't owned by this client, do nothing.
-	if(node.owner == null || node.owner.id != ClientPlayer.id) {
-		console.log("That's not your node!");
+	if(this.army.owner.id != ClientPlayer.id) {
+		console.log("That's not your army! Army at " + this.army.node.id + " is owned by " + this.army.owner.id);
 	}
 	else {
-		swipePath.push(node);
-		lines.push(new Phaser.Line(node.x, node.y, game.input.mousePointer.x, game.input.mousePointer.y));
+		console.log("Army at " + this.army.node.id + " is owned by " + this.army.owner.id);
+		swipePath.push(this.army.node);
+		lines.push(new Phaser.Line(this.army.node.x, this.army.node.y, game.input.mousePointer.x, game.input.mousePointer.y));
 	}
 }
 
@@ -172,23 +173,16 @@ function createNodes(data) {
 		// Creates a node from the data given and sets the callbacks for the node.
 		node_data = data.nodes[i];
 		let newNode = new MapNode(i, node_data.x, node_data.y);
-
 		newNode.graphics.inputEnabled = true;
-		newNode.graphics.events.onInputDown.add(function(){swipe(newNode)});
 		newNode.graphics.events.onInputOver.add(function(){mouseOver(newNode)});
-		newNode.graphics.events.onInputUp.add(function(){endSwipe()});
-
 		// Pushes the node into the node buffer and displays it.
 		nodes.push(newNode);
-		newNode.display(game);
 	}
 
 	// Adds all the paths from adjacency lists
 	for(var i = 0; i < nodes.length; i++) {
 		for(var j = 0; j < data.nodes[i].adj.length; j++) {
-			let newPath = new Path(nodes[i], findnodebyid(data.nodes[i].adj[j]));
-			newPath.display(game);
-			nodes[i].addPath(newPath);
+			nodes[i].addPath(findnodebyid(data.nodes[i].adj[j]));
 		}
 	}
 
@@ -211,39 +205,31 @@ function createNodes(data) {
 		}
 
 		// Updates the army counts and the new owners of the castles.
-		console.log("Looking for player id: " + currentArmy.player + " from army " + currentArmy);
-		nodes[castlePosition].updateArmy(new Army(currentArmy.count, findplayerbyid(currentArmy.player), nodes[castlePosition]));
-		nodes[castlePosition].owner = player;
+		var newArmy = player.addArmy(currentArmy.count, nodes[castlePosition]);
+		newArmy.graphics.events.onInputDown.add(swipe, {army: newArmy});
 	}
 }
 
 function updateNodes(data){
 	var sentNodes = data.nodes;
-	for(var i = 0; i < nodes.length; i++){
+	for(var i = 0; i < sentNodes.length; i++){
 		// If the sent node has an army, update it.
 		if(sentNodes[i].army){
 			var currentArmy = sentNodes[i].army;
 			// If our nodes didn't hold an army, initialize that node's army
-			if(!nodes[i].army){
-				nodes[i].army = new Army(0,0,nodes[i]);
+			playerOwner = findplayerbyid(currentArmy.player);
+			if(playerOwner.getArmyId(nodes[i].x, nodes[i].y) == -1) {
+				var newArmy = playerOwner.addArmy(0, nodes[i]);
+				newArmy.graphics.events.onInputDown.add(swipe, {army: newArmy});
 			}
 			// Update our clients army variables
-			nodes[i].army.count = currentArmy.count;
-			nodes[i].army.owner = findplayerbyid(currentArmy.player);
-			nodes[i].army.color = nodes[i].army.owner.color;
-			nodes[i].owner = findplayerbyid(currentArmy.player);
+			playerOwner.updateArmy(currentArmy.count, nodes[i]);
 		}
-		// If the sent node doesn't have an army, destroy any army in the client node
-		else {
-			if(nodes[i].army) {
-				nodes[i].army.destroyGraphics();
-			}
-			nodes[i].army = null;
-			nodes[i].owner = null;
-		}
-		// Update the node and army with the new values passed to it.
-		nodes[i].update();
-		nodes[i].army ? nodes[i].army.update() : null;
+	}
+	for(var j = 0; j < players.length; j++) {
+		players[j].removeArmies();
+		players[j].clearUpdated();
+		players[j].updateArmies();
 	}
 }
 
@@ -271,6 +257,7 @@ main.prototype = {
 
 	create: function () {
 		game.stage.backgroundColor = 0xE1A193;
+		game.input.onUp.add(endSwipe);
 		console.log("client started");
     socket.emit("client_started",{});
 
