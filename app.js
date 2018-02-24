@@ -12,15 +12,26 @@ app.use('/client',express.static(__dirname + '/client'));
 
 serv.listen(process.env.PORT || 2000);
 console.log("Server started.");
+// io connection
+var io = require('socket.io')(serv,{});
 var player_list = []; // all players connected across all games.
 var games = [];// all games;
 makeNewGame();
+tickGames();
 function makeNewGame(){
 	 var game  = new gameObjects.Game()
 	 makeMap(game); //should move into objects.js
 	 games.push(game);
 }
-
+function tickGames(){
+	for(var i = 0; i < games.length; i++){
+		games[i].tick(io);
+		if(games[i].finished){
+			games.splice(i,1);
+		}
+	}
+	setTimeout(tickGames, 500);
+}
 function makeMap(game){
 	var nodes = [];
 	var high = 5;
@@ -31,17 +42,21 @@ function makeMap(game){
 			let x =  i*100;
 			let y =  j*100;
 			var adj = [];
+			// If the node isn't on the left layer, push the node on the left.
 			if(i != 1){
-				adj.push(count-1);
-			}
-			if(j != 1){
 				adj.push(count-5);
 			}
-			if(i < high){
-				adj.push(count+1);
+			// If the node isn't on the top layer, push the node on top.
+			if(j != 1){
+				adj.push(count-1);
 			}
-			if(j < high){
+			// If the node isn't on the right layer, push the node on the right.
+			if(i < high){
 				adj.push(count+5);
+			}
+			// If the node isn't on the bottom layer, push the node on bottom.
+			if(j < high){
+				adj.push(count+1);
 			}
 			if(x != 100){
 				nodes[count] = new gameObjects.MapNode(x,y,adj);
@@ -55,7 +70,11 @@ function makeMap(game){
 	game.map.nodes = nodes;
 	game.map.castles = castles;
 }
-function onInputFired(){}
+function onInputFired(data){
+	if(games[0].map.nodes[data.nodes[0]].army && games[0].map.nodes[data.nodes[0]].army.count > 0 && games[0].map.nodes[data.nodes[0]].army.player == this.id){
+		games[0].map.moveArmy(data.nodes,this.id);
+	}
+}
 
 //call when a client disconnects and tell the clients except sender to remove the disconnected player
 //TODO have client send which game player is in, so we can remove them from it.
@@ -81,10 +100,7 @@ function onClientdisconnect() {
 
 // find player by the the unique socket id
 function find_playerid_in_game(id, game){
-
-
 	for (var i = 0; i < game.players.length; i++) {
-
 		if (game.players[i] == id) {
 			return game.players[i];
 		}
@@ -92,10 +108,9 @@ function find_playerid_in_game(id, game){
 
 	return false;
 }
+
 function find_playerid(id) {
-
 	for (var i = 0; i < player_list.length; i++) {
-
 		if (player_list[i] == id) {
 			return player_list[i];
 		}
@@ -103,36 +118,22 @@ function find_playerid(id) {
 
 	return false;
 }
-function getStartingCastleToAssign(game, id){//should be in objects.js
-	for(var i = 0; i < game.map.castles.length; i++){
-		console.log(game.map.nodes[game.map.castles[i]].army.player);
-		if(game.map.nodes[game.map.castles[i]].army.player == null){
-			game.map.nodes[game.map.castles[i]].assignPlayer(id);
-			console.log("assigning: "+ game.map.castles[i] + "To " + id);
-			game.map.castlesChanged = [];
-			game.map.castlesChanged.push(game.map.castles[i]);
-			return;
-		}
-	}
-}
 
 function onNewClient(){
    this.broadcast.emit('newPlayer',{id:this.id});
    this.emit('connected',{id:this.id, players:games[0].players});
    player_list.push(this.id);
-   games[0].players.push(this.id);
-   getStartingCastleToAssign(games[0], this.id);
+   games[0].addPlayer(this.id);
    this.emit('send_nodes', {nodes:games[0].map.nodes, castles:games[0].map.castles});
    //This is janky as fuck, just have it to prove a concept, needs to be cleanly reworked.
-   this.broadcast.emit('update_nodes',{nodes:games[0].map.castlesChanged, change: games[0].map.nodes[games[0].map.castlesChanged[0]]});
+   this.broadcast.emit('update_nodes', {nodes:games[0].map.nodes});
 
 }
-// io connection
-var io = require('socket.io')(serv,{});
+
 
 io.sockets.on('connection', function(socket){
 	console.log("socket connected");
-   	socket.on("client_started", onNewClient);
+  socket.on("client_started", onNewClient);
 	// listen for disconnection;
 	socket.on('disconnect', onClientdisconnect);
 	//listen for new player inputs.

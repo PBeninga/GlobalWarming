@@ -4,13 +4,11 @@ var mainmenu = {
     game.stage.backgroundColor = 0xADD8E6;
 
     var background = game.add.graphics();
-    // colour
-    background.beginFill(0x0000FF);
+    // colour and opacity
+    background.beginFill(0x0000FF, 0.1);
     // size
     backWidth = 500;
     backHeight = 200;
-    // opacity
-    background.alpha = 0.1;
     // centering
     background.drawRect((canvas_width/2)-(backWidth/2), (canvas_height/2)-(backHeight/2), backWidth, backHeight);
 

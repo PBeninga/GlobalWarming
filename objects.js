@@ -1,8 +1,11 @@
+//import { setTimeout } from "timers";
+
 class Game{
    constructor(){
       this.players = [];
       this.time = 0;
       this.map = new Map(); //WHATS GONNA HAPPEN HERE
+      this.finished =  false;
    }
 
    incrementTroops(num){
@@ -27,7 +30,11 @@ class Game{
          }
       }
       for(var i = 0; i < toRemove.length; i++){
-         this.map.nodes[toRemove[i]].army = new Army(null,50); // set to neutral castle
+         if(this.map.nodes[toRemove[i]] instanceof Castle){
+            this.map.nodes[toRemove[i]].army = new Army(null,50);
+         }else{
+             this.map.nodes[toRemove[i]].army = null;
+         } // set to neutral castle
       }
 
       this.players.splice(this.players.indexOf(id),1);
@@ -51,6 +58,10 @@ class Game{
       }
       this.players.push(id);
       this.map.nodes[destination].assignPlayer(id);
+   }
+   tick(io){
+       this.incrementTroops(1);
+       io.local.emit('update_nodes', {nodes:this.map.nodes});
    }
 }
 
@@ -187,7 +198,7 @@ console.log(game.map.nodes[1]);
 */
 
 /*
-NOT IMPLEMENTED 
+NOT IMPLEMENTED
 class Path{
    constructor(nodeA,nodeB){
       this.nodes = [];
