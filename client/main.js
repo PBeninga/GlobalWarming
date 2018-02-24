@@ -10,6 +10,7 @@ var nodes = [];
 var armies = [];
 var swipePath = [];
 var gameId;
+var lines = [];
 var colors = [0xFF0000,	0xFF9F00, 0xF8FF00, 0x7AFF00, 0x00FFFF,
 							0x0000FF, 0x8900FF, 0xFF00F6, 0x097B00, 0x980842];
 var colorTaken = [false, false, false, false, false,
@@ -133,6 +134,7 @@ function swipe(node) {
 	}
 	else {
 		swipePath.push(node);
+		lines.push(new Phaser.Line(node.x, node.y, game.input.mousePointer.x, game.input.mousePointer.y));
 	}
 }
 
@@ -143,6 +145,8 @@ function mouseOver(node) {
 	if(swipePath.length != 0) {
 		if(swipePath[swipePath.length-1].pathTo(node)) {
 			swipePath.push(node);
+			lines[lines.length-1].end = new Phaser.Point(node.x, node.y);
+			lines.push(new Phaser.Line(node.x, node.y, game.input.mousePointer.x, game.input.mousePointer.y));
 			console.log("Added node " + node.id);
 		}
 		else {
@@ -162,6 +166,7 @@ function endSwipe() {
 			console.log("swipe failed");
 		}
 	}
+	lines = [];
 	swipePath = [];
 }
 
@@ -341,5 +346,14 @@ main.prototype = {
 
 	update: function () {
 		// emit the player input
+	},
+
+	render: function () {
+		if(lines.length > 0) {
+			lines[lines.length-1].end = new Phaser.Point(game.input.mousePointer.x, game.input.mousePointer.y);
+			for(var i = 0; i < lines.length; i++) {
+				game.debug.geom(lines[i], 0x000000);
+			}
+		}
 	}
 };
