@@ -26,7 +26,6 @@ function makeNewGame(){
 	 var game  = new gameObjects.Game(gameRoom, id);
 	 makeMap(game); //should move into objects.js
 	 games.set(id,game);
-	 console.log(game);
 	 return game;
 }
 function tickGames(){
@@ -41,6 +40,7 @@ function tickGames(){
 		element = gamesIter.next();
 	}
 	for(var i = 0; i < gamesToRemove.length; i++){
+		games.get(gamesToRemove[i]).endGame();
 		games.delete(gamesToRemove[i]);
 	}
 	gamesToRemove = [];
@@ -94,7 +94,7 @@ function onClientdisconnect(data) {
 	if (removePlayer) {
 		player_list.splice(player_list.indexOf(removePlayer), 1);
 	}
-	if(games.has(this.id)){
+	if(playersToGames.has(this.id)){
 		playersToGames.get(this.id).removePlayer(this.id);
 	}
 	console.log("removing player " + this.id);
@@ -133,7 +133,6 @@ function findGame(id){
 		element = gamesIter.next();
 	}
 	//if there are no open games add the player.
-	console.log("made a new game");
 	game = makeNewGame();
 	game.addPlayer(id);
 	return game;
@@ -141,8 +140,8 @@ function findGame(id){
 function onNewClient(){
 	game = findGame(this.id)
 	this.join(game.roomid)
-   	io.of(game.roomid).emit('newPlayer',{id:this.id});
-   	this.emit('connected',{id:this.id, players:game.players, game:game.roomid});//send the players id, the players, and the room id
+   	io.of(game.roomid).emit('newPlayer',{id:this.id, starting:game.starting});
+   	this.emit('connected',{id:this.id, players:game.players, game:game.roomid, timeTillStart:game.timeTillStart, starting:game.starting});//send the players id, the players, and the room id
 	player_list.push(this.id);
 	playersToGames.set(this.id, game);   
    	this.emit('send_nodes', {nodes:game.map.nodes, castles:game.map.castles});
