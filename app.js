@@ -18,6 +18,7 @@ var playersToGames = new Map();
 var player_list = []; // all players connected across all games.
 var gamesToRemove = [];// all games;
 var games = new Map();
+let tickLength = 250;
 tickGames();
 
 function makeNewGame(){
@@ -29,6 +30,7 @@ function makeNewGame(){
 	 return game;
 }
 function tickGames(){
+	thisTick = new Date().getTime();
 	gamesIter = games.values();
 	element = gamesIter.next();
 	while(!element.done){
@@ -44,7 +46,11 @@ function tickGames(){
 		games.delete(gamesToRemove[i]);
 	}
 	gamesToRemove = [];
-	setTimeout(tickGames, 500);
+	tickTime =  tickLength - (new Date().getTime() - thisTick);
+	if(tickTime < 0){
+		tickTime = 0;
+	}
+	setTimeout(tickGames, tickTime);
 }
 function makeMap(game){
 	var nodes = [];
