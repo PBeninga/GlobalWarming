@@ -15,7 +15,8 @@
   "dependencies": {
     "express": "^4.16.2",
     "p2": "^0.7.1",
-    "socket.io": "^2.0.4"
+    "socket.io": "^2.0.4",
+    "mongoose": "^5.0.7"
   },
   "bugs": {
     "url": "https://github.com/PBeninga/GlobalWarming/issues"
