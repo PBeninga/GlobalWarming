@@ -10,7 +10,7 @@ class Game{
       this.roomid = roomid;
       this.finished =  false;
       this.room.on('connection',function(socket){
-        socket.use('disconnect', this.onPlayerDisconnect);
+
       });
    }
    onInputFired(data, id){
@@ -74,12 +74,33 @@ class Game{
       }
       this.players.push(id);
       this.map.nodes[destination].assignPlayer(id);
+      if(this.players.length > 1){
+          console.log("should be starting");
+          let game = this;
+          setTimeout(function(){
+              game.started = true;
+          }, 10*1000);
+      }
       return true;
    }
    tick(){
-       this.incrementTroops(1);
-       this.room.emit('update_nodes', {nodes:this.map.nodes});
-   }
+        this.room.emit('update_nodes', {nodes:this.map.nodes});
+        if(this.started){
+            this.incrementTroops(1);
+            var playersInGame = [];
+            for(var i = 0; i < this.map.nodes.length; i++){
+                if(this.map.nodes[i].army){
+                    if(playersInGame.indexOf(this.map.nodes[i].army.player) == -1){
+                        playersInGame.push(this.map.nodes[i].army.player);
+                    }
+                }
+            }
+            if(playersInGame.length <= 1 && game.started){
+                console.log(playersInGame);
+                game.finished = true;
+            }      
+        }
+    }
 }
 
 class Map{
