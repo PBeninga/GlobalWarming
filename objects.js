@@ -7,14 +7,15 @@ class Game{
       this.room = room
       this.map = new Map(); //WHATS GONNA HAPPEN HERE
       this.started = false;
+      this.starting = false;
       this.roomid = roomid;
       this.finished =  false;
-      this.room.on('connection',function(socket){
-
-      });
+      this.winner = null;
+      this.timeTillStart = 10000;
+      this.timeGameBeganStarting = null;
    }
    onInputFired(data, id){
-        if(this.map.nodes[data.nodes[0]].army && this.map.nodes[data.nodes[0]].army.count > 0 && this.map.nodes[data.nodes[0]].army.player == id){
+        if(this.map.nodes[data.nodes[0]].army && this.map.nodes[data.nodes[0]].army.count > 0 && this.map.nodes[data.nodes[0]].army.player == id && this.started){
             this.map.moveArmy(data.nodes, id);
         }
    }
@@ -32,7 +33,7 @@ class Game{
          console.log("Attempting to remove player that doesn't exist.");
          return;
       }
-
+      console.log("removing player: "+id+" from game"+this.roomid);
       //find any army in a mapnode that is owned by removed player
       var toRemove = [];
       for(var i = 0; i < this.map.nodes.length; i++){
@@ -41,7 +42,7 @@ class Game{
          }
       }
       for(var i = 0; i < toRemove.length; i++){
-         if(this.map.nodes[toRemove[i]] instanceof Castle){
+         if(this.map.castles.indexOf(toRemove[i]) != -1){
             this.map.nodes[toRemove[i]].army = new Army(null,50);
          }else{
              this.map.nodes[toRemove[i]].army = null;
@@ -74,31 +75,43 @@ class Game{
       }
       this.players.push(id);
       this.map.nodes[destination].assignPlayer(id);
-      if(this.players.length > 1){
-          console.log("should be starting");
-          let game = this;
-          setTimeout(function(){
-              game.started = true;
-          }, 10*1000);
-      }
+     
       return true;
+   }
+   endGame(){
+       this.room.emit("endGame",{winner:this.winner});
    }
    tick(){
         this.room.emit('update_nodes', {nodes:this.map.nodes});
+        if(this.players.length > 1 && !this.starting && !this.started){
+            this.starting = true;
+            console.log("should be starting");
+            let game = this;
+            this.timeGameBeganStarting = new Date().getTime();
+            setTimeout(function(){
+                game.started = true;
+                game.room.emit('startGame');
+            }, 10*1000);
+        }
         if(this.started){
             this.incrementTroops(1);
             var playersInGame = [];
             for(var i = 0; i < this.map.nodes.length; i++){
                 if(this.map.nodes[i].army){
-                    if(playersInGame.indexOf(this.map.nodes[i].army.player) == -1){
+                    if(playersInGame.indexOf(this.map.nodes[i].army.player) == -1 && this.map.nodes[i].army.player != null){
                         playersInGame.push(this.map.nodes[i].army.player);
                     }
                 }
             }
             if(playersInGame.length <= 1 && game.started){
-                console.log(playersInGame);
+                if(playersInGame.length == 1){
+                    this.winner = playersInGame[0];
+                }
                 game.finished = true;
             }      
+        }else if(this.starting){
+            this.timeTillStart = 10000 - (new Date().getTime() - this.timeGameBeganStarting);
+            this.room.emit('updateTime',{time:this.timeTillStart});
         }
     }
 }

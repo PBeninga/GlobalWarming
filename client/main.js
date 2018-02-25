@@ -16,13 +16,13 @@ var colors = [0xFF0000,	0xFF9F00, 0xF8FF00, 0x7AFF00, 0x00FFFF,
 							0x0000FF, 0x8900FF, 0xFF00F6, 0x097B00, 0x980842];
 var colorTaken = [false, false, false, false, false,
 									false, false, false, false, false];
+var bannerGFX;
 
 var main = function(game){
 };
-
 function onsocketConnected (data) {
 	console.log("connected to server");
- 	console.log(this.id + " " + data.id);
+	console.log(this.id + " " + data.id);
 	gameId = data.game
 	console.log(gameId);
 	gameSocket = io(gameId);
@@ -49,8 +49,26 @@ function onsocketConnected (data) {
 			ex. data.id
 		*/
 		gameSocket.on('remove_player', onRemovePlayer);
-
-   		gameSocket.on('newPlayer', onNewPlayer)
+		/* data  = 
+		{
+			winner: the id of the winner of the game
+		}
+		*/
+		gameSocket.on('endGame',endGame);
+		/*
+		data = 
+		{
+			id: new player id
+		}
+		*/
+		   gameSocket.on('newPlayer', onNewPlayer);
+		   /*data = 
+		   {
+			time: time left untill game starts
+		   }
+		   */
+		   gameSocket.on('updateTime', onUpdateTime);
+		   gameSocket.on('startGame',onStart);
 
 		//when the player receives the new input
 	ClientPlayer = addNewPlayer(this.id);
@@ -61,7 +79,50 @@ function onsocketConnected (data) {
 	}
 	// send the server our initial position and tell it we are connected
 }
+function onStart(){
+		bannerGFX.destroy();
+		bannerGFX= game.add.text(500,0, "Fight!",{
+			font: "70px Arial",
+			fill: "#FFFFFF",
+			align: "center"
+		  });
+		setTimeout(function(){bannerGFX.destroy();}, 5000);
+}
+function onUpdateTime(data){
+		if(bannerGFX){
+			bannerGFX.destroy();
+		}
+		let text = "Game starting in: " + data.time/1000;	
+		bannerGFX = game.add.text(100,0, text,{
+			font: "70px Arial",
+			fill: "#FFFFFF",
+			align: "center"
+		  });
+}
 
+function endGame(data){
+	if(ClientPlayer.id == data.winner){
+		displayWin();
+	}else{
+		displayLoss();
+	}
+}
+function displayLoss(){
+	bannerGFX.destroy();
+	bannerGFX = game.add.text(500,0, "You Suck!",{
+		font: "70px Arial",
+		fill: "#FFFFFF",
+		align: "center"
+	  });
+}
+function displayWin(){
+	bannerGFX.destroy();
+	bannerGFX= game.add.text(500,0, "Winner!",{
+		font: "70px Arial",
+		fill: "#FFFFFF",
+		align: "center"
+	  });
+}
 // When the server notifies us of client disconnection, we find the disconnected
 // enemy and remove from our game
 function onRemovePlayer (data) {
