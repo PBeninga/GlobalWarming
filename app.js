@@ -56,7 +56,7 @@ function makeMap(game){
 	var nodes = [];
 	var high = 5;
 	var count = 0;
-	var castles = [];
+	var castles = [0,4,24,20,10,14,12,2,22,18,6];
 	for(var i = 1; i <= high; i++){
 		for(var j = 1; j <= high; j++){
 			let x =  i*100;
@@ -78,15 +78,15 @@ function makeMap(game){
 			if(j < high){
 				adj.push(count+1);
 			}
-			if(x != 100){
+			if(castles.indexOf(count) == -1){
 				nodes[count] = new gameObjects.MapNode(x,y,adj);
 			}else{
-				castles.push(count);
 				nodes[count] = new gameObjects.Castle(x,y,adj);
 			}
 			count++;
 		}
 	}
+	game.map.startingCastles = [0,24,4,20];
 	game.map.nodes = nodes;
 	game.map.castles = castles;
 }
@@ -166,7 +166,9 @@ function generateID(length) {
     return text
 }
 function onInputFired(data){
-	games.get(data.game).onInputFired(data, this.id);
+	if(games.has(data.game)){
+		games.get(data.game).onInputFired(data, this.id);
+	}
 }
 io.sockets.on('connection', function(socket){
 	console.log("socket connected");

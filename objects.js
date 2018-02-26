@@ -11,7 +11,9 @@ class Game{
       this.roomid = roomid;
       this.finished =  false;
       this.winner = null;
+      this.maxPlayers = 4;
       this.timeTillStart = 10000;
+      this.startingCastles = [];
       this.timeGameBeganStarting = null;
    }
    onInputFired(data, id){
@@ -63,16 +65,17 @@ class Game{
       //finds first node that is a castle, not owned by another player, and assigns it to the new player.
       //***need to check if castle is being attacked
       var destination = -1;
-      for(var i = 0; i < this.map.castles.length; i++){
-         if(this.map.nodes[this.map.castles[i]].army.player == null){
-            var destination = i;
+      for(var i = 0; i < this.map.startingCastles.length; i++){
+         if(this.map.nodes[this.map.startingCastles[i]].army.player == null){
+            var destination = this.map.startingCastles[i];
             break;
          }
       }
-      if(destination == -1){
+      if(destination == -1 || this.players.length == this.maxPlayers){
           console.log("could not find a castle");
           return false;
       }
+      console.log(destination)
       this.players.push(id);
       this.map.nodes[destination].assignPlayer(id);
      
