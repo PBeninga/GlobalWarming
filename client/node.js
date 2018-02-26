@@ -4,7 +4,7 @@ class MapNode {
     this.x = x;
     this.y = y;
     this.paths = [];
-
+    this.owned = false;
     this.graphics = game.add.sprite(node_data.x, node_data.y, 'node_img');
     this.graphics.anchor.setTo(0.5,0.5);
     this.graphics.height = 50;

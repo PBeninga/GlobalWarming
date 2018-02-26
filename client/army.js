@@ -19,7 +19,6 @@ class Army {
     this.node = node;
     this.x = node.x;
     this.y = node.y;
-
     this.graphics = game.add.graphics(this.x, this.y);
     this.graphics.beginFill(this.color, 0.5);
     this.graphics.drawCircle(0, 0, 25);
@@ -51,8 +50,13 @@ class Army {
 
   update() {
     this.countGraphics.destroy();
+    var font  = "14px Arial";
+    console.log(ClientPlayer.id + " "+ this.owner.id);
+    if(ClientPlayer.id == this.owner.id){
+      font  = "20px Arial";
+    }
     this.countGraphics = game.add.text(this.x, this.y, this.count, {
-      font: "14px Arial",
+      font: font,
       fill: this.color,
       align: "center"
     });

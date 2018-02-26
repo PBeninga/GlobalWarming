@@ -151,7 +151,13 @@ function addNewPlayer(id) {
 	if(id == null) {
 		return DummyPlayer;
 	}
-	player = new Player(id, getColor());
+	var color;
+	if(id == socket.id){
+		color =  0x00B2EE;
+	}else{
+		color = getColor();
+	}
+	player = new Player(id, color);
 	players.push(player);
 	return player;
 }
@@ -317,6 +323,7 @@ function updateNodes(data){
 			// Update our clients army variables
 			playerOwner.updateArmy(currentArmy.count, nodes[i]);
 		}
+
 	}
 	for(var j = 0; j < players.length; j++) {
 		players[j].removeArmies();
@@ -348,7 +355,7 @@ function printCreateNodeData(data) {
 main.prototype = {
 
 	create: function () {
-		game.stage.backgroundColor = 0xE1A193;
+		game.stage.backgroundColor = 0x000000;
 		game.input.onUp.add(endSwipe);
 		console.log("client started");
     	socket.emit("client_started",{});
