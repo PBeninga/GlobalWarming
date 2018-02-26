@@ -166,7 +166,7 @@ function generateID(length) {
     return text
 }
 function onInputFired(data){
-	if(games.has(data.game){
+	if(games.has(data.game)){
 		games.get(data.game).onInputFired(data, this.id);
 	}
 }
