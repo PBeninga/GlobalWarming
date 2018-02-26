@@ -166,7 +166,9 @@ function generateID(length) {
     return text
 }
 function onInputFired(data){
-	games.get(data.game).onInputFired(data, this.id);
+	if(games.has(data.game){
+		games.get(data.game).onInputFired(data, this.id);
+	}
 }
 io.sockets.on('connection', function(socket){
 	console.log("socket connected");
