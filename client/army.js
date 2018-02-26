@@ -21,7 +21,7 @@ class Army {
     this.y = node.y;
     this.graphics = game.add.graphics(this.x, this.y);
     this.graphics.beginFill(this.color, 0.5);
-    this.graphics.drawCircle(0, 0, 25);
+    this.graphics.drawCircle(0, 0, 45);
     this.graphics.anchor.setTo(0.5,0.5);
     this.graphics.endFill();
     this.graphics.inputEnabled = true;

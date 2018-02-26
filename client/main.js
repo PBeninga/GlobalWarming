@@ -12,10 +12,10 @@ var swipePath = [];
 var gameId;
 var lines = [];
 
-var colors = [0xFF0000,	0xFF9F00, 0xF8FF00, 0x7AFF00, 0x00FFFF,
-							0x0000FF, 0x8900FF, 0xFF00F6, 0x097B00, 0x980842];
+var colors = [0xFF0000,	0xFF9F00, 0xF8FF00, 0x7AFF00,0x0000FF,
+										 0x8900FF, 0xFF00F6, 0x097B00, 0x980842];
 var colorTaken = [false, false, false, false, false,
-									false, false, false, false, false];
+									false, false, false, false];
 var bannerGFX;
 
 var main = function(game){
