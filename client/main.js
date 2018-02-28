@@ -49,20 +49,20 @@ function onsocketConnected (data) {
 			ex. data.id
 		*/
 		gameSocket.on('remove_player', onRemovePlayer);
-		/* data  = 
+		/* data  =
 		{
 			winner: the id of the winner of the game
 		}
 		*/
 		gameSocket.on('endGame',endGame);
 		/*
-		data = 
+		data =
 		{
 			id: new player id
 		}
 		*/
 		   gameSocket.on('newPlayer', onNewPlayer);
-		   /*data = 
+		   /*data =
 		   {
 			time: time left untill game starts
 		   }
@@ -92,7 +92,7 @@ function onUpdateTime(data){
 		if(bannerGFX){
 			bannerGFX.destroy();
 		}
-		let text = "Game starting in: " + data.time/1000;	
+		let text = "Game starting in: " + data.time/1000;
 		bannerGFX = game.add.text(100,0, text,{
 			font: "70px Arial",
 			fill: "#FFFFFF",
@@ -203,13 +203,13 @@ function swipe() {
 
 // Called when the mouse hovers over the node passed in the parameter.
 // Adds the node to the swipePath if a swipe was initialized.
-function mouseOver(node) {
-	console.log("Mouse is over node " + node.id);
+function mouseOver() {
+	console.log("Mouse is over node " + this.node.id);
 	if(swipePath.length != 0) {
-		if(swipePath[swipePath.length-1].pathTo(node)) {
-			swipePath.push(node);
-			lines[lines.length-1].end = new Phaser.Point(node.x, node.y);
-			lines.push(new Phaser.Line(node.x, node.y, game.input.mousePointer.x, game.input.mousePointer.y));
+		if(swipePath[swipePath.length-1].pathTo(this.node)) {
+			swipePath.push(this.node);
+			lines[lines.length-1].end = new Phaser.Point(this.node.x, this.node.y);
+			lines.push(new Phaser.Line(this.node.x, this.node.y, game.input.mousePointer.x, game.input.mousePointer.y));
 		}
 		else {
 		}
@@ -271,7 +271,7 @@ function createNodes(data) {
 		node_data = data.nodes[i];
 		let newNode = new MapNode(i, node_data.x, node_data.y);
 		newNode.graphics.inputEnabled = true;
-		newNode.graphics.events.onInputOver.add(function(){mouseOver(newNode)});
+		newNode.graphics.events.onInputOver.add(mouseOver, {node: newNode});
 		// Pushes the node into the node buffer and displays it.
 		nodes.push(newNode);
 	}
@@ -305,6 +305,7 @@ function createNodes(data) {
 		// Updates the army counts and the new owners of the castles.
 		var newArmy = player.addArmy(currentArmy.count, nodes[castlePosition]);
 		newArmy.graphics.events.onInputDown.add(swipe, {army: newArmy});
+		newArmy.graphics.events.onInputOver.add(mouseOver, {node: newArmy.node});
 	}
 }
 
@@ -319,6 +320,7 @@ function updateNodes(data){
 			if(playerOwner.getArmyId(nodes[i].x, nodes[i].y) == -1) {
 				var newArmy = playerOwner.addArmy(0, nodes[i]);
 				newArmy.graphics.events.onInputDown.add(swipe, {army: newArmy});
+				newArmy.graphics.events.onInputOver.add(mouseOver, {node: newArmy.node});
 			}
 			// Update our clients army variables
 			playerOwner.updateArmy(currentArmy.count, nodes[i]);
@@ -407,7 +409,7 @@ main.prototype = {
 					data.players[0].armies[0].location.x
 		*/
 		socket.on('send_nodes', createNodes);
-		
+
 	},
 
 	update: function () {
