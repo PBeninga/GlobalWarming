@@ -85,12 +85,13 @@ class Game{
        this.room.emit("endGame",{winner:this.winner});
    }
    tick(){ 
+        var troopsToAdd = 0;
         this.room.emit('update_nodes', {nodes:this.map.nodes});
 
         var tickStartTime = new Date().getTime();
         if(tickStartTime - this.time >= 500){
-           var troopsToAdd = Math.floor((tickStartTime -this.time)/500);
-           this.time = tickStartTime;
+           troopsToAdd = Math.floor((tickStartTime -this.time)/500);
+           this.time = tickStartTime - (tickStartTime%500);
         }
         
         if(this.players.length > 1 && !this.starting && !this.started){
@@ -104,8 +105,9 @@ class Game{
             }, 10*1000);
         }
         if(this.started){
-            if(this.time == tickStartTime){
+            if(troopsToAdd > 0){
                this.incrementTroops(troopsToAdd);
+               troopsToAdd = 0;
             }
             //should be unncessary after pathTraversal is merged
             var playersInGame = [];
