@@ -12,6 +12,7 @@ app.use('/client',express.static(__dirname + '/client'));
 
 serv.listen(process.env.PORT || 2000);
 console.log("Server started.");
+
 // io connection
 var io = require('socket.io')(serv,{});
 var playersToGames = new Map();
@@ -19,7 +20,7 @@ var player_list = []; // all players connected across all games.
 var gamesToRemove = [];// all games;
 var games = new Map();
 var inputs = [];
-let tickLength = 250;
+let tickLength = 50;
 tickGames();
 
 function makeNewGame(){
@@ -30,39 +31,7 @@ function makeNewGame(){
 	 games.set(id,game);
 	 return game;
 }
-function tickGames(){
-	thisTick = new Date().getTime();
-	gamesIter = games.values();
-	element = gamesIter.next();
-	while(!element.done){
-		game = element.value
-		game.tick();
-		if(game.finished){
-			gamesToRemove.push(game.roomid);
-		}
-		element = gamesIter.next();
-	}
-	for(var i = 0; i < gamesToRemove.length; i++){
-		games.get(gamesToRemove[i]).endGame();
-		games.delete(gamesToRemove[i]);
-	}
-	gamesToRemove = [];
-	tickTime =  tickLength - (new Date().getTime() - thisTick);
-	if(tickTime < 0){
-		tickTime = 0;
-	}
 
-        var buffer = inputs.slice();
-        inputs = [];
-        for(data of buffer){
-           if(games.has(data[0].game)){
-              console.log(data[0]);
-              games.get(data[0].game).onInputFired(data[0],data[1]);
-           }
-        }
-
-	setTimeout(tickGames, tickTime);
-}
 function makeMap(game){
 	var nodes = [];
 	var high = 5;
@@ -102,6 +71,45 @@ function makeMap(game){
 	game.map.castles = castles;
 }
 
+
+
+
+function tickGames(){
+	startTime = new Date().getTime();
+	gamesIter = games.values();
+	element = gamesIter.next();
+	while(!element.done){
+		game = element.value
+		game.tick();
+		if(game.finished){
+			gamesToRemove.push(game.roomid);
+		}
+		element = gamesIter.next();
+	}
+	for(var i = 0; i < gamesToRemove.length; i++){
+		games.get(gamesToRemove[i]).endGame();
+		games.delete(gamesToRemove[i]);
+	}
+	gamesToRemove = [];
+      
+        var buffer = inputs.slice();
+        inputs = [];
+        for(data of buffer){
+           if(games.has(data[0].game)){
+              games.get(data[0].game).onInputFired(data[0],data[1]);
+           }
+        }
+        var tickTime =  new Date().getTime() - startTime;
+	if(tickTime < 0){
+		tickTime = 0;
+	}
+        if(tickTime > tickLength){
+           console.log("Dropping Frame");
+           setTimeout(tickGames,(Math.floor(tickTime/tickLength)+1)*tickLength-tickTime);
+        }else{
+           setTimeout(tickGames, tickLength-tickTime);
+        }
+}
 //call when a client disconnects and tell the clients except sender to remove the disconnected player
 //TODO have client send which game player is in, so we can remove them from it.
 function onClientdisconnect(data) {

@@ -3,8 +3,8 @@
 class Game{
    constructor(room, roomid){
       this.players = [];
-      this.time = 0;
-      this.room = room
+      this.time = new Date().getTime();
+      this.room = room;
       this.map = new Map(); //WHATS GONNA HAPPEN HERE
       this.started = false;
       this.starting = false;
@@ -72,10 +72,10 @@ class Game{
          }
       }
       if(destination == -1 || this.players.length == this.maxPlayers){
-          console.log("could not find a castle");
+          console.log("Could not find a castle.");
           return false;
       }
-      console.log(destination)
+      console.log("Player assigned castle.");
       this.players.push(id);
       this.map.nodes[destination].assignPlayer(id);
      
@@ -84,11 +84,17 @@ class Game{
    endGame(){
        this.room.emit("endGame",{winner:this.winner});
    }
-   tick(){
+   tick(){ 
         this.room.emit('update_nodes', {nodes:this.map.nodes});
+
+        var tickStartTime = new Date().getTime();
+        if(tickStartTime - this.time >= 500){
+           this.time = tickStartTime;
+        }
+        
         if(this.players.length > 1 && !this.starting && !this.started){
             this.starting = true;
-            console.log("should be starting");
+            console.log("Game starting.");
             let game = this;
             this.timeGameBeganStarting = new Date().getTime();
             setTimeout(function(){
@@ -97,7 +103,10 @@ class Game{
             }, 10*1000);
         }
         if(this.started){
-            this.incrementTroops(1);
+            if(this.time == tickStartTime){
+               this.incrementTroops(1);
+            }
+            //should be unncessary after pathTraversal is merged
             var playersInGame = [];
             for(var i = 0; i < this.map.nodes.length; i++){
                 if(this.map.nodes[i].army){
