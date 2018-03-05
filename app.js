@@ -18,6 +18,7 @@ var playersToGames = new Map();
 var player_list = []; // all players connected across all games.
 var gamesToRemove = [];// all games;
 var games = new Map();
+var inputs = [];
 let tickLength = 250;
 tickGames();
 
@@ -50,6 +51,16 @@ function tickGames(){
 	if(tickTime < 0){
 		tickTime = 0;
 	}
+
+        var buffer = inputs.slice();
+        inputs = [];
+        for(data of buffer){
+           if(games.has(data[0].game)){
+              console.log(data[0]);
+              games.get(data[0].game).onInputFired(data[0],data[1]);
+           }
+        }
+
 	setTimeout(tickGames, tickTime);
 }
 function makeMap(game){
@@ -166,9 +177,7 @@ function generateID(length) {
     return text
 }
 function onInputFired(data){
-	if(games.has(data.game)){
-		games.get(data.game).onInputFired(data, this.id);
-	}
+	inputs.push([data,this.id]);
 }
 io.sockets.on('connection', function(socket){
 	console.log("socket connected");
