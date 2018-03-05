@@ -89,6 +89,7 @@ class Game{
 
         var tickStartTime = new Date().getTime();
         if(tickStartTime - this.time >= 500){
+           var troopsToAdd = Math.floor((tickStartTime -this.time)/500);
            this.time = tickStartTime;
         }
         
@@ -104,7 +105,7 @@ class Game{
         }
         if(this.started){
             if(this.time == tickStartTime){
-               this.incrementTroops(1);
+               this.incrementTroops(troopsToAdd);
             }
             //should be unncessary after pathTraversal is merged
             var playersInGame = [];
