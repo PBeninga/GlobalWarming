@@ -25,21 +25,54 @@ var mainmenu = {
     var tempButton = game.add.button(x, y, ident, callback, this, 2, 1, 0);
     tempButton.scale.set(scale,scale);
     tempButton.anchor.setTo(0.5, 0.5);
-    var text = game.add.text(tempButton.x, tempButton.y, string, {
+    tempButton.text = game.add.text(tempButton.x, tempButton.y, string, {
       font: "14px Arial",
       fill: "#fff",
       align: "center"
     });
-    text.anchor.setTo(0.5, 0.5);
+    tempButton.text.anchor.setTo(0.5, 0.5);
+
+    return tempButton;
   },
 
   login: function() {
     var LoginBorder = game.add.graphics();
     LoginBorder.beginFill(0xFFFFFF, 1);
     // size
-    backWidth = 600;
-    backHeight = 500;
+    borderWidth = 600;
+    borderHeight = 500;
+    maxLeft = (canvas_width/2)-(borderWidth/2);
+    maxTop = (canvas_height/2)-(borderHeight/2);
     // centering
-    LoginBorder.drawRect((canvas_width/2)-(backWidth/2), (canvas_height/2)-(backHeight/2), backWidth, backHeight);
+    LoginBorder.drawRect(maxLeft, maxTop, borderWidth, borderHeight);
+
+    inputWidth = borderWidth * 0.8
+    inputHeight = 10
+    inputLeft = maxLeft + ((borderWidth/2) - (inputWidth/2));
+    inputTop = maxTop + ((borderHeight/2) - (inputHeight/2));
+    inputData = {
+      font: '18px Arial',
+      fill: '#212121',
+      fontWeight: 'bold',
+      width: inputWidth,
+      padding: 8,
+      borderWidth: 1,
+      borderColor: '#000',
+      borderRadius: 6,
+      placeHolder: 'Password',
+      type: PhaserInput.InputType.password
+    };
+    var password = game.add.inputField(inputLeft, inputTop, inputData);
+    inputData.placeHolder = 'UserName';
+    inputData.type = PhaserInput.InputType.UserName;
+    var userName = game.add.inputField(inputLeft, inputTop - 60, inputData);
+
+    var cancel = this.createButton(game, "Cancel", 'button1', maxLeft + 300, maxTop + 400, 1, function() {
+      LoginBorder.destroy();
+      password.destroy();
+      userName.destroy();
+      cancel.text.destroy();
+      cancel.destroy();
+    });
   }
 }
