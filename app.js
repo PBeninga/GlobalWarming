@@ -12,31 +12,31 @@ app.use('/client',express.static(__dirname + '/client'));
 
 serv.listen(process.env.PORT || 2000);
 console.log("Server started.");
+
 // io connection
 var io = require('socket.io')(serv,{});
+var playersToGames = new Map();
 var player_list = []; // all players connected across all games.
-var games = [];// all games;
-makeNewGame();
+var gamesToRemove = [];// all games;
+var games = new Map();
+var inputs = [];
+let tickLength = 50;
 tickGames();
+
 function makeNewGame(){
-	 var game  = new gameObjects.Game()
+	 let id = "/"+generateID(20)
+	 let gameRoom = io.of(id);
+	 var game  = new gameObjects.Game(gameRoom, id);
 	 makeMap(game); //should move into objects.js
-	 games.push(game);
+	 games.set(id,game);
+	 return game;
 }
-function tickGames(){
-	for(var i = 0; i < games.length; i++){
-		games[i].tick(io);
-		if(games[i].finished){
-			games.splice(i,1);
-		}
-	}
-	setTimeout(tickGames, 500);
-}
+
 function makeMap(game){
 	var nodes = [];
 	var high = 5;
 	var count = 0;
-	var castles = [];
+	var castles = [0,4,24,20,10,14,12,2,22,18,6];
 	for(var i = 1; i <= high; i++){
 		for(var j = 1; j <= high; j++){
 			let x =  i*100;
@@ -58,44 +58,72 @@ function makeMap(game){
 			if(j < high){
 				adj.push(count+1);
 			}
-			if(x != 100){
+			if(castles.indexOf(count) == -1){
 				nodes[count] = new gameObjects.MapNode(x,y,adj);
 			}else{
-				castles.push(count);
 				nodes[count] = new gameObjects.Castle(x,y,adj);
 			}
 			count++;
 		}
 	}
+	game.map.startingCastles = [0,24,4,20];
 	game.map.nodes = nodes;
 	game.map.castles = castles;
 }
-function onInputFired(data){
-	if(games[0].map.nodes[data.nodes[0]].army && games[0].map.nodes[data.nodes[0]].army.count > 0 && games[0].map.nodes[data.nodes[0]].army.player == this.id){
-		games[0].map.moveArmy(data.nodes,this.id);
-	}
-}
 
+
+
+
+function tickGames(){
+	startTime = new Date().getTime();
+	gamesIter = games.values();
+	element = gamesIter.next();
+	while(!element.done){
+		game = element.value
+		game.tick();
+		if(game.finished){
+			gamesToRemove.push(game.roomid);
+		}
+		element = gamesIter.next();
+	}
+	for(var i = 0; i < gamesToRemove.length; i++){
+		games.get(gamesToRemove[i]).endGame();
+		games.delete(gamesToRemove[i]);
+	}
+	gamesToRemove = [];
+      
+        var buffer = inputs.slice();
+        inputs = [];
+        for(data of buffer){
+           if(games.has(data[0].game)){
+              games.get(data[0].game).onInputFired(data[0],data[1]);
+           }
+        }
+        var tickTime =  new Date().getTime() - startTime;
+	if(tickTime < 0){
+		tickTime = 0;
+	}
+        if(tickTime > tickLength){
+           console.log("Dropping Frame");
+           setTimeout(tickGames,(Math.floor(tickTime/tickLength)+1)*tickLength-tickTime);
+        }else{
+           setTimeout(tickGames, tickLength-tickTime);
+        }
+}
 //call when a client disconnects and tell the clients except sender to remove the disconnected player
 //TODO have client send which game player is in, so we can remove them from it.
-function onClientdisconnect() {
+function onClientdisconnect(data) {
 	console.log('disconnect');
 
 	var removePlayer = find_playerid(this.id);
-
 	if (removePlayer) {
 		player_list.splice(player_list.indexOf(removePlayer), 1);
 	}
-	removePlayer = find_playerid_in_game(this.id, games[0]);
-	if (removePlayer) {
-		games[0].removePlayer(removePlayer);
+	if(playersToGames.has(this.id)){
+		playersToGames.get(this.id).removePlayer(this.id);
 	}
-
 	console.log("removing player " + this.id);
-
 	//send message to every connected client except the sender
-	this.broadcast.emit('remove_player', {id: this.id});
-
 }
 
 // find player by the the unique socket id
@@ -118,24 +146,52 @@ function find_playerid(id) {
 
 	return false;
 }
-
+function findGame(id){
+	gamesIter = games.values();
+	element = gamesIter.next();
+	while(!element.done){
+		game = element.value
+		if(!game.started && game.addPlayer(id)){
+			console.log("returning a game");
+			return game;
+		}
+		element = gamesIter.next();
+	}
+	//if there are no open games add the player.
+	game = makeNewGame();
+	game.addPlayer(id);
+	return game;
+}
 function onNewClient(){
-   this.broadcast.emit('newPlayer',{id:this.id});
-   this.emit('connected',{id:this.id, players:games[0].players});
-   player_list.push(this.id);
-   games[0].addPlayer(this.id);
-   this.emit('send_nodes', {nodes:games[0].map.nodes, castles:games[0].map.castles});
-   //This is janky as fuck, just have it to prove a concept, needs to be cleanly reworked.
-   this.broadcast.emit('update_nodes', {nodes:games[0].map.nodes});
+	game = findGame(this.id)
+	this.join(game.roomid)
+   	io.of(game.roomid).emit('newPlayer',{id:this.id, starting:game.starting});
+   	this.emit('connected',{id:this.id, players:game.players, game:game.roomid, timeTillStart:game.timeTillStart, starting:game.starting});//send the players id, the players, and the room id
+	player_list.push(this.id);
+	playersToGames.set(this.id, game);   
+   	this.emit('send_nodes', {nodes:game.map.nodes, castles:game.map.castles});
+	io.of(game.roomid).emit('update_nodes', {nodes:game.map.nodes});
+	   
 
 }
+function generateID(length) {
+    let text = ""
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 
+    for(let i = 0; i < length; i++)  {
+        text += possible.charAt(Math.floor(Math.random() * possible.length))
+    }
 
+    return text
+}
+function onInputFired(data){
+	inputs.push([data,this.id]);
+}
 io.sockets.on('connection', function(socket){
 	console.log("socket connected");
-  socket.on("client_started", onNewClient);
+  	socket.on("client_started", onNewClient);
 	// listen for disconnection;
+	socket.on('input_fired', onInputFired);
 	socket.on('disconnect', onClientdisconnect);
 	//listen for new player inputs.
-	socket.on("input_fired", onInputFired);
 });
