@@ -1,5 +1,8 @@
 //GRID
-const BLOCK_SIZE = 20;
+var block_size = 20; //calculated based GRID_DIM and grid_h/w
+const GRID_DIM = 50;   //SET dimension of grid in number of blocks
+var grid_height = 500; //in pixels
+var grid_width = 500;  //in pixels
 
 //COLORS
 const GREY ="#B8B8B8";
@@ -27,10 +30,10 @@ var select_button = document.getElementById("select");
 var node_button = document.getElementById("node");
 var castle_button = document.getElementById("castle");
 var path_button = document.getElementById("path");
+var export_button = document.getElementById("export");
 
 //path variable
 var prev_node =-1;
-
 
 //TODO TODO
 // check for existence of a node or castle before creating one
@@ -46,13 +49,13 @@ document.addEventListener("click", function () {
     var canvas = document.getElementById('grid');
     var rect = canvas.getBoundingClientRect();
 
-    // some fancy math to get the grid col (x)  and row (y) of the given click
-    selected_block.x = parseInt((event.clientX - rect.left) / BLOCK_SIZE);
-    selected_block.y = parseInt((event.clientY - rect.top) / BLOCK_SIZE);
+    // some fancy math to get x and y in terms of the grid, not the page
+    selected_block.x = parseInt((event.clientX - rect.left) / block_size);
+    selected_block.y = parseInt((event.clientY - rect.top) / block_size);
    
     // if the click is not inside of the canvas
-    if( selected_block.x < 0 || selected_block.x > 25 ||
-        selected_block.y < 0 || selected_block.y > 25){
+    if( selected_block.x < 0 || selected_block.x > GRID_DIM ||
+        selected_block.y < 0 || selected_block.y > GRID_DIM){
         return;
     }
 
@@ -71,7 +74,7 @@ document.addEventListener("click", function () {
             place_path();
             break;
         default:
-            state=10;
+            state=SELECT_STATE;
             select();
     }
     
@@ -97,6 +100,11 @@ path_button.addEventListener("click", function(){
     state=PATH_STATE; 
 });
     
+export_button.addEventListener("click", function(){
+    export_map_payload(); 
+});
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Click functions based on mode
 
@@ -140,11 +148,11 @@ function place_path(){
     else {
         //create a path object using prev node
         var p = {
-           end_points:[
-               nodes[prev_node],
-               nodes[index]
-           ] 
+           end_points:[] 
         }
+        
+        p.end_points.push(prev_node);
+        p.end_points.push(index);
         //push the path obj and set previous to -1
         paths.push(p);
         prev_node=-1;
@@ -169,7 +177,7 @@ function draw(){
     var canvas = document.getElementById('grid');
     var g = canvas.getContext('2d');
    
-    g.clearRect(0,0,500,500);
+    g.clearRect(0,0,grid_width,grid_height);
     draw_grid(g);
     draw_selected_block(g);
     draw_paths(g);
@@ -182,28 +190,29 @@ function draw_grid(g){
     g.strokeStyle=BLACK;
     g.lineWidth=.5;
     
-    for( var x = 0; x<500; x+=BLOCK_SIZE ){
-        for( var y = 0; y<500; y+= BLOCK_SIZE ){
-            g.strokeRect(x,y,BLOCK_SIZE,BLOCK_SIZE);
+    for( var x = 0; x<grid_width; x+=block_size ){
+        for( var y = 0; y<grid_height; y+= block_size ){
+            g.strokeRect(x,y,block_size,block_size);
         }
     }
+    
 }
 
 function draw_selected_block(g){
     if(selected_block.x >= 0 && selected_block.y >= 0 ){
-        var xCoord = selected_block.x * 20;
-        var yCoord = selected_block.y * 20;
+        var xCoord = selected_block.x * block_size;
+        var yCoord = selected_block.y * block_size;
    
         g.lineWidth=4;
         g.strokeStyle=RED;
-        g.strokeRect(xCoord, yCoord, BLOCK_SIZE, BLOCK_SIZE);    
+        g.strokeRect(xCoord, yCoord, block_size, block_size);    
     }
 }
 
 function draw_nodes(g){
     g.fillStyle=TAN;
     for( var i = 0; i<nodes.length; i++){
-       g.fillRect(nodes[i].x*BLOCK_SIZE, nodes[i].y*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+       g.fillRect(nodes[i].x*block_size, nodes[i].y*block_size, block_size, block_size);
     } 
 }
 
@@ -211,24 +220,118 @@ function draw_castles(g){
     g.fillStyle=BLACK;
     for( var i=0; i<castles.length; i++){
         var temp = nodes[castles[i].node_index];
-        g.fillRect(temp.x*BLOCK_SIZE, temp.y*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+        g.fillRect(temp.x*block_size, temp.y*block_size, block_size, block_size);
     }
 }
 
 function draw_paths(g){
     for(var i = 0; i < paths.length; i ++ ){
-        var n1 = paths[i].end_points[0];
-        var n2 = paths[i].end_points[1];
+        var n0 = nodes[paths[i].end_points[0]];
+        var n1 = nodes[paths[i].end_points[1]];
         g.strokeStyle=RED;
         
-        g.moveTo(n1.x*BLOCK_SIZE + (BLOCK_SIZE/2), n1.y*BLOCK_SIZE + (BLOCK_SIZE/2));
-        g.lineTo(n2.x*BLOCK_SIZE + (BLOCK_SIZE/2), n2.y*BLOCK_SIZE + (BLOCK_SIZE/2));
+        g.moveTo(n0.x*block_size + (block_size/2), n0.y*block_size + (block_size/2));
+        g.lineTo(n1.x*block_size + (block_size/2), n1.y*block_size + (block_size/2));
         g.stroke();
         
     }
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Other
+
+function minimum(x, y){
+    if(x<y){
+        return x;
+    }
+    return y;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Files with exporting
+
+function export_map_payload(){
+  
+    //give each node a referernce to its respective paths
+    for(var i = 0; i < paths.length; i++){
+        add_reference(i);
+    }
+    
+    var payload = build_map_payload();
+    
+    send_payload(payload);
+    
+}
+
+function add_reference(path_index){
+    
+    var node_index_0 = paths[path_index].end_points[0];
+    var node_index_1 = paths[path_index].end_points[1];
+    
+    nodes[node_index_0].adj.push(node_index_1);
+    nodes[node_index_0].paths.push(path_index);
+    nodes[node_index_1].adj.push(node_index_0);
+    nodes[node_index_1].paths.push(path_index);
+    
+} 
+
+function build_map_payload(){
+   
+    var payload = {
+        
+        height: GRID_DIM,
+        width: GRID_DIM,
+        
+        nodes: nodes,
+        castles: castles,
+        paths: paths
+             
+    }
+    
+    return payload;
+    
+}
+
+function getPath(){
+    
+    var path = "/Users/adamb/GlobalWarming/mapBuilder/newFile.txt"
+    
+    path = prompt("Enter the file path in the form \'/folder/fileName.txt\'" +
+                "\nWhere the file path starts at your root directory or C drive");
+    
+    return path;
+}
+
+function send_payload(payload){
+ 
+    var xhr = new XMLHttpRequest();
+    var url = "/";
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Content-type", "application/json"); 
+    
+    var path = getPath();
+    
+    var wrapper = {
+        path: path,
+        payload: payload
+    }
+    
+    var data = JSON.stringify(wrapper);
+    //alert(data);
+    xhr.send(data);             
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Main
+var canvas = document.getElementById('grid');
+var rect = canvas.getBoundingClientRect();
+
+grid_height = rect.bottom - rect.top;
+grid_width = rect.right - rect.left;
+block_size = minimum( grid_height, grid_width ) / GRID_DIM;
 
 draw();
+
