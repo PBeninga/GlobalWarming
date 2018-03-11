@@ -19,6 +19,70 @@ function createButton(game, string, ident, x, y, scale, callback) {
   return tempButton;
 }
 
+function createAccount() {
+   var AccountBorder = game.add.graphics();
+   AccountBorder.beginFill(0xFFFFFF, 1);
+   borderWidth = 600;
+   borderHeight = 500;
+   maxLeft = (canvas_width/2)-(borderWidth/2);
+   maxTop = (canvas_height/2)-(borderHeight/2);
+
+   AccountBorder.drawRect(maxLeft, maxTop, borderWidth, borderHeight);
+
+   inputWidth = borderWidth * 0.8
+   inputHeight = 10
+   inputLeft = maxLeft + ((borderWidth/2) - (inputWidth/2));
+   inputTop = maxTop + ((borderHeight/2) - (inputHeight/2));
+   inputData = {
+      font: '18px Arial',
+      fill: '#212121',
+      fontWeight: 'bold',
+      width: inputWidth,
+      padding: 8,
+      borderWidth: 1,
+      borderColor: '#000',
+      borderRadius: 6,
+      placeHolder: 'UserName',
+      type: PhaserInput.InputType.UserName
+   };
+   var userName = game.add.inputField(inputLeft, inputTop - 60, inputData);
+   inputDataTwo = {
+      font: '18px Arial',
+      fill: '#212121',
+      fontWeight: 'bold',
+      width: inputWidth,
+      padding: 8,
+      borderWidth: 1,
+      borderColor: '#000',
+      borderRadius: 6,
+      placeHolder: 'Password',
+      type: PhaserInput.InputType.password
+   };
+   var password = game.add.inputField(inputLeft, inputTop, inputDataTwo);
+  
+   var login;
+   var cancel = createButton(game, "Cancel", 'button1', maxLeft + 300, maxTop + 400, 1, function() {
+      AccountBorder.destroy();
+      password.destroy();
+      userName.destroy();
+      cancel.text.destroy();
+      cancel.destroy();
+      login.text.destroy();
+      login.destroy();
+   });
+
+
+   login = createButton(game, "Make Account", 'button1', maxLeft + 300, maxTop + 330, 1, function() {
+      AccountBorder.destroy();
+      password.destroy();
+      userName.destroy();
+      cancel.text.destroy();
+      cancel.destroy();
+      login.text.destroy();
+      login.destroy();
+      socket.emit("new_account", {'playerID': playerID, 'data' : {'username': userName.value, 'password' : password.value}});
+   });
+}
 
 function login() {
   var LoginBorder = game.add.graphics();
@@ -89,7 +153,6 @@ function createID() {
    return Math.random().toString(36).substr(2, 10);
 }
 function processLogin(data) {
-   console.log('fuck all of this');
    if(data.loginStatus === 'true') game.state.start('main', true, false, socket);
    else mainmenu.login();
 }
@@ -115,6 +178,7 @@ mainmenu.prototype = {
       game.state.start('main', true, false, socket);
     });
     createButton(game, "Login", 'button1', canvas_width/2, canvas_height/2, 1, login);
+    createButton(game, "Create Account", 'button1', canvas_width/2, canvas_height/2 + 100, 1, createAccount);
     socket.on('login', processLogin);
   }
 }

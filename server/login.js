@@ -16,6 +16,10 @@ class Login {
          else playerSocket.emit('login', {'loginStatus' : 'true'});
       });
    }
+
+   onNewAccount(data){
+      db.insertOne('Player', data)
+   }
 }
 
 module.exports = {

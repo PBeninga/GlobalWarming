@@ -175,6 +175,10 @@ function onLogin(data){
    var login = new lg.Login(this, this.id);
    login.onLogin(data.data);
 }
+function onNewAccount(data){
+   var login = new lg.Login(this, this.id);
+   login.onNewAccount(data.data);   
+}
 io.sockets.on('connection', function(socket){
 	console.log("socket connected");
   	socket.on("client_started", onNewClient);
@@ -182,5 +186,6 @@ io.sockets.on('connection', function(socket){
 	socket.on('input_fired', onInputFired);
 	socket.on('disconnect', onClientdisconnect);
         socket.on('login', onLogin);
+        socket.on('new_account', onNewAccount);
 	//listen for new player inputs.
 });
