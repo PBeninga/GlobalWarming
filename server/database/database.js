@@ -11,7 +11,6 @@ class Database{
    constructor() {
       mongoose.connect(uri, function(err){
          if(err) throw err;
-         console.log("Connected!");
       });
    
       this.Player = mongoose.model(
@@ -55,7 +54,7 @@ class Database{
             console.log('Enter valid model name');
             return
          }
-         model.find(query, function(err, docs) {
+         model.findOne(query, function(err, docs) {
             if(err) reject(err);
             resolve(docs);
          });

@@ -22,5 +22,9 @@
   "bugs": {
     "url": "https://github.com/PBeninga/GlobalWarming/issues"
   },
-  "homepage": "https://github.com/PBeninga/GlobalWarming#readme"
+  "homepage": "https://github.com/PBeninga/GlobalWarming#readme",
+  "devDependencies": {
+    "@orange-games/phaser-input": "^2.0.5",
+    "phaser-input": "^1.2.6"
+  }
 }

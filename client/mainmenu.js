@@ -1,31 +1,200 @@
-var mainmenu = {
-  create: function(game) {
+var socket;
+socket = io.connect();
+var playerID = createID();
+var playerSocket;
+var menuFlag = 0;
+
+var mainmenu = function(game){};
+ 
+function createButton(game, string, ident, x, y, scale, callback) {
+  var tempButton = game.add.button(x, y, ident, callback, mainmenu, 2, 1, 0);
+  tempButton.scale.set(scale,scale);
+  tempButton.anchor.setTo(0.5, 0.5);
+  tempButton.text = game.add.text(tempButton.x, tempButton.y, string, {
+    font: "14px Arial",
+    fill: "#fff",
+    align: "center"
+  });
+  tempButton.text.anchor.setTo(0.5, 0.5);
+
+  return tempButton;
+}
+
+function createAccount() {
+   if(menuFlag == 1) return;
+   menuFlag = 1;
+
+   var AccountBorder = game.add.graphics();
+   AccountBorder.beginFill(0xFFFFFF, 1);
+   borderWidth = 500;
+   borderHeight = 400;
+   maxLeft = (canvas_width/2)-(borderWidth/2)+400;
+   maxTop = (canvas_height/2)-(borderHeight/2);
+
+   AccountBorder.drawRect(maxLeft, maxTop, borderWidth, borderHeight);
+
+   inputWidth = borderWidth * 0.8
+   inputHeight = 10
+   inputLeft = maxLeft + ((borderWidth/2) - (inputWidth/2));
+   inputTop = maxTop + ((borderHeight/2) - (inputHeight/2));
+   inputData = {
+      font: '18px Arial',
+      fill: '#212121',
+      fontWeight: 'bold',
+      width: inputWidth,
+      padding: 8,
+      borderWidth: 1,
+      borderColor: '#000',
+      borderRadius: 6,
+      placeHolder: 'UserName',
+      type: PhaserInput.InputType.UserName
+   };
+   var userName = game.add.inputField(inputLeft, inputTop - 60, inputData);
+   inputDataTwo = {
+      font: '18px Arial',
+      fill: '#212121',
+      fontWeight: 'bold',
+      width: inputWidth,
+      padding: 8,
+      borderWidth: 1,
+      borderColor: '#000',
+      borderRadius: 6,
+      placeHolder: 'Password',
+      type: PhaserInput.InputType.password
+   };
+   var password = game.add.inputField(inputLeft, inputTop, inputDataTwo);
+  
+   var login;
+   var cancel = createButton(game, "Cancel", 'button1', maxLeft + 250, maxTop + 350, 1, function() {
+      AccountBorder.destroy();
+      password.destroy();
+      userName.destroy();
+      cancel.text.destroy();
+      cancel.destroy();
+      login.text.destroy();
+      login.destroy();
+      menuFlag = 0;
+   });
+
+
+   login = createButton(game, "Make Account", 'button1', maxLeft + 250, maxTop + 280, 1, function() {
+      AccountBorder.destroy();
+      password.destroy();
+      userName.destroy();
+      cancel.text.destroy();
+      cancel.destroy();
+      login.text.destroy();
+      login.destroy();
+      menuFlag = 0;
+      socket.emit("new_account", {'playerID': playerID, 'data' : {'username': userName.value, 'password' : password.value}});
+   });
+}
+
+function login() {
+   if(menuFlag == 1) return;
+   menuFlag = 1;
+  var LoginBorder = game.add.graphics();
+  LoginBorder.beginFill(0xFFFFFF, 1);
+  // size
+  borderWidth = 500;
+  borderHeight = 400;
+  maxLeft = (canvas_width/2)-(borderWidth/2)+400;
+  maxTop = (canvas_height/2)-(borderHeight/2);
+  // centering
+  LoginBorder.drawRect(maxLeft, maxTop, borderWidth, borderHeight);
+
+  inputWidth = borderWidth * 0.8
+  inputHeight = 10
+  inputLeft = maxLeft + ((borderWidth/2) - (inputWidth/2));
+  inputTop = maxTop + ((borderHeight/2) - (inputHeight/2));
+  inputData = {
+    font: '18px Arial',
+    fill: '#212121',
+    fontWeight: 'bold',
+    width: inputWidth,
+    padding: 8,
+    borderWidth: 1,
+    borderColor: '#000',
+    borderRadius: 6,
+    placeHolder: 'UserName',
+    type: PhaserInput.InputType.UserName
+  };
+  var userName = game.add.inputField(inputLeft, inputTop - 60, inputData);
+  inputDataTwo = {
+    font: '18px Arial',
+    fill: '#212121',
+    fontWeight: 'bold',
+    width: inputWidth,
+    padding: 8,
+    borderWidth: 1,
+    borderColor: '#000',
+    borderRadius: 6,
+    placeHolder: 'Password',
+    type: PhaserInput.InputType.password
+  };
+  var password = game.add.inputField(inputLeft, inputTop, inputDataTwo);
+  
+  var login;
+  var cancel = createButton(game, "Cancel", 'button1', maxLeft + 250, maxTop + 350, 1, function() {
+    LoginBorder.destroy();
+    password.destroy();
+    userName.destroy();
+    cancel.text.destroy();
+    cancel.destroy();
+    login.text.destroy();
+    login.destroy();
+    menuFlag = 0;
+  });
+
+
+  login = createButton(game, "Login", 'button1', maxLeft + 250, maxTop + 280, 1, function() {
+    LoginBorder.destroy();
+    password.destroy();
+    userName.destroy();
+    cancel.text.destroy();
+    cancel.destroy();
+    login.text.destroy();
+    login.destroy();
+    menuFlag = 0;
+    socket.emit("login", {'playerID': playerID, 'data' : {'username': userName.value, 'password' : password.value}});
+  });
+}
+function createID() {
+   return Math.random().toString(36).substr(2, 10);
+}
+function processLogin(data) {
+   if(data.loginStatus === 'true') game.state.start('main', true, false, socket);
+   else login();
+}
+function processAccountCreation(data) {
+   console.log('Test Account Socket');
+   if(data.accountExists === 'true') createAccount();
+}
+
+mainmenu.prototype = {
+ create: function(game) {
+    game.add.plugin(PhaserInput.Plugin);
     console.log("Reached main menu");
     game.stage.backgroundColor = 0xADD8E6;
 
-    var background = game.add.graphics();
+    var MenuBorder = game.add.graphics();
     // colour and opacity
-    background.beginFill(0x0000FF, 0.1);
+    MenuBorder.beginFill(0x0000FF, 0.1);
     // size
     backWidth = 500;
-    backHeight = 200;
+    backHeight = 400;
     // centering
-    background.drawRect((canvas_width/2)-(backWidth/2), (canvas_height/2)-(backHeight/2), backWidth, backHeight);
+    MenuBorder.drawRect((canvas_width/2)-(backWidth/2), (canvas_height/2)-(backHeight/2), backWidth, backHeight);
 
-    this.createButton(game, null, canvas_width/2, canvas_height/2, 0.4, function() {
-      game.state.start('main');
-    });
-  },
 
-  createButton: function(game, string, x, y, scale, callback) {
-    var tempButton = game.add.button(x, y, 'button', callback, this, 2, 1, 0);
-    tempButton.scale.set(scale,scale);
-    tempButton.anchor.setTo(0.5, 0.5);
-    var text = game.add.text(tempButton.x, tempButton.y, string, {
-      font: "14px Arial",
-      fill: "#fff",
-      align: "center"
+    // start game
+    createButton(game, "Game Start", 'button1', canvas_width/2, canvas_height/2 - 100, 1, function() {
+      game.state.start('main', true, false, socket);
     });
-    text.anchor.setTo(0.5, 0.5);
-  },
+    createButton(game, "Login", 'button1', canvas_width/2, canvas_height/2, 1, login);
+    createButton(game, "Create Account", 'button1', canvas_width/2, canvas_height/2 + 100, 1, createAccount);
+    socket.on('login', processLogin);
+    socket.on('new_account', processAccountCreation);
+  }
 }
+

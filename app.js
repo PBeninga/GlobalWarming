@@ -4,6 +4,7 @@ var app = express();
 var serv = require('http').Server(app);
 //get the functions required to move players in the server.
 var gameObjects = require('./objects.js');
+var lg = require('./server/login.js');
 
 app.get('/',function(req, res) {
 	res.sendFile(__dirname + '/client/index.html');
@@ -187,11 +188,21 @@ function generateID(length) {
 function onInputFired(data){
 	inputs.push([data,this.id]);
 }
+function onLogin(data){
+   var login = new lg.Login(this, this.id);
+   login.onLogin(data.data);
+}
+function onNewAccount(data){
+   var login = new lg.Login(this, this.id);
+   login.onNewAccount(data.data);   
+}
 io.sockets.on('connection', function(socket){
 	console.log("socket connected");
   	socket.on("client_started", onNewClient);
 	// listen for disconnection;
 	socket.on('input_fired', onInputFired);
 	socket.on('disconnect', onClientdisconnect);
+        socket.on('login', onLogin);
+        socket.on('new_account', onNewAccount);
 	//listen for new player inputs.
 });

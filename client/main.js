@@ -1,5 +1,5 @@
 var socket;
-socket = io.connect();
+//socket = io.connect();
 var gameSocket;
 //the player list
 var players = [];
@@ -411,6 +411,10 @@ main.prototype = {
 		socket.on('send_nodes', createNodes);
 
 	},
+
+        init: function(sock) {
+            socket = sock;
+        },
 
 	update: function () {
 		// emit the player input
