@@ -2,6 +2,7 @@ var socket;
 socket = io.connect();
 var playerID = createID();
 var playerSocket;
+var menuFlag = 0;
 
 var mainmenu = function(game){};
  
@@ -20,11 +21,14 @@ function createButton(game, string, ident, x, y, scale, callback) {
 }
 
 function createAccount() {
+   if(menuFlag == 1) return;
+   menuFlag = 1;
+
    var AccountBorder = game.add.graphics();
    AccountBorder.beginFill(0xFFFFFF, 1);
-   borderWidth = 600;
-   borderHeight = 500;
-   maxLeft = (canvas_width/2)-(borderWidth/2);
+   borderWidth = 500;
+   borderHeight = 400;
+   maxLeft = (canvas_width/2)-(borderWidth/2)+400;
    maxTop = (canvas_height/2)-(borderHeight/2);
 
    AccountBorder.drawRect(maxLeft, maxTop, borderWidth, borderHeight);
@@ -61,7 +65,7 @@ function createAccount() {
    var password = game.add.inputField(inputLeft, inputTop, inputDataTwo);
   
    var login;
-   var cancel = createButton(game, "Cancel", 'button1', maxLeft + 300, maxTop + 400, 1, function() {
+   var cancel = createButton(game, "Cancel", 'button1', maxLeft + 250, maxTop + 350, 1, function() {
       AccountBorder.destroy();
       password.destroy();
       userName.destroy();
@@ -69,10 +73,11 @@ function createAccount() {
       cancel.destroy();
       login.text.destroy();
       login.destroy();
+      menuFlag = 0;
    });
 
 
-   login = createButton(game, "Make Account", 'button1', maxLeft + 300, maxTop + 330, 1, function() {
+   login = createButton(game, "Make Account", 'button1', maxLeft + 250, maxTop + 280, 1, function() {
       AccountBorder.destroy();
       password.destroy();
       userName.destroy();
@@ -80,17 +85,20 @@ function createAccount() {
       cancel.destroy();
       login.text.destroy();
       login.destroy();
+      menuFlag = 0;
       socket.emit("new_account", {'playerID': playerID, 'data' : {'username': userName.value, 'password' : password.value}});
    });
 }
 
 function login() {
+   if(menuFlag == 1) return;
+   menuFlag = 1;
   var LoginBorder = game.add.graphics();
   LoginBorder.beginFill(0xFFFFFF, 1);
   // size
-  borderWidth = 600;
-  borderHeight = 500;
-  maxLeft = (canvas_width/2)-(borderWidth/2);
+  borderWidth = 500;
+  borderHeight = 400;
+  maxLeft = (canvas_width/2)-(borderWidth/2)+400;
   maxTop = (canvas_height/2)-(borderHeight/2);
   // centering
   LoginBorder.drawRect(maxLeft, maxTop, borderWidth, borderHeight);
@@ -127,7 +135,7 @@ function login() {
   var password = game.add.inputField(inputLeft, inputTop, inputDataTwo);
   
   var login;
-  var cancel = createButton(game, "Cancel", 'button1', maxLeft + 300, maxTop + 400, 1, function() {
+  var cancel = createButton(game, "Cancel", 'button1', maxLeft + 250, maxTop + 350, 1, function() {
     LoginBorder.destroy();
     password.destroy();
     userName.destroy();
@@ -135,10 +143,11 @@ function login() {
     cancel.destroy();
     login.text.destroy();
     login.destroy();
+    menuFlag = 0;
   });
 
 
-  login = createButton(game, "Login", 'button1', maxLeft + 300, maxTop + 330, 1, function() {
+  login = createButton(game, "Login", 'button1', maxLeft + 250, maxTop + 280, 1, function() {
     LoginBorder.destroy();
     password.destroy();
     userName.destroy();
@@ -146,6 +155,7 @@ function login() {
     cancel.destroy();
     login.text.destroy();
     login.destroy();
+    menuFlag = 0;
     socket.emit("login", {'playerID': playerID, 'data' : {'username': userName.value, 'password' : password.value}});
   });
 }
@@ -154,7 +164,11 @@ function createID() {
 }
 function processLogin(data) {
    if(data.loginStatus === 'true') game.state.start('main', true, false, socket);
-   else mainmenu.login();
+   else login();
+}
+function processAccountCreation(data) {
+   console.log('Test Account Socket');
+   if(data.accountExists === 'true') createAccount();
 }
 
 mainmenu.prototype = {
@@ -180,6 +194,7 @@ mainmenu.prototype = {
     createButton(game, "Login", 'button1', canvas_width/2, canvas_height/2, 1, login);
     createButton(game, "Create Account", 'button1', canvas_width/2, canvas_height/2 + 100, 1, createAccount);
     socket.on('login', processLogin);
+    socket.on('new_account', processAccountCreation);
   }
 }
 

@@ -18,7 +18,15 @@ class Login {
    }
 
    onNewAccount(data){
-      db.insertOne('Player', data)
+      db.findOne('Player', data).then(function(user) {
+         if(user != null) {
+            console.log("Account already exists");
+            playerSocket.emit('new_account', {'accountExists' : 'true'});
+         }
+         else {
+            db.insertOne('Player', data);
+         }
+      });
    }
 }
 
