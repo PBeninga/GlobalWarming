@@ -49,16 +49,12 @@ class Army {
   }
 
   update() {
-    this.countGraphics.destroy();
     var font  = "14px Arial";
     if(ClientPlayer.id == this.owner.id){
       font  = "20px Arial";
     }
-    this.countGraphics = game.add.text(this.x, this.y, this.count, {
-      font: font,
-      fill: this.color,
-      align: "center"
-    });
-    this.countGraphics.anchor.setTo(0.5, 0.5);
+    this.countGraphics.setText(this.count);
+    this.countGraphics.addColor(this.color, 0);
+    this.countGraphics.addFontStyle(font, 0);
   }
 }
