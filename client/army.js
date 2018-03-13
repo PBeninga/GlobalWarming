@@ -51,7 +51,6 @@ class Army {
   update() {
     this.countGraphics.destroy();
     var font  = "14px Arial";
-    console.log(ClientPlayer.id + " "+ this.owner.id);
     if(ClientPlayer.id == this.owner.id){
       font  = "20px Arial";
     }

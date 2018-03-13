@@ -61,14 +61,14 @@ function onsocketConnected (data) {
 			id: new player id
 		}
 		*/
-		   gameSocket.on('newPlayer', onNewPlayer);
-		   /*data =
-		   {
+		gameSocket.on('newPlayer', onNewPlayer);
+		/*data =
+		 {
 			time: time left untill game starts
-		   }
-		   */
-		   gameSocket.on('updateTime', onUpdateTime);
-		   gameSocket.on('startGame',onStart);
+		 }
+		*/
+		gameSocket.on('updateTime', onUpdateTime);
+		gameSocket.on('startGame',onStart);
 
 		//when the player receives the new input
 	ClientPlayer = addNewPlayer(this.id);
@@ -357,6 +357,7 @@ function printCreateNodeData(data) {
 main.prototype = {
 
 	create: function () {
+		game.world.setBounds(0, 0, window.innerWidth * 2, window.innerHeight * 2)
 		game.stage.backgroundColor = 0x000000;
 		game.input.onUp.add(endSwipe);
 		console.log("client started");
@@ -412,15 +413,20 @@ main.prototype = {
 
 	},
 
-        init: function(sock) {
-            socket = sock;
-        },
+  init: function(sock) {
+      socket = sock;
+  },
 
 	update: function () {
+		game.camera.x = game.camera.x + 1;
+		if(nodes[0] != null) {
+			nodes[0].graphics.scale.x = nodes[0].graphics.scale.x;
+		}
 		// emit the player input
 	},
 
 	render: function () {
+		game.debug.cameraInfo(game.camera, 32, 32);
 		if(lines.length > 0) {
 			lines[lines.length-1].end = new Phaser.Point(game.input.mousePointer.x, game.input.mousePointer.y);
 			for(var i = 0; i < lines.length; i++) {
