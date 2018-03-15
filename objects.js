@@ -1,4 +1,28 @@
 //import { setTimeout } from "timers";
+//updateArmies
+class Player{
+    constructor(id){
+        this.id = id;
+        this.name = null;
+        this.armies = [];
+    }
+    findArmyIndexById(id){
+        for(var i = 0; i <  this.armies.length; i++){
+            if(this.armies[i] == id){
+                return i;
+            }
+        }
+        return -1;
+    }
+    findArmyById(id){
+        let index  = this.findArmyIndexById(id);
+        if(index > -1){
+            return armies[index];
+        }else{
+            return null;
+        }
+    }
+}
 
 class Game{
    constructor(room, roomid){
@@ -18,7 +42,8 @@ class Game{
    }
    onInputFired(data, id){
         if(this.map.nodes[data.nodes[0]].army && this.map.nodes[data.nodes[0]].army.count > 0 && this.map.nodes[data.nodes[0]].army.player == id && this.started){
-            this.map.moveArmy(data.nodes, id);
+
+            this.map.moveArmy(data.nodes, this.findPlayerById(id));
         }
    }
    incrementTroops(num){
@@ -76,15 +101,33 @@ class Game{
           return false;
       }
       console.log("Player assigned castle.");
-      this.players.push(id);
-      this.map.nodes[destination].assignPlayer(id);
-     
+      let player = new Player(id);
+      this.players.push(player);
+      this.map.nodes[destination].assignPlayer(player);
+
       return true;
    }
    endGame(){
        this.room.emit("endGame",{winner:this.winner});
    }
-   tick(){ 
+   findPlayerIndexById(id){
+       for(var i = 0; i <  this.players.length; i++){
+           if(this.players[i].id == id){
+
+               return i;
+           }
+       }
+       return -1;
+   }
+   findPlayerById(id){
+       let index = this.findPlayerIndexById(id);
+       if(index > -1){
+           return this.players[index];
+       }else{
+           return null;
+       }
+   }
+   tick(){
         var troopsToAdd = 0;
         this.room.emit('update_nodes', {nodes:this.map.nodes});
 
@@ -93,7 +136,7 @@ class Game{
            troopsToAdd = Math.floor((tickStartTime -this.time)/500);
            this.time = tickStartTime - (tickStartTime%500);
         }
-        
+
         if(this.players.length > 1 && !this.starting && !this.started){
             this.starting = true;
             console.log("Game starting.");
@@ -109,6 +152,25 @@ class Game{
                this.incrementTroops(troopsToAdd);
                troopsToAdd = 0;
             }
+            /*
+                [
+                    {
+                        nodes[]: 2 elements start nodes and then endnode
+                        army: army moving
+                        percentage: integer of percentage between paths.
+                    },
+                    ...
+
+                ]
+            */
+            this.room.emit('move_armies', {moving:this.map.buffer});
+            for(var i = 0; i < this.map.buffer.length; i++){
+                this.map.buffer[i].percentage += 5;
+                if(this.map.buffer[i].percentage >= 100){
+                    this.map.finishedMovingArmy(this.map.buffer[i].nodes,this.map.buffer[i].army);
+                    this.map.buffer.splice(i,1);
+                }
+            }
             //should be unncessary after pathTraversal is merged
             var playersInGame = [];
             for(var i = 0; i < this.map.nodes.length; i++){
@@ -123,7 +185,7 @@ class Game{
                     this.winner = playersInGame[0];
                 }
                 game.finished = true;
-            }      
+            }
         }else if(this.starting){
             this.timeTillStart = 10000 - (new Date().getTime() - this.timeGameBeganStarting);
             this.room.emit('updateTime',{time:this.timeTillStart});
@@ -136,6 +198,7 @@ class Map{
       this.nodes = [];
       this.castles = [];//which indicies of nodes are castles;
       this.castlesChanged = [];
+      this.buffer = [];
       //this.paths = [];
    }
 
@@ -150,62 +213,111 @@ class Map{
    moveArmy(nodes,player){
       var startNode = this.nodes[nodes[0]];
       var endNode = this.nodes[nodes[1]];
-      if(startNode.army.player == player){
+      if(startNode.army.player == player.id){
          //if startNode is a castle only move half the troops
          if(startNode instanceof Castle){
             var toMove = Math.floor(startNode.army.count/2);
             startNode.army.count -= toMove;
          }else{ //move all the troops
             toMove = startNode.army.count;
+            player.armies.splice(player.findArmyIndexById(startNode.army.id),1);
             startNode.army = null;
          }
+         this.buffer.push({nodes:nodes, army:new Army(player, toMove), percentage:0});
 
          //if end node is empty, add dummy army to be overwritten by moving troops
-         if(endNode.army == null){
+        //  if(endNode.army == null){
+        //     endNode.army = new Army(null,0);
+        //  }
+        //  //if end node contains your army, just combine armies
+        //  if(endNode.army.player == player){
+        //     endNode.army.count += toMove;
+        //  }else{ //battle
+        //     //if enemy army is greater, decrease enemy army by your attacking army count
+        //     if(endNode.army.count >= toMove){
+        //        endNode.army.count -= toMove;
+        //     }else{//conquer the node with your remaning troops (the difference)
+        //        endNode.army = new Army(player,toMove-endNode.army.count);
+        //     }
+        //  }
+      }
+   }
+
+    finishedMovingArmy(nodes,army){
+        let endNode = this.nodes[nodes[1]];
+        if(endNode.army == null){
             endNode.army = new Army(null,0);
          }
          //if end node contains your army, just combine armies
-         if(endNode.army.player == player){
-            endNode.army.count += toMove;
+         if(endNode.army == null){
+             endNode.army = new Army(null,0);
+        }
+         if(endNode.army.player == army.player){
+            endNode.army.count += army.count;
          }else{ //battle
             //if enemy army is greater, decrease enemy army by your attacking army count
-            if(endNode.army.count >= toMove){
-               endNode.army.count -= toMove;
+            if(endNode.army.count >= army.count){
+               endNode.army.count -= army.count;
             }else{//conquer the node with your remaning troops (the difference)
-               endNode.army = new Army(player,toMove-endNode.army.count);
+               army.count -= endNode.army.count;
+               endNode.army = army;
             }
-         }
-      }
-   }
+        }
+    }
 }
-
 class MapNode{
-   constructor(x,y,adj){
+   constructor(x,y,adj, id){
+      this.id = id;
       this.x = x;
       this.y = y;
       this.adj = adj;
+      this.paths = [];
+      for(var i = 0; i < adj.length; i++){
+          this.paths.push(new Path(id, adj[i]));
+      }
       this.army = null;
    }
 }
 
 class Castle extends MapNode{
-   constructor(x,y,adj){
-      super(x,y,adj);
+   constructor(x,y,adj, id){
+      super(x,y,adj, id);
       this.army = new Army(null,50);
       this.buff='none';
    }
 
-   assignPlayer(id){ //when player intially joins and is assigned a castle
-      this.army = new Army(id,50);
+   assignPlayer(player){ //when player intially joins and is assigned a castle
+      this.army = new Army(player,50);
    }
 }
 
 class Army{
-   constructor(id,size){
-      this.player = id;
+   constructor(player,size){
+      this.id = generateID(20);
+      if(player){
+        this.player = player.id;
+        player.armies.push(this);
+      }
       this.count = size;
       //this.buff = "swole";
    }
+}
+class Path{
+    constructor(startNode, endNode){
+        this.startNode = startNode;
+        this.endNode = endNode;
+        this.id =  startNode+" "+endNode;
+    }
+}
+function generateID(length) {
+    let text = ""
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+
+    for(let i = 0; i < length; i++)  {
+        text += possible.charAt(Math.floor(Math.random() * possible.length))
+    }
+
+    return text
 }
 /*
 //create game with a castle and an empty node
