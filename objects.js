@@ -1,5 +1,28 @@
 //import { setTimeout } from "timers";
 //updateArmies
+class Player{
+    constructor(id){
+        this.id = id;
+        this.name = null;
+        this.armies = [];
+    }
+    findArmyIndexById(id){
+        for(var i = 0; i <  this.armies.length; i++){
+            if(this.armies[i] == id){
+                return i;
+            }
+        }
+        return -1;
+    }
+    findArmyById(id){
+        let index  = this.findArmyIndexById(id);
+        if(index > -1){
+            return armies[index];
+        }else{
+            return null;
+        }
+    }
+}
 
 class Game{
    constructor(room, roomid){
@@ -19,7 +42,8 @@ class Game{
    }
    onInputFired(data, id){
         if(this.map.nodes[data.nodes[0]].army && this.map.nodes[data.nodes[0]].army.count > 0 && this.map.nodes[data.nodes[0]].army.player == id && this.started){
-            this.map.moveArmy(data.nodes, id);
+
+            this.map.moveArmy(data.nodes, this.findPlayerById(id));
         }
    }
    incrementTroops(num){
@@ -77,13 +101,31 @@ class Game{
           return false;
       }
       console.log("Player assigned castle.");
-      this.players.push(id);
-      this.map.nodes[destination].assignPlayer(id);
+      let player = new Player(id);
+      this.players.push(player);
+      this.map.nodes[destination].assignPlayer(player);
 
       return true;
    }
    endGame(){
        this.room.emit("endGame",{winner:this.winner});
+   }
+   findPlayerIndexById(id){
+       for(var i = 0; i <  this.players.length; i++){
+           if(this.players[i].id == id){
+
+               return i;
+           }
+       }
+       return -1;
+   }
+   findPlayerById(id){
+       let index = this.findPlayerIndexById(id);
+       if(index > -1){
+           return this.players[index];
+       }else{
+           return null;
+       }
    }
    tick(){
         var troopsToAdd = 0;
@@ -171,13 +213,14 @@ class Map{
    moveArmy(nodes,player){
       var startNode = this.nodes[nodes[0]];
       var endNode = this.nodes[nodes[1]];
-      if(startNode.army.player == player){
+      if(startNode.army.player == player.id){
          //if startNode is a castle only move half the troops
          if(startNode instanceof Castle){
             var toMove = Math.floor(startNode.army.count/2);
             startNode.army.count -= toMove;
          }else{ //move all the troops
             toMove = startNode.army.count;
+            player.armies.splice(player.findArmyIndexById(startNode.army.id),1);
             startNode.army = null;
          }
          this.buffer.push({nodes:nodes, army:new Army(player, toMove), percentage:0});
@@ -243,15 +286,18 @@ class Castle extends MapNode{
       this.buff='none';
    }
 
-   assignPlayer(id){ //when player intially joins and is assigned a castle
-      this.army = new Army(id,50);
+   assignPlayer(player){ //when player intially joins and is assigned a castle
+      this.army = new Army(player,50);
    }
 }
 
 class Army{
-   constructor(id,size){
+   constructor(player,size){
       this.id = generateID(20);
-      this.player = id;
+      if(player){
+        this.player = player.id;
+        player.armies.push(this);
+      }
       this.count = size;
       //this.buff = "swole";
    }

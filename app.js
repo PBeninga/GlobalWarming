@@ -93,7 +93,11 @@ function tickGames(){
 	}
 	gamesToRemove = [];
       
-        var buffer = inputs.slice();
+		var buffer = inputs.slice();
+		/*
+			Data:
+			id: 
+		*/
         inputs = [];
         for(data of buffer){
            if(games.has(data[0].game)){
