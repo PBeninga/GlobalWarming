@@ -57,4 +57,13 @@ class Army {
     this.countGraphics.addColor(this.color, 0);
     this.countGraphics.addFontStyle(font, 0);
   }
+
+  moveTo(x, y) {
+    this.graphics.x = x;
+    this.countGraphics.x = x;
+    this.graphics.y = y;
+    this.countGraphics.y = y;
+    this.x = x;
+    this.y = y;
+  }
 }
