@@ -2,7 +2,8 @@ class Path {
   constructor(Node1, Node2) {
     this.start = Node1;
     this.end = Node2;
-    this.graphics = [];
+    this.graphics = null;
+    this.distance = distance(Node1, Node2);
   }
 
   display() {
@@ -27,6 +28,26 @@ class Path {
     }
     this.graphics.endFill();
   }
+}
+
+function percentToX(percent) {
+  if(this.start.graphics.x < this.end.graphics.x) {
+    return this.start.graphics.x + (distance * percent);
+  }
+  else if(this.start.graphics.x > this.end.graphics.x) {
+    return this.start.graphics.x - (distance * percent);
+  }
+  return -1;
+}
+
+function percentToY(percent) {
+  if(this.start.graphics.y < this.end.graphics.y) {
+    return this.start.graphics.y + (distance * percent);
+  }
+  else if(this.start.graphics.y > this.end.graphics.y) {
+    return this.start.graphics.y - (distance * percent);
+  }
+  return -1;
 }
 
 function distance (Node1, Node2) {
