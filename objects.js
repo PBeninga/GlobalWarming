@@ -56,7 +56,7 @@ class Game{
       this.removePlayer(this.id);
    }
    removePlayer(id){
-      if(!this.players.includes(id)){
+      if(this.findPlayerIndexById(id) == -1){
          console.log("Attempting to remove player that doesn't exist.");
          return;
       }
@@ -76,7 +76,7 @@ class Game{
          } // set to neutral castle
       }
 
-      this.players.splice(this.players.indexOf(id),1);
+      this.players.splice(this.findPlayerIndexById(id),1);
 
       //find any army in a path that is owned by removed player
       //NOT IMPLEMENTED

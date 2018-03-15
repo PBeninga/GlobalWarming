@@ -82,7 +82,7 @@ function onsocketConnected (data) {
 }
 function onStart(){
 		bannerGFX.destroy();
-		bannerGFX= game.add.text(500,0, "Fight!",{
+		bannerGFX= game.add.text(game.camera.x,game.camera.y, "Fight!",{
 			font: "70px Arial",
 			fill: "#FFFFFF",
 			align: "center"
@@ -94,7 +94,7 @@ function onUpdateTime(data){
 			bannerGFX.destroy();
 		}
 		let text = "Game starting in: " + data.time/1000;
-		bannerGFX = game.add.text(100,0, text,{
+		bannerGFX = game.add.text(game.camera.x,game.camera.y, text,{
 			font: "70px Arial",
 			fill: "#FFFFFF",
 			align: "center"
@@ -110,7 +110,7 @@ function endGame(data){
 }
 function displayLoss(){
 	bannerGFX.destroy();
-	bannerGFX = game.add.text(500,0, "You Suck!",{
+	bannerGFX = game.add.text(game.camera.x,game.camera.y, "You Suck!",{
 		font: "70px Arial",
 		fill: "#FFFFFF",
 		align: "center"
@@ -118,7 +118,7 @@ function displayLoss(){
 }
 function displayWin(){
 	bannerGFX.destroy();
-	bannerGFX= game.add.text(500,0, "Winner!",{
+	bannerGFX= game.add.text(game.camera.x,game.camera.y, "Winner!",{
 		font: "70px Arial",
 		fill: "#FFFFFF",
 		align: "center"
@@ -330,6 +330,11 @@ function createNodes(data) {
 		}
 		if(currentArmy.player == ClientPlayer.id){
 			game.camera.setPosition(data.nodes[castlePosition].x-canvas_width/2, data.nodes[castlePosition].y-canvas_height/2);
+			bannerGFX = game.add.text(game.camera.x ,game.camera.y, "Waiting for players",{
+				font: "70px Arial",
+				fill: "#FFFFFF",
+				align: "center"
+			  });
 		}
 
 		// Updates the army counts and the new owners of the castles.
