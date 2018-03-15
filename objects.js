@@ -1,4 +1,5 @@
 //import { setTimeout } from "timers";
+//updateArmies
 
 class Game{
    constructor(room, roomid){
@@ -124,7 +125,8 @@ class Game{
             for(var i = 0; i < this.map.buffer.length; i++){
                 this.map.buffer[i].percentage += 5;
                 if(this.map.buffer[i].percentage >= 100){
-                    this.map.finishedMovingArmy(this.map.buffer[i].nodes,this.map.buffer[i].army)
+                    this.map.finishedMovingArmy(this.map.buffer[i].nodes,this.map.buffer[i].army);
+                    this.map.buffer.splice(i,1);
                 }
             }
             //should be unncessary after pathTraversal is merged
@@ -199,15 +201,19 @@ class Map{
    }
 
     finishedMovingArmy(nodes,army){
+        let endNode = this.nodes[nodes[1]];
         if(endNode.army == null){
             endNode.army = new Army(null,0);
          }
          //if end node contains your army, just combine armies
-         if(endNode.army.player == player){
+         if(endNode.army == null){
+             endNode.army = new Army(null,0);
+        }
+         if(endNode.army.player == army.player){
             endNode.army.count += army.count;
          }else{ //battle
             //if enemy army is greater, decrease enemy army by your attacking army count
-            if(endNode.army.count >= toMove){
+            if(endNode.army.count >= army.count){
                endNode.army.count -= army.count;
             }else{//conquer the node with your remaning troops (the difference)
                army.count -= endNode.army.count;
@@ -221,9 +227,10 @@ class MapNode{
       this.id = id;
       this.x = x;
       this.y = y;
+      this.adj = adj;
       this.paths = [];
       for(var i = 0; i < adj.length; i++){
-          paths.push(new Path(id, adj[i]));
+          this.paths.push(new Path(id, adj[i]));
       }
       this.army = null;
    }
