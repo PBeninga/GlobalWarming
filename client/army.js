@@ -18,9 +18,9 @@ class Army {
     this.color = owner.color;
     this.x = x;
     this.y = y;
-    this.graphics = game.add.graphics(this.x, this.y);
+    this.graphics = game.add.graphics();
     this.graphics.beginFill(this.color, 0.5);
-    this.graphics.drawCircle(0, 0, 45);
+    this.graphics.drawCircle(this.x, this.y, 45);
     this.graphics.anchor.setTo(0.5,0.5);
     this.graphics.endFill();
     this.graphics.inputEnabled = true;

@@ -69,6 +69,7 @@ function onsocketConnected (data) {
 		*/
 		gameSocket.on('updateTime', onUpdateTime);
 		gameSocket.on('startGame',onStart);
+		gameSocket.on('move_armies', moveArmies);
 
 		//when the player receives the new input
 	ClientPlayer = addNewPlayer(this.id);
@@ -204,7 +205,7 @@ function swipe() {
 // Called when the mouse hovers over the node passed in the parameter.
 // Adds the node to the swipePath if a swipe was initialized.
 function mouseOver() {
-	console.log("Mouse is over node " + this.node.id);
+	console.log("Mouse is over node " + this.node.x + ", " + this.node.y);
 	if(swipePath.length != 0) {
 		if(swipePath[swipePath.length-1].pathTo(this.node) != null) {
 			swipePath.push(this.node);
@@ -335,11 +336,12 @@ function createNodes(data) {
 function moveArmies(data) {
 	console.log("moveArmies");
 	for(var i = 0; i < data.moving.length; i++) {
-		startNode = data.moving[i].nodes[0];
-		currentPath = startNode.pathTo(data.moving[i].nodes[1]);
+		startNode = findnodebyid(data.moving[i].nodes[0]);
+		currentPath = startNode.pathTo(findnodebyid(data.moving[i].nodes[1]));
 		sentArmy = data.moving[i].army;
 		currentPlayer = findplayerbyid(data.moving[i].army.player);
-		currentPlayer.addArmy(sentArmy.count, currentPlayer, currentPath.percentToX(data.moving[i].percentage), currentPath.percentToY(data.moving[i].percentage));
+		console.log(currentPath.percentToX(data.moving[i].percentage /100) + ", " + currentPath.percentToY(data.moving[i].percentage/100));
+		currentPlayer.addArmy(sentArmy.count, currentPlayer, currentPath.percentToX(data.moving[i].percentage /100), currentPath.percentToY(data.moving[i].percentage/100));
 	}
 }
 
@@ -465,7 +467,6 @@ main.prototype = {
 					data.players[0].armies[0].location.x
 		*/
 		socket.on('send_nodes', createNodes);
-		socket.on('move_armies', moveArmies);
 	},
 
   init: function(sock) {
