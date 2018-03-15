@@ -82,7 +82,7 @@ function onsocketConnected (data) {
 }
 function onStart(){
 		bannerGFX.destroy();
-		bannerGFX= game.add.text(500,0, "Fight!",{
+		bannerGFX= game.add.text(game.camera.x,game.camera.y, "Fight!",{
 			font: "70px Arial",
 			fill: "#FFFFFF",
 			align: "center"
@@ -94,7 +94,7 @@ function onUpdateTime(data){
 			bannerGFX.destroy();
 		}
 		let text = "Game starting in: " + data.time/1000;
-		bannerGFX = game.add.text(100,0, text,{
+		bannerGFX = game.add.text(game.camera.x,game.camera.y, text,{
 			font: "70px Arial",
 			fill: "#FFFFFF",
 			align: "center"
@@ -110,7 +110,7 @@ function endGame(data){
 }
 function displayLoss(){
 	bannerGFX.destroy();
-	bannerGFX = game.add.text(500,0, "You Suck!",{
+	bannerGFX = game.add.text(game.camera.x,game.camera.y, "You Suck!",{
 		font: "70px Arial",
 		fill: "#FFFFFF",
 		align: "center"
@@ -118,7 +118,7 @@ function displayLoss(){
 }
 function displayWin(){
 	bannerGFX.destroy();
-	bannerGFX= game.add.text(500,0, "Winner!",{
+	bannerGFX= game.add.text(game.camera.x,game.camera.y, "Winner!",{
 		font: "70px Arial",
 		fill: "#FFFFFF",
 		align: "center"
@@ -210,7 +210,7 @@ function mouseOver() {
 		if(swipePath[swipePath.length-1].pathTo(this.node) != null) {
 			swipePath.push(this.node);
 			lines[lines.length-1].end = new Phaser.Point(this.node.x, this.node.y);
-			lines.push(new Phaser.Line(this.node.x, this.node.y, game.input.mousePointer.x, game.input.mousePointer.y));
+			lines.push(new Phaser.Line(this.node.x, this.node.y, game.input.mousePointer.x + game.camera.x, game.input.mousePointer.y+ game.camera.y));
 		}
 		else {
 		}
@@ -325,6 +325,17 @@ function createNodes(data) {
 		if(!included) {
 			player = addNewPlayer(currentArmy.player);
 		}
+		if(currentArmy.player){
+			console.log("HERHEHRHEHE" + currentArmy.player + " " + ClientPlayer.id);
+		}
+		if(currentArmy.player == ClientPlayer.id){
+			game.camera.setPosition(data.nodes[castlePosition].x-canvas_width/2, data.nodes[castlePosition].y-canvas_height/2);
+			bannerGFX = game.add.text(game.camera.x ,game.camera.y, "Waiting for players",{
+				font: "70px Arial",
+				fill: "#FFFFFF",
+				align: "center"
+			  });
+		}
 
 		// Updates the army counts and the new owners of the castles.
 		var newArmy = player.addArmy(currentArmy.count, nodes[castlePosition].x, nodes[castlePosition].y);
@@ -334,7 +345,7 @@ function createNodes(data) {
 }
 
 function moveArmies(data) {
-	console.log("moveArmies");
+	//console.log("moveArmies");
 	for(var i = 0; i < data.moving.length; i++) {
 		startNode = findnodebyid(data.moving[i].nodes[0]);
 		currentPath = startNode.pathTo(findnodebyid(data.moving[i].nodes[1]));
@@ -415,7 +426,7 @@ function printCreateNodeData(data) {
 main.prototype = {
 
 	create: function () {
-		game.world.setBounds(-canvas_width, -canvas_height, canvas_width * 2, canvas_height * 2);
+		game.world.setBounds(-canvas_width*2, -canvas_height*2, canvas_width * 4, canvas_height * 4);
 		game.stage.backgroundColor = 0x000000;
 		game.input.onUp.add(endSwipe);
 		console.log("client started");
@@ -501,7 +512,7 @@ main.prototype = {
 
 	render: function () {
 		if(lines.length > 0) {
-			lines[lines.length-1].end = new Phaser.Point(game.input.mousePointer.x, game.input.mousePointer.y);
+			lines[lines.length-1].end = new Phaser.Point(game.input.mousePointer.x +game.camera.x, game.input.mousePointer.y+game.camera.y);
 			for(var i = 0; i < lines.length; i++) {
 				game.debug.geom(lines[i], 0x000000);
 			}
