@@ -3,6 +3,7 @@ socket = io.connect();
 var playerID = createID();
 var playerSocket;
 var menuFlag = 0;
+var titleText;
 
 var mainmenu = function(game){};
  
@@ -176,6 +177,8 @@ mainmenu.prototype = {
     game.add.plugin(PhaserInput.Plugin);
     console.log("Reached main menu");
     game.stage.backgroundColor = 0xADD8E6;
+
+    titleText = game.add.bitmapText((canvas_width/2) - 255, 100, 'carrier_command', 'Global Warming', 32);
 
     var MenuBorder = game.add.graphics();
     // colour and opacity

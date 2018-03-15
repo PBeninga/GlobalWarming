@@ -9,6 +9,7 @@ var preloader = {
     game.load.image('button3', 'client/assets/blue_button02.png');
     game.load.image('button4', 'client/assets/blue_button03.png');
     game.load.image('button5', 'client/assets/blue_button04.png');
+    game.load.bitmapFont('carrier_command', 'client/assets/carrier_command.png', 'client/assets/carrier_command.xml');
   },
 
   create: function() {
