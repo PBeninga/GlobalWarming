@@ -340,8 +340,9 @@ function moveArmies(data) {
 		currentPath = startNode.pathTo(findnodebyid(data.moving[i].nodes[1]));
 		sentArmy = data.moving[i].army;
 		currentPlayer = findplayerbyid(data.moving[i].army.player);
-		console.log(currentPath.percentToX(data.moving[i].percentage /100) + ", " + currentPath.percentToY(data.moving[i].percentage/100));
-		currentPlayer.addArmy(sentArmy.count, currentPlayer, currentPath.percentToX(data.moving[i].percentage /100), currentPath.percentToY(data.moving[i].percentage/100));
+		currentPlayer.addArmy(sentArmy.count,
+			currentPath.percentToX(data.moving[i].percentage /100),
+			currentPath.percentToY(data.moving[i].percentage/100));
 	}
 }
 

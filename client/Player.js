@@ -49,6 +49,7 @@ class Player {
       if(this.armies[i].x == x && this.armies[i].y == y) {
         this.armies[i].count = count;
         this.updated[i] = true;
+        return;
       }
     }
   }
