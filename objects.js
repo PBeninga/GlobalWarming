@@ -109,6 +109,24 @@ class Game{
                this.incrementTroops(troopsToAdd);
                troopsToAdd = 0;
             }
+            /* 
+                [
+                    {
+                        nodes[]: 2 elements start nodes and then endnode
+                        army: army moving
+                        percentage: integer of percentage between paths.
+                    },
+                    ...
+
+                ]
+            */
+            this.room.emit("move_armies",this.map.buffer);
+            for(var i = 0; i < this.map.buffer.length; i++){
+                this.map.buffer[i].percentage += 5;
+                if(this.map.buffer[i].percentage >= 100){
+                    this.map.finishedMovingArmy(this.map.buffer[i].nodes,this.map.buffer[i].army)
+                }
+            }
             //should be unncessary after pathTraversal is merged
             var playersInGame = [];
             for(var i = 0; i < this.map.nodes.length; i++){
@@ -136,6 +154,7 @@ class Map{
       this.nodes = [];
       this.castles = [];//which indicies of nodes are castles;
       this.castlesChanged = [];
+      this.buffer = [];
       //this.paths = [];
    }
 
@@ -159,38 +178,60 @@ class Map{
             toMove = startNode.army.count;
             startNode.army = null;
          }
+         this.buffer.push({nodes:nodes, army:new Army(player, toMove), percentage:0});
 
          //if end node is empty, add dummy army to be overwritten by moving troops
-         if(endNode.army == null){
+        //  if(endNode.army == null){
+        //     endNode.army = new Army(null,0);
+        //  }
+        //  //if end node contains your army, just combine armies
+        //  if(endNode.army.player == player){
+        //     endNode.army.count += toMove;
+        //  }else{ //battle
+        //     //if enemy army is greater, decrease enemy army by your attacking army count
+        //     if(endNode.army.count >= toMove){
+        //        endNode.army.count -= toMove;
+        //     }else{//conquer the node with your remaning troops (the difference)
+        //        endNode.army = new Army(player,toMove-endNode.army.count);
+        //     }
+        //  }
+      }
+   }
+
+    finishedMovingArmy(nodes,army){
+        if(endNode.army == null){
             endNode.army = new Army(null,0);
          }
          //if end node contains your army, just combine armies
          if(endNode.army.player == player){
-            endNode.army.count += toMove;
+            endNode.army.count += army.count;
          }else{ //battle
             //if enemy army is greater, decrease enemy army by your attacking army count
             if(endNode.army.count >= toMove){
-               endNode.army.count -= toMove;
+               endNode.army.count -= army.count;
             }else{//conquer the node with your remaning troops (the difference)
-               endNode.army = new Army(player,toMove-endNode.army.count);
+               army.count -= endNode.army.count;
+               endNode.army = army;
             }
-         }
-      }
-   }
+        }
+    }
 }
-
 class MapNode{
-   constructor(x,y,adj){
+   constructor(x,y,adj, id){
+      this.id = id;
       this.x = x;
       this.y = y;
-      this.adj = adj;
+      this.paths = [];
+      for(var i = 0; i < adj.length; i++){
+          paths.push(new Path(id, adj[i]));
+      }
       this.army = null;
    }
 }
 
 class Castle extends MapNode{
-   constructor(x,y,adj){
-      super(x,y,adj);
+   constructor(x,y,adj, id){
+      super(x,y,adj, id);
       this.army = new Army(null,50);
       this.buff='none';
    }
@@ -202,10 +243,28 @@ class Castle extends MapNode{
 
 class Army{
    constructor(id,size){
+      this.id = generateID(20);
       this.player = id;
       this.count = size;
       //this.buff = "swole";
    }
+}
+class Path{
+    constructor(startNode, endNode){
+        this.startNode = startNode;
+        this.endNode = endNode;
+        this.id =  startNode+" "+endNode;   
+    }
+}
+function generateID(length) {
+    let text = ""
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+
+    for(let i = 0; i < length; i++)  {
+        text += possible.charAt(Math.floor(Math.random() * possible.length))
+    }
+
+    return text
 }
 /*
 //create game with a castle and an empty node
