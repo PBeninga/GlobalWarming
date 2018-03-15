@@ -8,7 +8,7 @@ class Player{
     }
     findArmyIndexById(id){
         for(var i = 0; i <  this.armies.length; i++){
-            if(this.armies[i] ==  id){
+            if(this.armies[i] == id){
                 return i;
             }
         }
@@ -42,6 +42,7 @@ class Game{
    }
    onInputFired(data, id){
         if(this.map.nodes[data.nodes[0]].army && this.map.nodes[data.nodes[0]].army.count > 0 && this.map.nodes[data.nodes[0]].army.player == id && this.started){
+
             this.map.moveArmy(data.nodes, this.findPlayerById(id));
         }
    }
@@ -111,14 +112,15 @@ class Game{
    }
    findPlayerIndexById(id){
        for(var i = 0; i <  this.players.length; i++){
-           if(this.players[i] ==  id){
+           if(this.players[i].id == id){
+
                return i;
            }
        }
        return -1;
    }
    findPlayerById(id){
-       let index = findPlayerIndexById(id);
+       let index = this.findPlayerIndexById(id);
        if(index > -1){
            return this.players[index];
        }else{
@@ -292,9 +294,10 @@ class Castle extends MapNode{
 class Army{
    constructor(player,size){
       this.id = generateID(20);
-      this.playerObj = player;
-      this.player = player.id;
-      player.armies.push(this);
+      if(player){
+        this.player = player.id;
+        player.armies.push(this);
+      }
       this.count = size;
       //this.buff = "swole";
    }
