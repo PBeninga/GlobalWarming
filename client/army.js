@@ -49,17 +49,21 @@ class Army {
   }
 
   update() {
-    this.countGraphics.destroy();
     var font  = "14px Arial";
-    console.log(ClientPlayer.id + " "+ this.owner.id);
     if(ClientPlayer.id == this.owner.id){
       font  = "20px Arial";
     }
-    this.countGraphics = game.add.text(this.x, this.y, this.count, {
-      font: font,
-      fill: this.color,
-      align: "center"
-    });
-    this.countGraphics.anchor.setTo(0.5, 0.5);
+    this.countGraphics.setText(this.count);
+    this.countGraphics.addColor(this.color, 0);
+    this.countGraphics.addFontStyle(font, 0);
+  }
+
+  moveTo(x, y) {
+    this.graphics.x = x;
+    this.countGraphics.x = x;
+    this.graphics.y = y;
+    this.countGraphics.y = y;
+    this.x = x;
+    this.y = y;
   }
 }

@@ -61,14 +61,14 @@ function onsocketConnected (data) {
 			id: new player id
 		}
 		*/
-		   gameSocket.on('newPlayer', onNewPlayer);
-		   /*data =
-		   {
+		gameSocket.on('newPlayer', onNewPlayer);
+		/*data =
+		 {
 			time: time left untill game starts
-		   }
-		   */
-		   gameSocket.on('updateTime', onUpdateTime);
-		   gameSocket.on('startGame',onStart);
+		 }
+		*/
+		gameSocket.on('updateTime', onUpdateTime);
+		gameSocket.on('startGame',onStart);
 
 		//when the player receives the new input
 	ClientPlayer = addNewPlayer(this.id);
@@ -283,6 +283,18 @@ function createNodes(data) {
 		}
 	}
 
+// TODO: REPLACE EVERYTHING BELOW THIS ONCE DATA GETS RESTRUCTURED
+/*
+	for(var i = 0; i < data.players.length; i++) {
+		var player = addNewPlayer(daya.players[i].id);
+		for(var j = 0; j < data.players[i].armies.length; j++) {
+			var newArmy = player.addArmy(data.players[i].armies[j].count, nodes[data.players[i].armies[j].location]);
+			newArmy.graphics.events.onInputDown.add(swipe, {army: newArmy});
+			newArmy.graphics.events.onInputOver.add(mouseOver, {node: newArmy.node});
+		}
+	}
+*/
+
 	// Iterates through all castles in the node list.
 	for(var i = 0; i < data.castles.length; i++){
 		var castlePosition = data.castles[i];
@@ -310,6 +322,27 @@ function createNodes(data) {
 }
 
 function updateNodes(data){
+	//TODO: REPLACE EVERYTHING BELOW THIS WHEN DATA GETS RESTRUCTURED
+/*
+	for(var i = 0; i < data.players.length; i++) {
+		var currentPlayer = findplayerbyid(data.players[i].id);
+		for(var j = 0; j < data.players[i].armies.length; j++) {
+			currentArmy = data.players[i].armies[j];
+			if(currentArmy.id >= currentPlayer.armies.length) {
+				var newArmy = currentPlayer.addArmy(0, nodes[currentArmy.location]);
+				newArmy.graphics.events.onInputDown.add(swipe, {army: newArmy});
+				newArmy.graphics.events.onInputOver.add(mouseOver, {node: newArmy.node});
+			}
+			playerOwner.updateArmy(currentArmy.count, nodes[i]);
+		}
+	}
+	for(var j = 0; j < players.length; j++) {
+		players[j].removeArmies();
+		players[j].clearUpdated();
+		players[j].updateArmies();
+	}
+*/
+
 	var sentNodes = data.nodes;
 	for(var i = 0; i < sentNodes.length; i++){
 		// If the sent node has an army, update it.
@@ -357,6 +390,7 @@ function printCreateNodeData(data) {
 main.prototype = {
 
 	create: function () {
+		game.world.setBounds(-canvas_width, -canvas_height, canvas_width * 2, canvas_height * 2);
 		game.stage.backgroundColor = 0x000000;
 		game.input.onUp.add(endSwipe);
 		console.log("client started");
@@ -401,7 +435,7 @@ main.prototype = {
 					id: Player ID
 					armies[
 						count: Strength of the army
-						location: Where the army is located (currently x, y)
+						location: Where the army is located (index of node)
 					]
 				]
 			}
@@ -412,11 +446,32 @@ main.prototype = {
 
 	},
 
-        init: function(sock) {
-            socket = sock;
-        },
+  init: function(sock) {
+      socket = sock;
+  },
 
 	update: function () {
+		if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) ||
+				game.input.keyboard.isDown(Phaser.Keyboard.A))
+		{
+			game.camera.x -= 4;
+		}
+		else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT) ||
+						 game.input.keyboard.isDown(Phaser.Keyboard.D))
+		{
+			game.camera.x += 4;
+		}
+
+		if (game.input.keyboard.isDown(Phaser.Keyboard.UP) ||
+				game.input.keyboard.isDown(Phaser.Keyboard.W))
+		{
+			game.camera.y -= 4;
+		}
+		else if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN) ||
+						 game.input.keyboard.isDown(Phaser.Keyboard.S))
+		{
+			game.camera.y += 4;
+		}
 		// emit the player input
 	},
 
