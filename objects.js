@@ -79,13 +79,13 @@ class Game{
       console.log("Player assigned castle.");
       this.players.push(id);
       this.map.nodes[destination].assignPlayer(id);
-     
+
       return true;
    }
    endGame(){
        this.room.emit("endGame",{winner:this.winner});
    }
-   tick(){ 
+   tick(){
         var troopsToAdd = 0;
         this.room.emit('update_nodes', {nodes:this.map.nodes});
 
@@ -94,7 +94,7 @@ class Game{
            troopsToAdd = Math.floor((tickStartTime -this.time)/500);
            this.time = tickStartTime - (tickStartTime%500);
         }
-        
+
         if(this.players.length > 1 && !this.starting && !this.started){
             this.starting = true;
             console.log("Game starting.");
@@ -110,7 +110,7 @@ class Game{
                this.incrementTroops(troopsToAdd);
                troopsToAdd = 0;
             }
-            /* 
+            /*
                 [
                     {
                         nodes[]: 2 elements start nodes and then endnode
@@ -121,7 +121,7 @@ class Game{
 
                 ]
             */
-            this.room.emit("move_armies",this.map.buffer);
+            this.room.emit('move_armies', {moving:this.map.buffer});
             for(var i = 0; i < this.map.buffer.length; i++){
                 this.map.buffer[i].percentage += 5;
                 if(this.map.buffer[i].percentage >= 100){
@@ -143,7 +143,7 @@ class Game{
                     this.winner = playersInGame[0];
                 }
                 game.finished = true;
-            }      
+            }
         }else if(this.starting){
             this.timeTillStart = 10000 - (new Date().getTime() - this.timeGameBeganStarting);
             this.room.emit('updateTime',{time:this.timeTillStart});
@@ -260,7 +260,7 @@ class Path{
     constructor(startNode, endNode){
         this.startNode = startNode;
         this.endNode = endNode;
-        this.id =  startNode+" "+endNode;   
+        this.id =  startNode+" "+endNode;
     }
 }
 function generateID(length) {

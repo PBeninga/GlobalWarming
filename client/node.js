@@ -28,9 +28,9 @@ class MapNode {
   pathTo(node) {
     for(var i = 0; i < this.paths.length; i++) {
       if(this.paths[i].end.id == node.id) {
-        return true;
+        return this.paths[i];
       }
     }
-    return false;
+    return null;
   }
 }

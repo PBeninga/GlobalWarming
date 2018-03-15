@@ -34,20 +34,14 @@ function percentToX(percent) {
   if(this.start.graphics.x < this.end.graphics.x) {
     return this.start.graphics.x + (distance * percent);
   }
-  else if(this.start.graphics.x > this.end.graphics.x) {
-    return this.start.graphics.x - (distance * percent);
-  }
-  return -1;
+  return this.start.graphics.x - (distance * percent);
 }
 
 function percentToY(percent) {
   if(this.start.graphics.y < this.end.graphics.y) {
     return this.start.graphics.y + (distance * percent);
   }
-  else if(this.start.graphics.y > this.end.graphics.y) {
-    return this.start.graphics.y - (distance * percent);
-  }
-  return -1;
+  return this.start.graphics.y - (distance * percent);
 }
 
 function distance (Node1, Node2) {

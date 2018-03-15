@@ -11,14 +11,13 @@ function merge(army1, army2) {
 
 class Army {
   // TODO: Eventually replace Node with a Location object
-  constructor(count, owner, node) {
+  constructor(count, owner, x, y) {
     this.count = count;
     this.owner = owner;
     this.id = -1;
     this.color = owner.color;
-    this.node = node;
-    this.x = node.x;
-    this.y = node.y;
+    this.x = x;
+    this.y = y;
     this.graphics = game.add.graphics(this.x, this.y);
     this.graphics.beginFill(this.color, 0.5);
     this.graphics.drawCircle(0, 0, 45);

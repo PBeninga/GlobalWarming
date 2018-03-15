@@ -192,12 +192,12 @@ function getColor() {
 function swipe() {
 	// If the army isn't owned by this client, do nothing.
 	if(this.army.owner.id != ClientPlayer.id) {
-		console.log("That's not your army! Army at " + this.army.node.id + " is owned by " + this.army.owner.id);
+		console.log("That's not your army! Army at " + this.army.x + "," + this.army.y + " is owned by " + this.army.owner.id);
 	}
 	else {
-		console.log("Army at " + this.army.node.id + " is owned by " + this.army.owner.id);
-		swipePath.push(this.army.node);
-		lines.push(new Phaser.Line(this.army.node.x, this.army.node.y, game.input.mousePointer.x, game.input.mousePointer.y));
+		console.log("Army at " + this.army.x + "," + this.army.y + " is owned by " + this.army.owner.id);
+		swipePath.push(findnodebyloc(this.army.x, this.army.y));
+		lines.push(new Phaser.Line(this.army.x, this.army.y, game.input.mousePointer.x, game.input.mousePointer.y));
 	}
 }
 
@@ -206,7 +206,7 @@ function swipe() {
 function mouseOver() {
 	console.log("Mouse is over node " + this.node.id);
 	if(swipePath.length != 0) {
-		if(swipePath[swipePath.length-1].pathTo(this.node)) {
+		if(swipePath[swipePath.length-1].pathTo(this.node) != null) {
 			swipePath.push(this.node);
 			lines[lines.length-1].end = new Phaser.Point(this.node.x, this.node.y);
 			lines.push(new Phaser.Line(this.node.x, this.node.y, game.input.mousePointer.x, game.input.mousePointer.y));
@@ -257,6 +257,17 @@ function findplayerbyid (id) {
 function findnodebyid (id) {
 	for (var i = 0; i < nodes.length; i++) {
 		if (nodes[i].id == id) {
+			return nodes[i];
+		}
+	}
+	console.log("Failure to find node id " + id);
+	return null;
+}
+
+//Search through nodes list, and return the node with the id set
+function findnodebyloc (x, y) {
+	for (var i = 0; i < nodes.length; i++) {
+		if (nodes[i].x == x && nodes[i].y == y) {
 			return nodes[i];
 		}
 	}
@@ -315,9 +326,20 @@ function createNodes(data) {
 		}
 
 		// Updates the army counts and the new owners of the castles.
-		var newArmy = player.addArmy(currentArmy.count, nodes[castlePosition]);
+		var newArmy = player.addArmy(currentArmy.count, nodes[castlePosition].x, nodes[castlePosition].y);
 		newArmy.graphics.events.onInputDown.add(swipe, {army: newArmy});
-		newArmy.graphics.events.onInputOver.add(mouseOver, {node: newArmy.node});
+		newArmy.graphics.events.onInputOver.add(mouseOver, {node: nodes[castlePosition]});
+	}
+}
+
+function moveArmies(data) {
+	console.log("moveArmies");
+	for(var i = 0; i < data.moving.length; i++) {
+		startNode = data.moving[i].nodes[0];
+		currentPath = startNode.pathTo(data.moving[i].nodes[1]);
+		sentArmy = data.moving[i].army;
+		currentPlayer = findplayerbyid(data.moving[i].army.player);
+		currentPlayer.addArmy(sentArmy.count, currentPlayer, currentPath.percentToX(data.moving[i].percentage), currentPath.percentToY(data.moving[i].percentage));
 	}
 }
 
@@ -351,12 +373,12 @@ function updateNodes(data){
 			// If our nodes didn't hold an army, initialize that node's army
 			playerOwner = findplayerbyid(currentArmy.player);
 			if(playerOwner.getArmyId(nodes[i].x, nodes[i].y) == -1) {
-				var newArmy = playerOwner.addArmy(0, nodes[i]);
+				var newArmy = playerOwner.addArmy(0, nodes[i].x, nodes[i].y);
 				newArmy.graphics.events.onInputDown.add(swipe, {army: newArmy});
-				newArmy.graphics.events.onInputOver.add(mouseOver, {node: newArmy.node});
+				newArmy.graphics.events.onInputOver.add(mouseOver, {node: nodes[i]});
 			}
 			// Update our clients army variables
-			playerOwner.updateArmy(currentArmy.count, nodes[i]);
+			playerOwner.updateArmy(currentArmy.count, nodes[i].x, nodes[i].y);
 		}
 
 	}
@@ -443,7 +465,7 @@ main.prototype = {
 					data.players[0].armies[0].location.x
 		*/
 		socket.on('send_nodes', createNodes);
-
+		socket.on('move_armies', moveArmies);
 	},
 
   init: function(sock) {
