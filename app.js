@@ -60,9 +60,9 @@ function makeMap(game){
 				adj.push(count+1);
 			}
 			if(castles.indexOf(count) == -1){
-				nodes[count] = new gameObjects.MapNode(x,y,adj);
+				nodes[count] = new gameObjects.MapNode(x,y,adj, count);
 			}else{
-				nodes[count] = new gameObjects.Castle(x,y,adj);
+				nodes[count] = new gameObjects.Castle(x,y,adj, count);
 			}
 			count++;
 		}
