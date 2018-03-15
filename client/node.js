@@ -5,7 +5,7 @@ class MapNode {
     this.y = y;
     this.paths = [];
     this.owned = false;
-    this.graphics = game.add.sprite(node_data.x, node_data.y, 'node_img');
+    this.graphics = game.add.sprite(x, y, 'node_img');
     this.graphics.anchor.setTo(0.5,0.5);
     this.graphics.height = 50;
     this.graphics.width = 50;
@@ -28,9 +28,9 @@ class MapNode {
   pathTo(node) {
     for(var i = 0; i < this.paths.length; i++) {
       if(this.paths[i].end.id == node.id) {
-        return true;
+        return this.paths[i];
       }
     }
-    return false;
+    return null;
   }
 }

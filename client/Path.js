@@ -10,44 +10,44 @@ class Path {
     this.graphics = game.add.graphics();
     this.graphics.beginFill(0xFF3300);
     this.graphics.lineStyle(10, 0xffd900, 1);
-    if(this.start.graphics.x < this.end.graphics.x) {
-      this.graphics.drawRect(this.start.graphics.x, this.start.graphics.y,
+    if(this.start.x < this.end.x) {
+      this.graphics.drawRect(this.start.x, this.start.y,
                                                   xdistance(this.start, this.end), this.start.height);
     }
-    if(this.start.graphics.x > this.end.graphics.x) {
-      this.graphics.drawRect(this.end.graphics.x, this.end.graphics.y,
+    if(this.start.x > this.end.x) {
+      this.graphics.drawRect(this.end.x, this.end.y,
                                                   xdistance(this.start, this.end), this.end.height);
     }
-    if(this.start.graphics.y < this.end.graphics.y) {
-      this.graphics.drawRect(this.start.graphics.x, this.start.graphics.y,
+    if(this.start.y < this.end.y) {
+      this.graphics.drawRect(this.start.x, this.start.y,
                                                   this.start.width, ydistance(this.start, this.end));
     }
-    if(this.start.graphics.y > this.end.graphics.y) {
-      this.graphics.drawRect(this.end.graphics.x, this.end.graphics.y,
+    if(this.start.y > this.end.y) {
+      this.graphics.drawRect(this.end.x, this.end.y,
                                                   this.end.width, ydistance(this.start, this.end));
     }
     this.graphics.endFill();
   }
-}
 
-function percentToX(percent) {
-  if(this.start.graphics.x < this.end.graphics.x) {
-    return this.start.graphics.x + (distance * percent);
+  percentToX(percent) {
+    if(this.start.x < this.end.x) {
+      return this.start.x + (this.distance * percent);
+    }
+    if(this.start.x > this.end.x) {
+      return this.start.x - (this.distance * percent);
+    }
+    return this.start.x;
   }
-  else if(this.start.graphics.x > this.end.graphics.x) {
-    return this.start.graphics.x - (distance * percent);
-  }
-  return -1;
-}
 
-function percentToY(percent) {
-  if(this.start.graphics.y < this.end.graphics.y) {
-    return this.start.graphics.y + (distance * percent);
+  percentToY(percent) {
+    if(this.start.y < this.end.y) {
+      return this.start.y + (this.distance * percent);
+    }
+    if(this.start.y > this.end.y) {
+      return this.start.y - (this.distance * percent);
+    }
+    return this.start.y;
   }
-  else if(this.start.graphics.y > this.end.graphics.y) {
-    return this.start.graphics.y - (distance * percent);
-  }
-  return -1;
 }
 
 function distance (Node1, Node2) {
