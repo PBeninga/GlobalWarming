@@ -20,6 +20,38 @@ var bannerGFX;
 
 var main = function(game){
 };
+
+// ONLY CALL IF YOU WANT TO DESTROY ALL OBJECTS IN MAIN
+function removeAll() {
+	bannerGFX.destroy();
+
+	// Removes all lines? Is this even necessary?
+	lines = [];
+	// Removes all Nodes and Paths
+	for(var i = 0; i < nodes.length; i++) {
+		for(var j = 0; j < nodes[i].paths.length; j++) {
+			if(nodes[i].paths[j].graphics != null) {
+				nodes[i].paths[j].graphics.destroy();
+			}
+		}
+		if(nodes[i].graphics != null) {
+			nodes[i].graphics.destroy();
+		}
+	}
+
+	if(players != null) {
+		for(var i = 0; i < players.length; i++) {
+			for(var j = 0; j < players[i].armies.length; j++) {
+				players[i].armies[j].destroyGraphics();
+			}
+		}
+	}
+	players = [];
+	ClientPlayer = null;
+	DummyPlayer = new Player(-1, 0x000000);
+	players.push(DummyPlayer);
+}
+
 function onsocketConnected (data) {
 	console.log("connected to server");
 	console.log(this.id + " " + data.id);
@@ -108,6 +140,7 @@ function endGame(data){
 		displayLoss();
 	}
 }
+
 function displayLoss(){
 	bannerGFX.destroy();
 	bannerGFX = game.add.text(game.camera.x,game.camera.y, "You Suck!",{
@@ -433,6 +466,24 @@ main.prototype = {
 		game.world.setBounds(-canvas_width*2, -canvas_height*2, canvas_width * 4, canvas_height * 4);
 		game.stage.backgroundColor = 0x000000;
 		game.input.onUp.add(endSwipe);
+
+		var tempButton = game.add.button(10, 10, 'button1', function() {
+			if(gameSocket != null) {
+				gameSocket.emit("disconnect", {id:ClientPlayer.id})
+				gameSocket.disconnect();
+			}
+			removeAll();
+			game.state.start('mainmenu', true, false, socket);
+		}, main, 2, 1, 0);
+		tempButton.scale.set(1.0,1.0);
+		tempButton.anchor.setTo(0.5, 0.5);
+		tempButton.text = game.add.text(tempButton.x, tempButton.y, "Return to Main Menu", {
+			font: "14px Arial",
+			fill: "#fff",
+			align: "center"
+		});
+		tempButton.text.anchor.setTo(0.5, 0.5);
+
 		console.log("client started");
     	socket.emit("client_started",{});
 
