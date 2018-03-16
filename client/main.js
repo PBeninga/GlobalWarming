@@ -17,13 +17,15 @@ var colors = [0xFF0000,	0xFF9F00, 0xF8FF00, 0x7AFF00,0x0000FF,
 var colorTaken = [false, false, false, false, false,
 									false, false, false, false];
 var bannerGFX;
+var leaveButton;
 
 var main = function(game){
 };
 
 // ONLY CALL IF YOU WANT TO DESTROY ALL OBJECTS IN MAIN
 function removeAll() {
-	bannerGFX.destroy();
+	if(bannerGFX != null)
+		bannerGFX.destroy();
 
 	// Removes all lines? Is this even necessary?
 	lines = [];
@@ -38,7 +40,7 @@ function removeAll() {
 			nodes[i].graphics.destroy();
 		}
 	}
-
+	// Removes all players and armies
 	if(players != null) {
 		for(var i = 0; i < players.length; i++) {
 			for(var j = 0; j < players[i].armies.length; j++) {
@@ -46,6 +48,8 @@ function removeAll() {
 			}
 		}
 	}
+	if(leaveButton != null)
+		leaveButton.destroy();
 	players = [];
 	ClientPlayer = null;
 	DummyPlayer = new Player(-1, 0x000000);
@@ -467,22 +471,21 @@ main.prototype = {
 		game.stage.backgroundColor = 0x000000;
 		game.input.onUp.add(endSwipe);
 
-		var tempButton = game.add.button(10, 10, 'button1', function() {
+		leaveButton = game.add.button(game.camera.x + window.innerWidth, game.camera.y + window.innerHeight, 'button1', function() {
 			if(gameSocket != null) {
-				gameSocket.emit("disconnect", {id:ClientPlayer.id})
 				gameSocket.disconnect();
 			}
+			socket.disconnect();
 			removeAll();
 			game.state.start('mainmenu', true, false, socket);
 		}, main, 2, 1, 0);
-		tempButton.scale.set(1.0,1.0);
-		tempButton.anchor.setTo(0.5, 0.5);
-		tempButton.text = game.add.text(tempButton.x, tempButton.y, "Return to Main Menu", {
+		leaveButton.anchor.setTo(0.0, 0.0);
+		leaveButton.text = game.add.text(leaveButton.x, leaveButton.y, "Return to Main Menu", {
 			font: "14px Arial",
 			fill: "#fff",
 			align: "center"
 		});
-		tempButton.text.anchor.setTo(0.5, 0.5);
+		leaveButton.text.anchor.setTo(0.5, 0.5);
 
 		console.log("client started");
     	socket.emit("client_started",{});
@@ -562,6 +565,11 @@ main.prototype = {
 		{
 			game.camera.y += 4;
 		}
+
+		leaveButton.x = game.camera.x + window.innerWidth - leaveButton.width;
+		leaveButton.text.x = game.camera.x + window.innerWidth - (leaveButton.width / 2);
+		leaveButton.y = game.camera.y;
+		leaveButton.text.y = game.camera.y + (leaveButton.height / 2);
 		// emit the player input
 	},
 
