@@ -1,12 +1,28 @@
 var socket;
-socket = io.connect();
 var playerID = createID();
 var playerSocket;
 var menuFlag = 0;
 var titleText;
+var startButton;
+var loginButton;
+var createAccountButton;
 
 var mainmenu = function(game){};
- 
+
+function createBaseButtons() {
+  startButton = createButton(game, "Game Start", 'button1', canvas_width/2, canvas_height/2 - 100, 1, function() {
+    game.state.start('main', true, false, socket);
+  });
+  loginButton = createButton(game, "Login", 'button1', canvas_width/2, canvas_height/2, 1, login);
+  createAccountButton = createButton(game, "Create Account", 'button1', canvas_width/2, canvas_height/2 + 100, 1, createAccount);
+}
+
+function destroyBaseButtons() {
+  startButton.destroy();
+  loginButton.destroy();
+  createAccountButton.destroy();
+}
+
 function createButton(game, string, ident, x, y, scale, callback) {
   var tempButton = game.add.button(x, y, ident, callback, mainmenu, 2, 1, 0);
   tempButton.scale.set(scale,scale);
@@ -24,12 +40,13 @@ function createButton(game, string, ident, x, y, scale, callback) {
 function createAccount() {
    if(menuFlag == 1) return;
    menuFlag = 1;
+   destroyBaseButtons();
 
    var AccountBorder = game.add.graphics();
    AccountBorder.beginFill(0xFFFFFF, 1);
    borderWidth = 500;
    borderHeight = 400;
-   maxLeft = (canvas_width/2)-(borderWidth/2)+400;
+   maxLeft = (canvas_width/2)-(borderWidth/2);
    maxTop = (canvas_height/2)-(borderHeight/2);
 
    AccountBorder.drawRect(maxLeft, maxTop, borderWidth, borderHeight);
@@ -64,7 +81,7 @@ function createAccount() {
       type: PhaserInput.InputType.password
    };
    var password = game.add.inputField(inputLeft, inputTop, inputDataTwo);
-  
+
    var login;
    var cancel = createButton(game, "Cancel", 'button1', maxLeft + 250, maxTop + 350, 1, function() {
       AccountBorder.destroy();
@@ -75,6 +92,7 @@ function createAccount() {
       login.text.destroy();
       login.destroy();
       menuFlag = 0;
+      createBaseButtons();
    });
 
 
@@ -88,18 +106,20 @@ function createAccount() {
       login.destroy();
       menuFlag = 0;
       socket.emit("new_account", {'playerID': playerID, 'data' : {'username': userName.value, 'password' : password.value}});
+      createBaseButtons();
    });
 }
 
 function login() {
    if(menuFlag == 1) return;
    menuFlag = 1;
+   destroyBaseButtons();
   var LoginBorder = game.add.graphics();
   LoginBorder.beginFill(0xFFFFFF, 1);
   // size
   borderWidth = 500;
   borderHeight = 400;
-  maxLeft = (canvas_width/2)-(borderWidth/2)+400;
+  maxLeft = (canvas_width/2)-(borderWidth/2);
   maxTop = (canvas_height/2)-(borderHeight/2);
   // centering
   LoginBorder.drawRect(maxLeft, maxTop, borderWidth, borderHeight);
@@ -134,7 +154,7 @@ function login() {
     type: PhaserInput.InputType.password
   };
   var password = game.add.inputField(inputLeft, inputTop, inputDataTwo);
-  
+
   var login;
   var cancel = createButton(game, "Cancel", 'button1', maxLeft + 250, maxTop + 350, 1, function() {
     LoginBorder.destroy();
@@ -145,6 +165,7 @@ function login() {
     login.text.destroy();
     login.destroy();
     menuFlag = 0;
+    createBaseButtons();
   });
 
 
@@ -158,6 +179,7 @@ function login() {
     login.destroy();
     menuFlag = 0;
     socket.emit("login", {'playerID': playerID, 'data' : {'username': userName.value, 'password' : password.value}});
+    createBaseButtons();
   });
 }
 function createID() {
@@ -174,6 +196,7 @@ function processAccountCreation(data) {
 
 mainmenu.prototype = {
  create: function(game) {
+    socket = io.connect();
     game.add.plugin(PhaserInput.Plugin);
     console.log("Reached main menu");
     game.stage.backgroundColor = 0xADD8E6;
@@ -191,13 +214,8 @@ mainmenu.prototype = {
 
 
     // start game
-    createButton(game, "Game Start", 'button1', canvas_width/2, canvas_height/2 - 100, 1, function() {
-      game.state.start('main', true, false, socket);
-    });
-    createButton(game, "Login", 'button1', canvas_width/2, canvas_height/2, 1, login);
-    createButton(game, "Create Account", 'button1', canvas_width/2, canvas_height/2 + 100, 1, createAccount);
+    createBaseButtons();
     socket.on('login', processLogin);
     socket.on('new_account', processAccountCreation);
   }
 }
-
