@@ -221,8 +221,12 @@ function mouseOver() {
 // Emits an 'input_fired' if the swipe has two or more nodes in it, otherwise it discards the swipe.
 function endSwipe() {
 	if(swipePath.length > 1) {
-		console.log("emitting: ["+swipePath[0].id +", "+swipePath[1].id+"]");
-		socket.emit('input_fired', {game:gameId, nodes: [swipePath[0].id, swipePath[1].id]});
+                var swipeNodes = [];
+                for(node of swipePath){
+                   swipeNodes.push(node.id);
+                }
+		console.log("emitting: "+ swipeNodes);
+		socket.emit('input_fired', {game:gameId, nodes: swipeNodes});
 	}
 	else {
 		if(swipePath.length == 1) {

@@ -42,7 +42,6 @@ class Game{
    }
    onInputFired(data, id){
         if(this.map.nodes[data.nodes[0]].army && this.map.nodes[data.nodes[0]].army.count > 0 && this.map.nodes[data.nodes[0]].army.player == id && this.started){
-
             this.map.moveArmy(data.nodes, this.findPlayerById(id));
         }
    }
@@ -168,7 +167,11 @@ class Game{
                 this.map.buffer[i].percentage += 5;
                 if(this.map.buffer[i].percentage >= 100){
                     this.map.finishedMovingArmy(this.map.buffer[i].nodes,this.map.buffer[i].army);
-                    this.map.buffer.splice(i,1);
+                    var finished  = this.map.buffer.splice(i,1)[0];
+                    if(finished.nodes.length > 2){
+                       finished.nodes.shift();
+                       this.map.moveArmy(finished.nodes, this.findPlayerById(finished.army.player));
+                    }
                 }
             }
             //should be unncessary after pathTraversal is merged
