@@ -92,28 +92,28 @@ function tickGames(){
 		games.delete(gamesToRemove[i]);
 	}
 	gamesToRemove = [];
-      
-		var buffer = inputs.slice();
+
+	var buffer = inputs.slice();
 		/*
 			Data:
-			id: 
+			id:
 		*/
-        inputs = [];
-        for(data of buffer){
-           if(games.has(data[0].game)){
-              games.get(data[0].game).onInputFired(data[0],data[1]);
-           }
-        }
-        var tickTime =  new Date().getTime() - startTime;
+  inputs = [];
+  for(data of buffer){
+    if(games.has(data[0].game)){
+      games.get(data[0].game).onInputFired(data[0],data[1]);
+    }
+  }
+  var tickTime =  new Date().getTime() - startTime;
 	if(tickTime < 0){
 		tickTime = 0;
 	}
-        if(tickTime > tickLength){
-           console.log("Dropping Frame");
-           setTimeout(tickGames,(Math.floor(tickTime/tickLength)+1)*tickLength-tickTime);
-        }else{
-           setTimeout(tickGames, tickLength-tickTime);
-        }
+  if(tickTime > tickLength){
+    console.log("Dropping Frame");
+    setTimeout(tickGames,(Math.floor(tickTime/tickLength)+1)*tickLength-tickTime);
+  }else{
+    setTimeout(tickGames, tickLength-tickTime);
+  }
 }
 //call when a client disconnects and tell the clients except sender to remove the disconnected player
 //TODO have client send which game player is in, so we can remove them from it.
@@ -126,6 +126,18 @@ function onClientdisconnect(data) {
 	}
 	if(playersToGames.has(this.id)){
 		playersToGames.get(this.id).removePlayer(this.id);
+		// If the game has no players in it, we remove it.
+		if(playersToGames.get(this.id).players.length == 0) {
+			playersToGames.delete(this.id);
+			console.log("removing game associated with " + this.id);
+			console.log("current number of games is " + playersToGames.size);
+		}
+		else {
+			console.log("game still contains");
+			for(var i = 0; i < playersToGames.get(this.id).players.length; i++) {
+				console.log("	" + playersToGames.get(this.id).players.id);
+			}
+		}
 	}
 	console.log("removing player " + this.id);
 	//send message to every connected client except the sender
@@ -170,14 +182,12 @@ function findGame(id){
 function onNewClient(){
 	game = findGame(this.id)
 	this.join(game.roomid)
-   	io.of(game.roomid).emit('newPlayer',{id:this.id, starting:game.starting});
-   	this.emit('connected',{id:this.id, players:game.players, game:game.roomid, timeTillStart:game.timeTillStart, starting:game.starting});//send the players id, the players, and the room id
+  io.of(game.roomid).emit('newPlayer',{id:this.id, starting:game.starting});
+  this.emit('connected',{id:this.id, players:game.players, game:game.roomid, timeTillStart:game.timeTillStart, starting:game.starting});//send the players id, the players, and the room id
 	player_list.push(this.id);
-	playersToGames.set(this.id, game);   
-   	this.emit('send_nodes', {nodes:game.map.nodes, castles:game.map.castles});
+	playersToGames.set(this.id, game);
+  this.emit('send_nodes', {nodes:game.map.nodes, castles:game.map.castles});
 	io.of(game.roomid).emit('update_nodes', {nodes:game.map.nodes});
-	   
-
 }
 function generateID(length) {
     let text = ""
@@ -198,15 +208,15 @@ function onLogin(data){
 }
 function onNewAccount(data){
    var login = new lg.Login(this, this.id);
-   login.onNewAccount(data.data);   
+   login.onNewAccount(data.data);
 }
 io.sockets.on('connection', function(socket){
-	console.log("socket connected");
-  	socket.on("client_started", onNewClient);
-	// listen for disconnection;
-	socket.on('input_fired', onInputFired);
-	socket.on('disconnect', onClientdisconnect);
-        socket.on('login', onLogin);
-        socket.on('new_account', onNewAccount);
-	//listen for new player inputs.
+console.log("socket connected");
+socket.on("client_started", onNewClient);
+// listen for disconnection;
+socket.on('input_fired', onInputFired);
+socket.on('disconnect', onClientdisconnect);
+socket.on('login', onLogin);
+socket.on('new_account', onNewAccount);
+//listen for new player inputs.
 });
