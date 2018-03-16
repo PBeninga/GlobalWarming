@@ -17,7 +17,7 @@ var colors = [0xFF0000,	0xFF9F00, 0xF8FF00, 0x7AFF00,0x0000FF,
 var colorTaken = [false, false, false, false, false,
 									false, false, false, false];
 var bannerGFX;
-var leaveButton;
+//var leaveButton;
 
 var main = function(game){
 };
@@ -48,8 +48,10 @@ function removeAll() {
 			}
 		}
 	}
+	/*
 	if(leaveButton != null)
 		leaveButton.destroy();
+		*/
 	players = [];
 	ClientPlayer = null;
 	DummyPlayer = new Player(-1, 0x000000);
@@ -470,7 +472,7 @@ main.prototype = {
 		game.world.setBounds(-canvas_width*2, -canvas_height*2, canvas_width * 4, canvas_height * 4);
 		game.stage.backgroundColor = 0x000000;
 		game.input.onUp.add(endSwipe);
-
+/*
 		leaveButton = game.add.button(game.camera.x + window.innerWidth, game.camera.y + window.innerHeight, 'button1', function() {
 			if(gameSocket != null) {
 				gameSocket.disconnect();
@@ -486,6 +488,7 @@ main.prototype = {
 			align: "center"
 		});
 		leaveButton.text.anchor.setTo(0.5, 0.5);
+		*/
 
 		console.log("client started");
     	socket.emit("client_started",{});
@@ -565,11 +568,12 @@ main.prototype = {
 		{
 			game.camera.y += 4;
 		}
-
+/*
 		leaveButton.x = game.camera.x + window.innerWidth - leaveButton.width;
 		leaveButton.text.x = game.camera.x + window.innerWidth - (leaveButton.width / 2);
 		leaveButton.y = game.camera.y;
 		leaveButton.text.y = game.camera.y + (leaveButton.height / 2);
+		*/
 		// emit the player input
 	},
 
