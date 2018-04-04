@@ -17,9 +17,47 @@ var colors = [0xFF0000,	0xFF9F00, 0xF8FF00, 0x7AFF00,0x0000FF,
 var colorTaken = [false, false, false, false, false,
 									false, false, false, false];
 var bannerGFX;
+//var leaveButton;
 
 var main = function(game){
 };
+
+// ONLY CALL IF YOU WANT TO DESTROY ALL OBJECTS IN MAIN
+function removeAll() {
+	if(bannerGFX != null)
+		bannerGFX.destroy();
+
+	// Removes all lines? Is this even necessary?
+	lines = [];
+	// Removes all Nodes and Paths
+	for(var i = 0; i < nodes.length; i++) {
+		for(var j = 0; j < nodes[i].paths.length; j++) {
+			if(nodes[i].paths[j].graphics != null) {
+				nodes[i].paths[j].graphics.destroy();
+			}
+		}
+		if(nodes[i].graphics != null) {
+			nodes[i].graphics.destroy();
+		}
+	}
+	// Removes all players and armies
+	if(players != null) {
+		for(var i = 0; i < players.length; i++) {
+			for(var j = 0; j < players[i].armies.length; j++) {
+				players[i].armies[j].destroyGraphics();
+			}
+		}
+	}
+	/*
+	if(leaveButton != null)
+		leaveButton.destroy();
+		*/
+	players = [];
+	ClientPlayer = null;
+	DummyPlayer = new Player(-1, 0x000000);
+	players.push(DummyPlayer);
+}
+
 function onsocketConnected (data) {
 	console.log("connected to server");
 	console.log(this.id + " " + data.id);
@@ -108,6 +146,7 @@ function endGame(data){
 		displayLoss();
 	}
 }
+
 function displayLoss(){
 	bannerGFX.destroy();
 	bannerGFX = game.add.text(game.camera.x,game.camera.y, "You Suck!",{
@@ -433,6 +472,24 @@ main.prototype = {
 		game.world.setBounds(-canvas_width*2, -canvas_height*2, canvas_width * 4, canvas_height * 4);
 		game.stage.backgroundColor = 0x000000;
 		game.input.onUp.add(endSwipe);
+/*
+		leaveButton = game.add.button(game.camera.x + window.innerWidth, game.camera.y + window.innerHeight, 'button1', function() {
+			if(gameSocket != null) {
+				gameSocket.disconnect();
+			}
+			socket.disconnect();
+			removeAll();
+			game.state.start('mainmenu', true, false, socket);
+		}, main, 2, 1, 0);
+		leaveButton.anchor.setTo(0.0, 0.0);
+		leaveButton.text = game.add.text(leaveButton.x, leaveButton.y, "Return to Main Menu", {
+			font: "14px Arial",
+			fill: "#fff",
+			align: "center"
+		});
+		leaveButton.text.anchor.setTo(0.5, 0.5);
+		*/
+
 		console.log("client started");
     	socket.emit("client_started",{});
 
@@ -511,6 +568,12 @@ main.prototype = {
 		{
 			game.camera.y += 4;
 		}
+/*
+		leaveButton.x = game.camera.x + window.innerWidth - leaveButton.width;
+		leaveButton.text.x = game.camera.x + window.innerWidth - (leaveButton.width / 2);
+		leaveButton.y = game.camera.y;
+		leaveButton.text.y = game.camera.y + (leaveButton.height / 2);
+		*/
 		// emit the player input
 	},
 
