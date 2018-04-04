@@ -4,7 +4,7 @@
   "description": "rts server",
   "main": "app.js",
   "scripts": {
-    "test": "jasmine"
+    "test": "jasmine spec/testSpec.js"
   },
   "repository": {
     "type": "git",
@@ -13,11 +13,12 @@
   "author": "Patrick Beninga",
   "license": "ISC",
   "dependencies": {
+    "@orange-games/phaser-input": "^2.0.5",
     "express": "^4.16.2",
-    "p2": "^0.7.1",
-    "socket.io": "^2.0.4",
     "mongoose": "^5.0.7",
-    "@orange-games/phaser-input": "^2.0.5"
+    "p2": "^0.7.1",
+    "request": "^2.85.0",
+    "socket.io": "^2.0.4"
   },
   "bugs": {
     "url": "https://github.com/PBeninga/GlobalWarming/issues"
