@@ -4,7 +4,7 @@
   "description": "rts server",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jasmine"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,7 @@
   "homepage": "https://github.com/PBeninga/GlobalWarming#readme",
   "devDependencies": {
     "@orange-games/phaser-input": "^2.0.5",
+    "jasmine": "^3.1.0",
     "phaser-input": "^1.2.6"
   }
 }
