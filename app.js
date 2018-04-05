@@ -3,7 +3,9 @@ var express = require('express');
 var app = express();
 var serv = require('http').Server(app);
 //get the functions required to move players in the server.
-var gameObjects = require('./objects.js');
+var gameObject = require('./Game.js');
+var mapObjects = require('./Map.js');
+var miscFunc = require('./MiscFunctions.js');
 var lg = require('./server/login.js');
 
 app.get('/',function(req, res) {
@@ -25,9 +27,9 @@ let tickLength = 50;
 tickGames();
 
 function makeNewGame(){
-	 let id = "/"+generateID(20)
+	 let id = "/"+miscFunc.generateID(20)
 	 let gameRoom = io.of(id);
-	 var game  = new gameObjects.Game(gameRoom, id);
+	 var game  = new gameObject.Game(gameRoom, id);
 	 makeMap(game); //should move into objects.js
 	 games.set(id,game);
 	 return game;
@@ -60,9 +62,9 @@ function makeMap(game){
 				adj.push(count+1);
 			}
 			if(castles.indexOf(count) == -1){
-				nodes[count] = new gameObjects.MapNode(x,y,adj, count);
+				nodes[count] = new mapObjects.MapNode(x,y,adj, count);
 			}else{
-				nodes[count] = new gameObjects.Castle(x,y,adj, count);
+				nodes[count] = new mapObjects.Castle(x,y,adj, count);
 			}
 			count++;
 		}
@@ -188,16 +190,6 @@ function onNewClient(){
 	playersToGames.set(this.id, game);
   this.emit('send_nodes', {nodes:game.map.nodes, castles:game.map.castles});
 	io.of(game.roomid).emit('update_nodes', {nodes:game.map.nodes});
-}
-function generateID(length) {
-    let text = ""
-    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-
-    for(let i = 0; i < length; i++)  {
-        text += possible.charAt(Math.floor(Math.random() * possible.length))
-    }
-
-    return text
 }
 function onInputFired(data){
 	inputs.push([data,this.id]);
