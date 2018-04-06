@@ -3,13 +3,15 @@ var armyObject = require('./Army.js');
 var playerObject = require('./Player.js');
 
 class Game{
-   constructor(room, roomid){
+   constructor(gameSocket, roomid){
       this.players = [];
       this.time = new Date().getTime();
-      this.room = room;
-      this.map = new gameMap.Map(); //WHATS GONNA HAPPEN HERE
+      this.gameSocket = gameSocket;
+      this.map = new gameMap.Map();
+      //To be replaced when we explicitly put in matchmaking
       this.started = false;
       this.starting = false;
+
       this.roomid = roomid;
       this.finished =  false;
       this.winner = null;
@@ -17,6 +19,7 @@ class Game{
       this.timeTillStart = 10000;
       this.startingCastles = [];
       this.timeGameBeganStarting = null;
+
    }
    onInputFired(data, id){
         if(this.map.nodes[data.nodes[0]].army && this.map.nodes[data.nodes[0]].army.count > 0 && this.map.nodes[data.nodes[0]].army.player == id && this.started){
@@ -85,7 +88,7 @@ class Game{
       return true;
    }
    endGame(){
-       this.room.emit("endGame",{winner:this.winner});
+       this.gameSocket.emit("endGame",{winner:this.winner});
    }
    findPlayerIndexById(id){
        for(var i = 0; i <  this.players.length; i++){
@@ -106,7 +109,7 @@ class Game{
    }
    tick(){
         var troopsToAdd = 0;
-        this.room.emit('update_nodes', {nodes:this.map.nodes});
+        this.gameSocket.emit('update_nodes', {nodes:this.map.nodes});
 
         var tickStartTime = new Date().getTime();
         if(tickStartTime - this.time >= 500){
@@ -121,7 +124,7 @@ class Game{
             this.timeGameBeganStarting = new Date().getTime();
             setTimeout(function(){
                 game.started = true;
-                game.room.emit('startGame');
+                game.gameSocket.emit('startGame');
             }, 10*1000);
         }
         if(this.started){
@@ -140,7 +143,7 @@ class Game{
 
                 ]
             */
-            this.room.emit('move_armies', {moving:this.map.buffer});
+            this.gameSocket.emit('move_armies', {moving:this.map.buffer});
             for(var i = 0; i < this.map.buffer.length; i++){
                 this.map.buffer[i].percentage += 5;
                 if(this.map.buffer[i].percentage >= 100){
@@ -169,7 +172,7 @@ class Game{
             }
         }else if(this.starting){
             this.timeTillStart = 10000 - (new Date().getTime() - this.timeGameBeganStarting);
-            this.room.emit('updateTime',{time:this.timeTillStart});
+            this.gameSocket.emit('updateTime',{time:this.timeTillStart});
         }
     }
 }

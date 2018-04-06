@@ -122,7 +122,7 @@ function tickGames(){
 function onClientdisconnect(data) {
 	console.log('disconnect');
 
-	var removePlayer = find_playerid(this.id);
+	var removePlayer = findPlayerID(this.id);
 	if (removePlayer) {
 		player_list.splice(player_list.indexOf(removePlayer), 1);
 	}
@@ -146,17 +146,7 @@ function onClientdisconnect(data) {
 }
 
 // find player by the the unique socket id
-function find_playerid_in_game(id, game){
-	for (var i = 0; i < game.players.length; i++) {
-		if (game.players[i] == id) {
-			return game.players[i];
-		}
-	}
-
-	return false;
-}
-
-function find_playerid(id) {
+function findPlayerID(id) {
 	for (var i = 0; i < player_list.length; i++) {
 		if (player_list[i] == id) {
 			return player_list[i];
@@ -181,6 +171,7 @@ function findGame(id){
 	game.addPlayer(id);
 	return game;
 }
+
 function onNewClient(){
 	game = findGame(this.id)
 	this.join(game.roomid)
