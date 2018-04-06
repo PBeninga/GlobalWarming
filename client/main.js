@@ -383,10 +383,11 @@ function moveArmies(data) {
 		startNode = findnodebyid(data.moving[i].nodes[0]);
 		currentPath = startNode.pathTo(findnodebyid(data.moving[i].nodes[1]));
 		currentPlayer = findplayerbyid(data.moving[i].army.player);
+		console.log("CurrentPlayer:" + currentPlayer.id + "  x:" + currentPath.percentToX(data.moving[i].percentage/100) + "  y:" + currentPath.percentToY(data.moving[i].percentage/100) + "  armyID:" + data.moving[i].army.id);
 		currentPlayer.moveArmy(
 			currentPath.percentToX(data.moving[i].percentage/100),
 			currentPath.percentToY(data.moving[i].percentage/100),
-			data.moving[i].army);
+			data.moving[i].army.id);
 	}
 }
 

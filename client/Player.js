@@ -39,6 +39,8 @@ class Player {
 
   moveArmy(x, y, id) {
     for(var i = 0; i < this.armies.length; i++) {
+      console.log("Current Army ID: " + this.armies[i].id);
+      console.log("Target Army ID: " + id);
       if(this.armies[i].id == id) {
         console.log("MOVING ARMY " + this.armies[i].id);
         this.armies[i].moveTo(x, y);
