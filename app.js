@@ -14,7 +14,7 @@ app.get('/',function(req, res) {
 app.use('/client',express.static(__dirname + '/client'));
 
 serv.listen(process.env.PORT || 2000);
-console.log("Server started.");
+console.log("Server started on port 2000");
 
 // io connection
 var io = require('socket.io')(serv,{});
