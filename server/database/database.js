@@ -86,9 +86,7 @@ class Database{
             return;
          }
          var data = new model(doc);
-         console.log("something else");
          data.save(function(err) {
-            console.log("something");
             if(err) reject(err);
          });
       });
