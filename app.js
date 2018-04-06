@@ -57,19 +57,6 @@ function tick(){
   
    removeFinishedGames(); 
    
-   //to be depricated soon 
-   var buffer = inputs.slice();
-     /*
-         Data:
-         id:
-     */
-   inputs = [];
-   for(data of buffer){
-      if(games.has(data[0].game)){
-         games.get(data[0].game).onInputFired(data[0],data[1]);
-      }
-   }
-   
    forceTickRate(); // Wait until the minimum tick-time has passed
    
 }
@@ -126,11 +113,16 @@ function forceTickRate(){
 
 function makeNewGame(){
 	 let id = "/"+miscFunc.generateID(20)
-	 let gameRoom = io.of(id);
-	 var game  = new gameObject.Game(gameRoom, id);
+	 let gameSocket = io.of(id);
+	 var game  = new gameObject.Game(gameSocket, id);
 	 makeMap(game); //should move into objects.js
 	 games.set(id,game);
 	 return game;
+}
+
+function onInputFired(data) {
+	currentGame = games.get(data.game);
+	currentGame.addInput(data.nodes, this.id);
 }
 
 function makeMap(game){
@@ -172,11 +164,6 @@ function makeMap(game){
 	game.map.castles = castles;
 }
 
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Socket functions
 
 //call when a client disconnects and tell the clients except sender to remove the disconnected player
 //TODO have client send which game player is in, so we can remove them from it.
@@ -236,7 +223,6 @@ function onInputFired(data){
    inputs.push([data,this.id]);
 }
 
-
 function onLogin(data){
    var login = new lg.Login(this, this.id);
    login.onLogin(data.data);
@@ -253,9 +239,8 @@ io.sockets.on('connection', function(socket){
 console.log("socket connected");
 socket.on("client_started", onNewClient);
 // listen for disconnection;
-socket.on('input_fired', onInputFired);
 socket.on('disconnect', onClientdisconnect);
 socket.on('login', onLogin);
 socket.on('new_account', onNewAccount);
-//listen for new player inputs.
+socket.on('input_fired', onInputFired);
 });

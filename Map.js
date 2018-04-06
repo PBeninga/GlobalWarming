@@ -4,7 +4,6 @@ class Map{
    constructor(){
       this.nodes = [];
       this.castles = [];//which indicies of nodes are castles;
-      this.castlesChanged = [];
       this.buffer = [];
       //this.paths = [];
    }
