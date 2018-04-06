@@ -27,7 +27,6 @@ class Game{
    addInput(moveNodes, id){
      this.inputs.push(moveNodes);
      this.inputs.push(id);
-     console.log("length: " + this.inputs.length);
    }
 
    doInputs(){
