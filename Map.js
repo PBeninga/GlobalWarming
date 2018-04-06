@@ -30,22 +30,6 @@ class Map{
             startNode.army = null;
          }
          this.buffer.push({nodes:nodes, army:new armyObject.Army(player, toMove), percentage:0});
-
-         //if end node is empty, add dummy army to be overwritten by moving troops
-        //  if(endNode.army == null){
-        //     endNode.army = new Army(null,0);
-        //  }
-        //  //if end node contains your army, just combine armies
-        //  if(endNode.army.player == player){
-        //     endNode.army.count += toMove;
-        //  }else{ //battle
-        //     //if enemy army is greater, decrease enemy army by your attacking army count
-        //     if(endNode.army.count >= toMove){
-        //        endNode.army.count -= toMove;
-        //     }else{//conquer the node with your remaning troops (the difference)
-        //        endNode.army = new Army(player,toMove-endNode.army.count);
-        //     }
-        //  }
       }
    }
 

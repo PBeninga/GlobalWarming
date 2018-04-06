@@ -20,6 +20,9 @@ class Player{
             return null;
         }
     }
+    moveArmy(id) {
+      
+    }
 }
 
 module.exports = {

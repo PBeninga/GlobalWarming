@@ -8,7 +8,7 @@ class Army{
         player.armies.push(this);
       }
       this.count = size;
-      //this.buff = "swole";
+      this.buff = null;
    }
 }
 
