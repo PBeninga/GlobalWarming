@@ -74,6 +74,9 @@ function makeMap(game){
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Tick functions
+
 function tick(){
    
    startTime = new Date().getTime();
@@ -82,6 +85,7 @@ function tick(){
   
    removeFinishedGames();
    
+   //to be depricated soon 
    var buffer = inputs.slice();
      /*
          Data:
@@ -94,21 +98,9 @@ function tick(){
       }
    }
    
-   var tickTime =  new Date().getTime() - startTime;
-   
-   if(tickTime < 0){
-      tickTime = 0;
-   }
-   
-   if(tickTime > tickLength){
-      console.log("Dropping Frame");
-      setTimeout(tick,(Math.floor(tickTime/tickLength)+1)*tickLength-tickTime);
-   }else{
-    setTimeout(tick, tickLength-tickTime);
-   }
+   forceTickRate();
    
 }
-
 
 /////////////
 // tick helpers
@@ -139,6 +131,26 @@ function removeFinishedGames(){
 
 }
 
+function forceTickRate(){
+   
+   var tickTime =  new Date().getTime() - startTime;
+   
+   if(tickTime < 0){
+      tickTime = 0;
+   }
+   
+   if(tickTime > tickLength){
+      console.log("Dropping Frame");
+      setTimeout(tick,(Math.floor(tickTime/tickLength)+1)*tickLength-tickTime);
+   }else{
+      setTimeout(tick, tickLength-tickTime);
+   }
+   
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Socket functions
 
 //call when a client disconnects and tell the clients except sender to remove the disconnected player
 //TODO have client send which game player is in, so we can remove them from it.
