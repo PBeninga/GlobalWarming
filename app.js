@@ -221,4 +221,7 @@ socket.on('new_account', onNewAccount);
 //listen for new player inputs.
 });
 
-module.exports = {generateID : generateID}
+module.exports = {
+   generateID : generateID,
+   makeMap : makeMap
+}
