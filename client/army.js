@@ -10,7 +10,6 @@ function merge(army1, army2) {
 }
 
 class Army {
-  // TODO: Eventually replace Node with a Location object
   constructor(count, owner, x, y) {
     this.count = count;
     this.owner = owner;

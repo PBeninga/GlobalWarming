@@ -35,7 +35,6 @@ var io = require('socket.io')(serv,{});
 var playersToGames = new Map();
 var gamesToRemove = [];// all games;
 var games = new Map();
-var inputs = [];
 let tickLength = 50;
 
 
@@ -53,11 +52,11 @@ function tick(){
    startTime = new Date().getTime();
 
    tickGames(); //Iterates through all games and calls their tick methods
-  
-   removeFinishedGames(); 
-   
+
+   removeFinishedGames();
+
    forceTickRate(startTime); // Wait until the minimum tick-time has passed
-   
+
 }
 
 
@@ -91,7 +90,7 @@ function removeFinishedGames(){
 }
 
 function forceTickRate(startTime){
-   
+
    var tickTime =  new Date().getTime() - startTime;
 
    if(tickTime < 0){
@@ -217,6 +216,7 @@ function makeMap(game){
 				nodes[count] = new mapObjects.MapNode(x,y,adj, count);
 			}else{
 				nodes[count] = new mapObjects.Castle(x,y,adj, count);
+				nodes[count].army = game.dummyPlayer.addArmy(50, nodes[count]);
 			}
 			count++;
 		}
@@ -242,4 +242,3 @@ function findGame(id){
 	game.addPlayer(id);
 	return game;
 }
-
