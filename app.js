@@ -19,7 +19,6 @@ console.log("Server started on port 2000");
 // io connection
 var io = require('socket.io')(serv,{});
 var playersToGames = new Map();
-var player_list = []; // all players connected across all games.
 var gamesToRemove = [];// all games;
 var games = new Map();
 var inputs = [];
@@ -121,11 +120,7 @@ function tickGames(){
 //TODO have client send which game player is in, so we can remove them from it.
 function onClientdisconnect(data) {
 	console.log('disconnect');
-
-	var removePlayer = findPlayerID(this.id);
-	if (removePlayer) {
-		player_list.splice(player_list.indexOf(removePlayer), 1);
-	}
+    
 	if(playersToGames.has(this.id)){
 		playersToGames.get(this.id).removePlayer(this.id);
 		// If the game has no players in it, we remove it.
@@ -143,17 +138,6 @@ function onClientdisconnect(data) {
 	}
 	console.log("removing player " + this.id);
 	//send message to every connected client except the sender
-}
-
-// find player by the the unique socket id
-function findPlayerID(id) {
-	for (var i = 0; i < player_list.length; i++) {
-		if (player_list[i] == id) {
-			return player_list[i];
-		}
-	}
-
-	return false;
 }
 
 
@@ -180,7 +164,6 @@ function onNewClient(){
 	this.join(game.roomid)
   io.of(game.roomid).emit('newPlayer',{id:this.id, starting:game.starting});
   this.emit('connected',{id:this.id, players:game.players, game:game.roomid, timeTillStart:game.timeTillStart, starting:game.starting});//send the players id, the players, and the room id
-	player_list.push(this.id);
 	playersToGames.set(this.id, game);
   this.emit('send_nodes', {nodes:game.map.nodes, castles:game.map.castles});
 	io.of(game.roomid).emit('update_nodes', {nodes:game.map.nodes});
