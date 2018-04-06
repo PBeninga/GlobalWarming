@@ -57,7 +57,7 @@ function tick(){
   
    removeFinishedGames(); 
    
-   forceTickRate(); // Wait until the minimum tick-time has passed
+   forceTickRate(startTime); // Wait until the minimum tick-time has passed
    
 }
 
@@ -90,7 +90,7 @@ function removeFinishedGames(){
 
 }
 
-function forceTickRate(){
+function forceTickRate(startTime){
    
    var tickTime =  new Date().getTime() - startTime;
    
