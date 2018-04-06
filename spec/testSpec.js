@@ -1,4 +1,5 @@
 var request = require("request");
+var app = require("../app.js");
 
 var base_url = "http://localhost:5000/"
 
@@ -10,4 +11,11 @@ describe("Hello World Server", function() {
       });
     });
   });
+});
+
+describe("id Gen test", function(){
+   it("should return a random key", function(){
+      code = app.generateID(7);
+      expect( code.length == 7);
+   });
 });
