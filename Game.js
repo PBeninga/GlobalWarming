@@ -6,21 +6,24 @@ class Game{
    constructor(gameSocket, roomid){
       this.roomid = roomid;
       this.gameSocket = gameSocket;
-
+      //Useful game data
       this.players = [];
+      this.dummyPlayer = new playerObject.Player(null);
+      this.players.push(this.dummyPlayer);
       this.map = new gameMap.Map();
       this.inputs = [];
+      this.movingArmies = [];
       //To be replaced when we explicitly put in matchmaking
       this.started = false;
       this.starting = false;
-
+      //Finishing Variables
       this.finished =  false;
       this.winner = null;
-      this.startingCastles = [];
-      this.timeGameBeganStarting = null;
       //Game Variables
       this.maxPlayers = 4;
-      this.timeTillStart = 1000;
+      this.constTimeTillStart = 3000;
+      this.timeTillStart = 3000;
+      this.timeGameBeganStarting = null;
       this.time = new Date().getTime();
    }
 
@@ -31,6 +34,7 @@ class Game{
 
    doInputs(){
      for(var i = 0; i < this.inputs.length; i++) {
+       console.log("Doing Input");
        var moveNodes = this.inputs[i];
        i++;
        var id = this.inputs[i];
@@ -38,16 +42,24 @@ class Game{
           this.map.nodes[moveNodes[0]].army.count > 0 && //the start node's army has enough troops
           this.map.nodes[moveNodes[0]].army.player == id && //the start node's army is equal to
           this.started){
-            this.map.moveArmy(moveNodes, this.findPlayerById(id));
+            this.moveArmy(moveNodes, this.map.nodes[moveNodes[0]].army.id, this.findPlayerById(id));
         }
       }
       this.inputs = [];
    }
    incrementTroops(num){
-      this.map.incrementAllTroops(num);
+      for(var i = 0; i < this.players.length; i++) {
+        this.players[i].incrementArmies(num);
+      }
    }
-   moveArmy(nodes,player){
-      this.map.moveArmy(nodes,player);
+   moveArmy(nodes, armyID, player){
+     //TODO: Fix hacky solution
+     var currentPlayerArmyListLength = player.armies.length;
+     var movingArmy = player.moveArmy(armyID, nodes[0]);
+     if(currentPlayerArmyListLength == player.armies.length) {
+       nodes[0].army = null;
+     }
+     this.movingArmies.push({nodes:nodes, army:movingArmy, percentage:0});
    }
    onPlayerDisconnect(){
       this.removePlayer(this.id);
@@ -68,7 +80,7 @@ class Game{
       //Alter the players nodes in some way.
       for(var i = 0; i < toRemove.length; i++){
          if(this.map.castles.indexOf(toRemove[i]) != -1){
-            this.map.nodes[toRemove[i]].army = new armyObject.Army(null,50);
+            this.map.nodes[toRemove[i]].army = new armyObject.Army(null,50,this.map.nodes[toRemove[i]]);
          }else{
              this.map.nodes[toRemove[i]].army = null;
          }
@@ -98,8 +110,8 @@ class Game{
       console.log("Player assigned castle.");
       let player = new playerObject.Player(id);
       this.players.push(player);
-      this.map.nodes[destination].assignPlayer(player);
-
+      this.dummyPlayer.removeArmyAtNode(this.map.nodes[destination]);
+      this.map.nodes[destination].army = player.addArmy(50,this.map.nodes[destination]);
       return true;
    }
    endGame(){
@@ -108,14 +120,13 @@ class Game{
    findPlayerIndexById(id){
        for(var i = 0; i <  this.players.length; i++){
            if(this.players[i].id == id){
-
                return i;
            }
        }
        return -1;
    }
    findPlayerById(id){
-       let index = this.findPlayerIndexById(id);
+       var index = this.findPlayerIndexById(id);
        if(index > -1){
            return this.players[index];
        }else{
@@ -124,15 +135,15 @@ class Game{
    }
    tick(){
         var troopsToAdd = 0;
-        this.gameSocket.emit('update_nodes', {nodes:this.map.nodes});
+        this.gameSocket.emit('update_armies', {players:this.players});
 
         var tickStartTime = new Date().getTime();
         if(tickStartTime - this.time >= 500){
            troopsToAdd = Math.floor((tickStartTime -this.time)/500);
            this.time = tickStartTime - (tickStartTime%500);
         }
-
-        if(this.players.length > 1 && !this.starting && !this.started){
+        // If there are more than 1 player (DummyPlayer doesnt count) and the game isn't started or starting
+        if(this.players.length > 2 && !this.starting && !this.started){
             this.starting = true;
             console.log("Game starting.");
             let game = this;
@@ -140,53 +151,50 @@ class Game{
             setTimeout(function(){
                 game.started = true;
                 game.gameSocket.emit('startGame');
-            }, 10*1000);
+            }, this.constTimeTillStart);
         }
         if(this.started){
             if(troopsToAdd > 0){
                this.incrementTroops(troopsToAdd);
-               troopsToAdd = 0;
             }
-            /*
-                [
-                    {
-                        nodes[]: 2 elements start nodes and then endnode
-                        army: army moving
-                        percentage: integer of percentage between paths.
-                    },
-                    ...
 
-                ]
-            */
-            this.gameSocket.emit('move_armies', {moving:this.map.buffer});
-            for(var i = 0; i < this.map.buffer.length; i++){
-                this.map.buffer[i].percentage += 5;
-                if(this.map.buffer[i].percentage >= 100){
-                    this.map.finishedMovingArmy(this.map.buffer[i].nodes,this.map.buffer[i].army);
-                    var finished  = this.map.buffer.splice(i,1)[0];
+            this.gameSocket.emit('move_armies', {moving:this.movingArmies});
+            // Move all the armies
+            for(var i = 0; i < this.movingArmies.length; i++){
+              var currentMoving = this.movingArmies[i];
+              var startNode = this.map.nodes[this.movingArmies[i].nodes[0]];
+              var endNode = this.map.nodes[this.movingArmies[i].nodes[1]];
+              currentMoving.percentage += 5;
+                if(currentMoving.percentage >= 100){
+                    var battleLoser = currentMoving.army.battle(endNode.army);
+                    //Remove the army from the players list
+                    if(battleLoser.player != null) {
+                      this.findPlayerById(battleLoser.player).removeArmy(battleLoser.id);
+                    }
+                    //Replace the end node's army with the moving army if it won.
+                    if(battleLoser.id != currentMoving.army.id) {
+                      endNode.army = currentMoving.army;
+                    }
+                    var finished  = this.movingArmies.splice(i,1)[0];
+                    // Check for end consition
                     if(finished.nodes.length > 2){
                        finished.nodes.shift();
-                       this.map.moveArmy(finished.nodes, this.findPlayerById(finished.army.player));
+                       this.moveArmy(finished.nodes, finished.army, this.findPlayerById(finished.army.player));
                     }
                 }
             }
-            //should be unncessary after pathTraversal is merged
-            var playersInGame = [];
-            for(var i = 0; i < this.map.nodes.length; i++){
-                if(this.map.nodes[i].army){
-                    if(playersInGame.indexOf(this.map.nodes[i].army.player) == -1 && this.map.nodes[i].army.player != null){
-                        playersInGame.push(this.map.nodes[i].army.player);
-                    }
+            // Check for end condition (1 Player + DummyPlayer remaining)
+            if(this.players.length <= 2 && this.started){
+                if(this.players[0].id == this.dummyPlayer.id){
+                  this.winner = this.players[1];
                 }
-            }
-            if(playersInGame.length <= 1 && game.started){
-                if(playersInGame.length == 1){
-                    this.winner = playersInGame[0];
+                else {
+                  this.winner = this.players[0];
                 }
-                game.finished = true;
+                this.finished = true;
             }
         }else if(this.starting){
-            this.timeTillStart = 10000 - (new Date().getTime() - this.timeGameBeganStarting);
+            this.timeTillStart = this.constTimeTillStart - (new Date().getTime() - this.timeGameBeganStarting);
             this.gameSocket.emit('updateTime',{time:this.timeTillStart});
         }
         this.doInputs();

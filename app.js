@@ -36,7 +36,6 @@ var io = require('socket.io')(serv,{});
 var playersToGames = new Map();
 var gamesToRemove = [];// all games;
 var games = new Map();
-var inputs = [];
 let tickLength = 50;
 
 
@@ -54,11 +53,11 @@ function tick(){
    startTime = new Date().getTime();
 
    tickGames(); //Iterates through all games and calls their tick methods
-  
-   removeFinishedGames(); 
-   
+
+   removeFinishedGames();
+
    forceTickRate(startTime); // Wait until the minimum tick-time has passed
-   
+
 }
 
 /////////////
@@ -91,7 +90,7 @@ function removeFinishedGames(){
 }
 
 function forceTickRate(startTime){
-   
+
    var tickTime =  new Date().getTime() - startTime;
 
    if(tickTime < 0){
@@ -155,6 +154,7 @@ function makeMap(game){
 				nodes[count] = new mapObjects.MapNode(x,y,adj, count);
 			}else{
 				nodes[count] = new mapObjects.Castle(x,y,adj, count);
+				nodes[count].army = game.dummyPlayer.addArmy(50, nodes[count]);
 			}
 			count++;
 		}
@@ -214,8 +214,7 @@ function onNewClient(){
     io.of(game.roomid).emit('newPlayer',{id:this.id, starting:game.starting});
     this.emit('connected',{id:this.id, players:game.players, game:game.roomid, timeTillStart:game.timeTillStart, starting:game.starting});//send the players id, the players, and the room id
     playersToGames.set(this.id, game);
-    this.emit('send_nodes', {nodes:game.map.nodes, castles:game.map.castles});
-    io.of(game.roomid).emit('update_nodes', {nodes:game.map.nodes});
+    this.emit('send_nodes', {nodes:game.map.nodes, players:game.players});
 }
 
 function onLogin(data){
