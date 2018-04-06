@@ -18,7 +18,9 @@
     "mongoose": "^5.0.7",
     "p2": "^0.7.1",
     "request": "^2.85.0",
-    "socket.io": "^2.0.4"
+    "socket.io": "^2.0.4",
+    "jasmine-node": "~1.14.5",
+    "istanbul": "~0.4.5"
   },
   "bugs": {
     "url": "https://github.com/PBeninga/GlobalWarming/issues"
