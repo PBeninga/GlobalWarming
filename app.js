@@ -23,7 +23,7 @@ var gamesToRemove = [];// all games;
 var games = new Map();
 var inputs = [];
 let tickLength = 50;
-tickGames();
+tick();
 
 function makeNewGame(){
 	 let id = "/"+miscFunc.generateID(20)
@@ -74,48 +74,64 @@ function makeMap(game){
 }
 
 
+function tick(){
+   
+   startTime = new Date().getTime();
+   
+   gamesIter = games.values();
+   element = gamesIter.next();
+   
+   while(!element.done){
+      game = element.value
+      game.tick();
+      if(game.finished){
+         gamesToRemove.push(game.roomid);
+      }
+      element = gamesIter.next();
+   }
+   
+   for(var i = 0; i < gamesToRemove.length; i++){
+      games.get(gamesToRemove[i]).endGame();
+      games.delete(gamesToRemove[i]);
+   }
+   gamesToRemove = [];
 
-
-function tickGames(){
-	startTime = new Date().getTime();
-	gamesIter = games.values();
-	element = gamesIter.next();
-	while(!element.done){
-		game = element.value
-		game.tick();
-		if(game.finished){
-			gamesToRemove.push(game.roomid);
-		}
-		element = gamesIter.next();
-	}
-	for(var i = 0; i < gamesToRemove.length; i++){
-		games.get(gamesToRemove[i]).endGame();
-		games.delete(gamesToRemove[i]);
-	}
-	gamesToRemove = [];
-
-	var buffer = inputs.slice();
-		/*
-			Data:
-			id:
-		*/
-  inputs = [];
-  for(data of buffer){
-    if(games.has(data[0].game)){
-      games.get(data[0].game).onInputFired(data[0],data[1]);
-    }
-  }
-  var tickTime =  new Date().getTime() - startTime;
-	if(tickTime < 0){
-		tickTime = 0;
-	}
-  if(tickTime > tickLength){
-    console.log("Dropping Frame");
-    setTimeout(tickGames,(Math.floor(tickTime/tickLength)+1)*tickLength-tickTime);
-  }else{
-    setTimeout(tickGames, tickLength-tickTime);
-  }
+   var buffer = inputs.slice();
+     /*
+         Data:
+         id:
+     */
+   inputs = [];
+   for(data of buffer){
+      if(games.has(data[0].game)){
+         games.get(data[0].game).onInputFired(data[0],data[1]);
+      }
+   }
+   
+   var tickTime =  new Date().getTime() - startTime;
+   
+   if(tickTime < 0){
+      tickTime = 0;
+   }
+   
+   if(tickTime > tickLength){
+      console.log("Dropping Frame");
+      setTimeout(tick,(Math.floor(tickTime/tickLength)+1)*tickLength-tickTime);
+   }else{
+    setTimeout(tick, tickLength-tickTime);
+   }
+   
 }
+
+
+/////////////
+// tick helpers
+
+
+
+
+
+
 //call when a client disconnects and tell the clients except sender to remove the disconnected player
 //TODO have client send which game player is in, so we can remove them from it.
 function onClientdisconnect(data) {
@@ -160,18 +176,18 @@ function findGame(id){
 
 
 function onNewClient(){
-	game = findGame(this.id);
-	this.join(game.roomid)
-  io.of(game.roomid).emit('newPlayer',{id:this.id, starting:game.starting});
-  this.emit('connected',{id:this.id, players:game.players, game:game.roomid, timeTillStart:game.timeTillStart, starting:game.starting});//send the players id, the players, and the room id
-	playersToGames.set(this.id, game);
-  this.emit('send_nodes', {nodes:game.map.nodes, castles:game.map.castles});
-	io.of(game.roomid).emit('update_nodes', {nodes:game.map.nodes});
+    game = findGame(this.id);
+    this.join(game.roomid)
+    io.of(game.roomid).emit('newPlayer',{id:this.id, starting:game.starting});
+    this.emit('connected',{id:this.id, players:game.players, game:game.roomid, timeTillStart:game.timeTillStart, starting:game.starting});//send the players id, the players, and the room id
+    playersToGames.set(this.id, game);
+    this.emit('send_nodes', {nodes:game.map.nodes, castles:game.map.castles});
+    io.of(game.roomid).emit('update_nodes', {nodes:game.map.nodes});
 }
 
 
 function onInputFired(data){
-	inputs.push([data,this.id]);
+   inputs.push([data,this.id]);
 }
 
 
