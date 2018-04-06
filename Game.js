@@ -1,10 +1,15 @@
 var gameMap = require('./Map.js');
+var miscFunc = require('./MiscFunctions.js');
 var armyObject = require('./Army.js');
 var playerObject = require('./Player.js');
+const fs = require('fs');
 
 class Game{
-   constructor(gameSocket, roomid){
-      this.roomid = roomid;
+   constructor(io){ 
+      
+      let id = "/"+miscFunc.generateID(20)
+	  let gameSocket = io.of(id);
+      this.roomid = id;
       this.gameSocket = gameSocket;
 
       this.players = [];
