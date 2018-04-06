@@ -4,7 +4,7 @@
   "description": "rts server",
   "main": "app.js",
   "scripts": {
-    "test": "jasmine spec/testSpec.js"
+    "test": "jasmine"
   },
   "repository": {
     "type": "git",
