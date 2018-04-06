@@ -77,25 +77,11 @@ function makeMap(game){
 function tick(){
    
    startTime = new Date().getTime();
+  
+   tickGames();
+  
+   removeFinishedGames();
    
-   gamesIter = games.values();
-   element = gamesIter.next();
-   
-   while(!element.done){
-      game = element.value
-      game.tick();
-      if(game.finished){
-         gamesToRemove.push(game.roomid);
-      }
-      element = gamesIter.next();
-   }
-   
-   for(var i = 0; i < gamesToRemove.length; i++){
-      games.get(gamesToRemove[i]).endGame();
-      games.delete(gamesToRemove[i]);
-   }
-   gamesToRemove = [];
-
    var buffer = inputs.slice();
      /*
          Data:
@@ -127,9 +113,31 @@ function tick(){
 /////////////
 // tick helpers
 
+function tickGames(){
+   
+   gamesIter = games.values();
+   element = gamesIter.next();
+   
+   while(!element.done){
+      game = element.value
+      game.tick();
+      if(game.finished){
+         gamesToRemove.push(game.roomid);
+      }
+      element = gamesIter.next();
+   }
+   
+}
 
+function removeFinishedGames(){
+   
+   for(var i = 0; i < gamesToRemove.length; i++){
+      games.get(gamesToRemove[i]).endGame();
+      games.delete(gamesToRemove[i]);
+   }
+   gamesToRemove = [];
 
-
+}
 
 
 //call when a client disconnects and tell the clients except sender to remove the disconnected player
