@@ -50,9 +50,9 @@ tick();
 // Tick functions
 
 function tick(){
-   
+
    startTime = new Date().getTime();
-  
+
    tickGames(); //Iterates through all games and calls their tick methods
   
    removeFinishedGames(); 
@@ -65,10 +65,10 @@ function tick(){
 // tick helpers
 
 function tickGames(){
-   
+
    gamesIter = games.values();
    element = gamesIter.next();
-   
+
    while(!element.done){
       game = element.value
       game.tick();
@@ -77,11 +77,11 @@ function tickGames(){
       }
       element = gamesIter.next();
    }
-   
+
 }
 
 function removeFinishedGames(){
-   
+
    for(var i = 0; i < gamesToRemove.length; i++){
       games.get(gamesToRemove[i]).endGame();
       games.delete(gamesToRemove[i]);
@@ -93,18 +93,18 @@ function removeFinishedGames(){
 function forceTickRate(startTime){
    
    var tickTime =  new Date().getTime() - startTime;
-   
+
    if(tickTime < 0){
       tickTime = 0;
    }
-   
+
    if(tickTime > tickLength){
       console.log("Dropping Frame");
       setTimeout(tick,(Math.floor(tickTime/tickLength)+1)*tickLength-tickTime);
    }else{
       setTimeout(tick, tickLength-tickTime);
    }
-   
+
 }
 
 
@@ -169,7 +169,7 @@ function makeMap(game){
 //TODO have client send which game player is in, so we can remove them from it.
 function onClientdisconnect(data) {
 	console.log('disconnect');
-    
+
 	if(playersToGames.has(this.id)){
 		playersToGames.get(this.id).removePlayer(this.id);
 		// If the game has no players in it, we remove it.
@@ -216,11 +216,6 @@ function onNewClient(){
     playersToGames.set(this.id, game);
     this.emit('send_nodes', {nodes:game.map.nodes, castles:game.map.castles});
     io.of(game.roomid).emit('update_nodes', {nodes:game.map.nodes});
-}
-
-
-function onInputFired(data){
-   inputs.push([data,this.id]);
 }
 
 function onLogin(data){
