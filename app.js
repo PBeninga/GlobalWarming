@@ -155,6 +155,8 @@ function findPlayerID(id) {
 
 	return false;
 }
+
+
 function findGame(id){
 	gamesIter = games.values();
 	element = gamesIter.next();
@@ -172,8 +174,9 @@ function findGame(id){
 	return game;
 }
 
+
 function onNewClient(){
-	game = findGame(this.id)
+	game = findGame(this.id);
 	this.join(game.roomid)
   io.of(game.roomid).emit('newPlayer',{id:this.id, starting:game.starting});
   this.emit('connected',{id:this.id, players:game.players, game:game.roomid, timeTillStart:game.timeTillStart, starting:game.starting});//send the players id, the players, and the room id
@@ -182,17 +185,25 @@ function onNewClient(){
   this.emit('send_nodes', {nodes:game.map.nodes, castles:game.map.castles});
 	io.of(game.roomid).emit('update_nodes', {nodes:game.map.nodes});
 }
+
+
 function onInputFired(data){
 	inputs.push([data,this.id]);
 }
+
+
 function onLogin(data){
    var login = new lg.Login(this, this.id);
    login.onLogin(data.data);
 }
+
+
 function onNewAccount(data){
    var login = new lg.Login(this, this.id);
    login.onNewAccount(data.data);
 }
+
+
 io.sockets.on('connection', function(socket){
 console.log("socket connected");
 socket.on("client_started", onNewClient);
