@@ -1,28 +1,48 @@
-var express = require('express');
+//////////////
+// Link other files
 
-var app = express();
-var serv = require('http').Server(app);
-//get the functions required to move players in the server.
 var gameObject = require('./Game.js');
 var mapObjects = require('./Map.js');
 var miscFunc = require('./MiscFunctions.js');
 var lg = require('./server/login.js');
 
+
+//////////////
+// Express stuff
+
+var express = require('express');
+var app = express();
+var serv = require('http').Server(app);
+
 app.get('/',function(req, res) {
 	res.sendFile(__dirname + '/client/index.html');
 });
+
 app.use('/client',express.static(__dirname + '/client'));
 
 serv.listen(process.env.PORT || 2000);
 console.log("Server started on port 2000");
 
+
+//////////////
 // io connection
+
 var io = require('socket.io')(serv,{});
+
+
+/////////////////
+// Global varibales
+
 var playersToGames = new Map();
 var gamesToRemove = [];// all games;
 var games = new Map();
 var inputs = [];
 let tickLength = 50;
+
+
+/////////////////
+// Start ticking
+
 tick();
 
 function makeNewGame(){
@@ -81,9 +101,9 @@ function tick(){
    
    startTime = new Date().getTime();
   
-   tickGames();
+   tickGames(); //Iterates through all games and calls their tick methods
   
-   removeFinishedGames();
+   removeFinishedGames(); 
    
    //to be depricated soon 
    var buffer = inputs.slice();
@@ -98,7 +118,7 @@ function tick(){
       }
    }
    
-   forceTickRate();
+   forceTickRate(); // Wait until the minimum tick-time has passed
    
 }
 
