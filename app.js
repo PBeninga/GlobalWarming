@@ -14,7 +14,7 @@ app.get('/',function(req, res) {
 app.use('/client',express.static(__dirname + '/client'));
 
 serv.listen(process.env.PORT || 2000);
-console.log("Server started.");
+console.log("Server started on port 2000");
 
 // io connection
 var io = require('socket.io')(serv,{});
@@ -149,6 +149,8 @@ function findPlayerID(id) {
 
 	return false;
 }
+
+
 function findGame(id){
 	gamesIter = games.values();
 	element = gamesIter.next();
@@ -166,9 +168,14 @@ function findGame(id){
 	return game;
 }
 
+
 function onNewClient(){
 	game = findGame(this.id);
+<<<<<<< HEAD
 	this.join(game.roomid);
+=======
+	this.join(game.roomid)
+>>>>>>> d986b2df5baa0d916cb8a52ff386c21e74f0f8c5
   io.of(game.roomid).emit('newPlayer',{id:this.id, starting:game.starting});
   this.emit('connected',{id:this.id, players:game.players, game:game.roomid, timeTillStart:game.timeTillStart, starting:game.starting});//send the players id, the players, and the room id
 	player_list.push(this.id);
@@ -176,14 +183,28 @@ function onNewClient(){
   this.emit('send_nodes', {nodes:game.map.nodes, castles:game.map.castles});
 	io.of(game.roomid).emit('update_nodes', {nodes:game.map.nodes});
 }
+<<<<<<< HEAD
+=======
+
+
+function onInputFired(data){
+	inputs.push([data,this.id]);
+}
+
+
+>>>>>>> d986b2df5baa0d916cb8a52ff386c21e74f0f8c5
 function onLogin(data){
    var login = new lg.Login(this, this.id);
    login.onLogin(data.data);
 }
+
+
 function onNewAccount(data){
    var login = new lg.Login(this, this.id);
    login.onNewAccount(data.data);
 }
+
+
 io.sockets.on('connection', function(socket){
 console.log("socket connected");
 socket.on("client_started", onNewClient);
