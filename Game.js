@@ -4,27 +4,45 @@ var playerObject = require('./Player.js');
 
 class Game{
    constructor(gameSocket, roomid){
-      this.players = [];
-      this.time = new Date().getTime();
+      this.roomid = roomid;
       this.gameSocket = gameSocket;
+
+      this.players = [];
       this.map = new gameMap.Map();
+      this.inputs = [];
       //To be replaced when we explicitly put in matchmaking
       this.started = false;
       this.starting = false;
 
-      this.roomid = roomid;
       this.finished =  false;
       this.winner = null;
-      this.maxPlayers = 4;
-      this.timeTillStart = 10000;
       this.startingCastles = [];
       this.timeGameBeganStarting = null;
-
+      //Game Variables
+      this.maxPlayers = 4;
+      this.timeTillStart = 1000;
+      this.time = new Date().getTime();
    }
-   onInputFired(data, id){
-        if(this.map.nodes[data.nodes[0]].army && this.map.nodes[data.nodes[0]].army.count > 0 && this.map.nodes[data.nodes[0]].army.player == id && this.started){
-            this.map.moveArmy(data.nodes, this.findPlayerById(id));
+
+   addInput(moveNodes, id){
+     this.inputs.push(moveNodes);
+     this.inputs.push(id);
+     console.log("length: " + this.inputs.length);
+   }
+
+   doInputs(){
+     for(var i = 0; i < this.inputs.length; i++) {
+       var moveNodes = this.inputs[i];
+       i++;
+       var id = this.inputs[i];
+        if(this.map.nodes[moveNodes[0]].army && //the start node has an army
+          this.map.nodes[moveNodes[0]].army.count > 0 && //the start node's army has enough troops
+          this.map.nodes[moveNodes[0]].army.player == id && //the start node's army is equal to
+          this.started){
+            this.map.moveArmy(moveNodes, this.findPlayerById(id));
         }
+      }
+      this.inputs = [];
    }
    incrementTroops(num){
       this.map.incrementAllTroops(num);
@@ -48,18 +66,16 @@ class Game{
             toRemove.push(i);
          }
       }
+      //Alter the players nodes in some way.
       for(var i = 0; i < toRemove.length; i++){
          if(this.map.castles.indexOf(toRemove[i]) != -1){
             this.map.nodes[toRemove[i]].army = new armyObject.Army(null,50);
          }else{
              this.map.nodes[toRemove[i]].army = null;
-         } // set to neutral castle
+         }
       }
 
       this.players.splice(this.findPlayerIndexById(id),1);
-
-      //find any army in a path that is owned by removed player
-      //NOT IMPLEMENTED
    }
    //return true on player succesfully added
    addPlayer(id){
@@ -174,6 +190,7 @@ class Game{
             this.timeTillStart = 10000 - (new Date().getTime() - this.timeGameBeganStarting);
             this.gameSocket.emit('updateTime',{time:this.timeTillStart});
         }
+        this.doInputs();
     }
 }
 

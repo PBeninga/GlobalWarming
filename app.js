@@ -28,11 +28,16 @@ tickGames();
 
 function makeNewGame(){
 	 let id = "/"+miscFunc.generateID(20)
-	 let gameRoom = io.of(id);
-	 var game  = new gameObject.Game(gameRoom, id);
+	 let gameSocket = io.of(id);
+	 var game  = new gameObject.Game(gameSocket, id);
 	 makeMap(game); //should move into objects.js
 	 games.set(id,game);
 	 return game;
+}
+
+function onInputFired(data) {
+	currentGame = games.get(data.game);
+	currentGame.addInput(data.nodes, this.id);
 }
 
 function makeMap(game){
@@ -95,17 +100,6 @@ function tickGames(){
 	}
 	gamesToRemove = [];
 
-	var buffer = inputs.slice();
-		/*
-			Data:
-			id:
-		*/
-  inputs = [];
-  for(data of buffer){
-    if(games.has(data[0].game)){
-      games.get(data[0].game).onInputFired(data[0],data[1]);
-    }
-  }
   var tickTime =  new Date().getTime() - startTime;
 	if(tickTime < 0){
 		tickTime = 0;
@@ -173,17 +167,14 @@ function findGame(id){
 }
 
 function onNewClient(){
-	game = findGame(this.id)
-	this.join(game.roomid)
+	game = findGame(this.id);
+	this.join(game.roomid);
   io.of(game.roomid).emit('newPlayer',{id:this.id, starting:game.starting});
   this.emit('connected',{id:this.id, players:game.players, game:game.roomid, timeTillStart:game.timeTillStart, starting:game.starting});//send the players id, the players, and the room id
 	player_list.push(this.id);
 	playersToGames.set(this.id, game);
   this.emit('send_nodes', {nodes:game.map.nodes, castles:game.map.castles});
 	io.of(game.roomid).emit('update_nodes', {nodes:game.map.nodes});
-}
-function onInputFired(data){
-	inputs.push([data,this.id]);
 }
 function onLogin(data){
    var login = new lg.Login(this, this.id);
@@ -197,9 +188,8 @@ io.sockets.on('connection', function(socket){
 console.log("socket connected");
 socket.on("client_started", onNewClient);
 // listen for disconnection;
-socket.on('input_fired', onInputFired);
 socket.on('disconnect', onClientdisconnect);
 socket.on('login', onLogin);
 socket.on('new_account', onNewAccount);
-//listen for new player inputs.
+socket.on('input_fired', onInputFired);
 });
