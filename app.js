@@ -45,54 +45,6 @@ let tickLength = 50;
 
 tick();
 
-function makeNewGame(){
-	 let id = "/"+miscFunc.generateID(20)
-	 let gameRoom = io.of(id);
-	 var game  = new gameObject.Game(gameRoom, id);
-	 makeMap(game); //should move into objects.js
-	 games.set(id,game);
-	 return game;
-}
-
-function makeMap(game){
-	var nodes = [];
-	var high = 5;
-	var count = 0;
-	var castles = [0,4,24,20,10,14,12,2,22,18,6];
-	for(var i = 1; i <= high; i++){
-		for(var j = 1; j <= high; j++){
-			let x =  i*100;
-			let y =  j*100;
-			var adj = [];
-			// If the node isn't on the left layer, push the node on the left.
-			if(i != 1){
-				adj.push(count-5);
-			}
-			// If the node isn't on the top layer, push the node on top.
-			if(j != 1){
-				adj.push(count-1);
-			}
-			// If the node isn't on the right layer, push the node on the right.
-			if(i < high){
-				adj.push(count+5);
-			}
-			// If the node isn't on the bottom layer, push the node on bottom.
-			if(j < high){
-				adj.push(count+1);
-			}
-			if(castles.indexOf(count) == -1){
-				nodes[count] = new mapObjects.MapNode(x,y,adj, count);
-			}else{
-				nodes[count] = new mapObjects.Castle(x,y,adj, count);
-			}
-			count++;
-		}
-	}
-	game.map.startingCastles = [0,24,4,20];
-	game.map.nodes = nodes;
-	game.map.castles = castles;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Tick functions
@@ -167,6 +119,60 @@ function forceTickRate(){
    }
    
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// New Game
+
+function makeNewGame(){
+	 let id = "/"+miscFunc.generateID(20)
+	 let gameRoom = io.of(id);
+	 var game  = new gameObject.Game(gameRoom, id);
+	 makeMap(game); //should move into objects.js
+	 games.set(id,game);
+	 return game;
+}
+
+function makeMap(game){
+	var nodes = [];
+	var high = 5;
+	var count = 0;
+	var castles = [0,4,24,20,10,14,12,2,22,18,6];
+	for(var i = 1; i <= high; i++){
+		for(var j = 1; j <= high; j++){
+			let x =  i*100;
+			let y =  j*100;
+			var adj = [];
+			// If the node isn't on the left layer, push the node on the left.
+			if(i != 1){
+				adj.push(count-5);
+			}
+			// If the node isn't on the top layer, push the node on top.
+			if(j != 1){
+				adj.push(count-1);
+			}
+			// If the node isn't on the right layer, push the node on the right.
+			if(i < high){
+				adj.push(count+5);
+			}
+			// If the node isn't on the bottom layer, push the node on bottom.
+			if(j < high){
+				adj.push(count+1);
+			}
+			if(castles.indexOf(count) == -1){
+				nodes[count] = new mapObjects.MapNode(x,y,adj, count);
+			}else{
+				nodes[count] = new mapObjects.Castle(x,y,adj, count);
+			}
+			count++;
+		}
+	}
+	game.map.startingCastles = [0,24,4,20];
+	game.map.nodes = nodes;
+	game.map.castles = castles;
+}
+
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
