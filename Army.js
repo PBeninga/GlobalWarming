@@ -16,16 +16,13 @@ class Army{
 
    // returns the loser
    battle(army) {
-     if(army == null){
-       army = new Army(null,0,this.node, this.buff);
-     }
      //if end node contains your army, just combine armies
      if(this.player == army.player){
-       count += army.count;
+       this.count += army.count;
        return army;
      }else{ //battle
        //if enemy army is greater, decrease enemy army by your attacking army count
-       if(this.count >= army.count){
+       if(army.count >= this.count){
          army.count -= this.count;
          return this;
        }else{//conquer the node with your remaning troops (the difference)

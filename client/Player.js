@@ -48,10 +48,11 @@ class Player {
     }
   }
   // Updates the army at the given node by the given count
-  updateArmy(count, id) {
+  updateArmy(count, id, x, y) {
     for(var i = 0; i < this.armies.length; i++) {
       if(this.armies[i].id == id) {
         this.armies[i].count = count;
+        this.armies[i].moveTo(x, y);
         this.updated[i] = true;
         return;
       }

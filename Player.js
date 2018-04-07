@@ -19,18 +19,24 @@ class Player{
     }
 
     removeArmy(id) {
+      console.log("Attempting to remove army " + id);
       for(var i = 0; i < this.armies.length; i++){
-          if(this.armies[i] == id){
-              return this.armies.splice(i, 1);
-          }
+        if(this.armies[i].id == id){
+          console.log("Removed Army " + id);
+          var removedArmy = this.armies.splice(i, 1);
+          return removedArmy;
+        }
       }
       return null;
     }
 
     removeArmyAtNode(node) {
+      console.log("Current Army List Length: " + this.armies.length);
+      console.log("Attempting to remove army at node " + node.id + " owned by " + this.id);
       for(var i = 0; i < this.armies.length; i++){
           if(this.armies[i].node == node.id){
-              return this.armies.splice(i, 1);
+            console.log("Removed Army (at node)" + this.armies[i].id);
+            return this.armies.splice(i, 1);
           }
       }
       return null;
@@ -65,11 +71,12 @@ class Player{
       // If the army is on a castle
       if(moveArmy.buff != null){
         var toMove = Math.floor(moveArmy.count/2);
-        moveArmy -= toMove;
+        moveArmy.count -= toMove;
         moveArmy = this.addArmy(toMove, node)
+        if(moveArmy.buff == 'castle') {
+          moveArmy.buff = null;
+        }
         this.armies.push(moveArmy);
-      }
-      else {
       }
       return moveArmy;
     }

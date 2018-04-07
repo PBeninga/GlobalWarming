@@ -1,5 +1,3 @@
-var armyObject = require('./Army.js');
-
 class Map{
    constructor(){
       this.nodes = [];

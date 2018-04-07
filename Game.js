@@ -11,7 +11,6 @@ class Game{
       this.dummyPlayer = new playerObject.Player(null);
       this.players.push(this.dummyPlayer);
       this.map = new gameMap.Map();
-      this.inputs = [];
       this.movingArmies = [];
       //To be replaced when we explicitly put in matchmaking
       this.started = false;
@@ -28,38 +27,40 @@ class Game{
    }
 
    addInput(moveNodes, id){
-     this.inputs.push(moveNodes);
-     this.inputs.push(id);
+     if(this.map.nodes[moveNodes[0]].army && //the start node has an army
+       this.map.nodes[moveNodes[0]].army.count > 0 && //the start node's army has enough troops
+       this.map.nodes[moveNodes[0]].army.player == id && //the start node's army is equal to
+       this.started){
+         this.queueMoveArmy(moveNodes, this.map.nodes[moveNodes[0]].army.id, this.findPlayerById(id));
+       }
    }
 
-   doInputs(){
-     for(var i = 0; i < this.inputs.length; i++) {
-       console.log("Doing Input");
-       var moveNodes = this.inputs[i];
-       i++;
-       var id = this.inputs[i];
-        if(this.map.nodes[moveNodes[0]].army && //the start node has an army
-          this.map.nodes[moveNodes[0]].army.count > 0 && //the start node's army has enough troops
-          this.map.nodes[moveNodes[0]].army.player == id && //the start node's army is equal to
-          this.started){
-            this.moveArmy(moveNodes, this.map.nodes[moveNodes[0]].army.id, this.findPlayerById(id));
-        }
-      }
-      this.inputs = [];
-   }
    incrementTroops(num){
       for(var i = 0; i < this.players.length; i++) {
         this.players[i].incrementArmies(num);
       }
    }
-   moveArmy(nodes, armyID, player){
+   queueMoveArmy(nodes, armyID, player){
      //TODO: Fix hacky solution
      var currentPlayerArmyListLength = player.armies.length;
-     var movingArmy = player.moveArmy(armyID, nodes[0]);
+     console.log("Moving Army:" + armyID + "  Player:" + player.id);
+     var movingArmy = player.moveArmy(armyID, this.map.nodes[nodes[0]]);
      if(currentPlayerArmyListLength == player.armies.length) {
-       nodes[0].army = null;
+       console.log("Removed the army from node " + nodes[0]);
+       this.map.nodes[nodes[0]].army = null;
      }
      this.movingArmies.push({nodes:nodes, army:movingArmy, percentage:0});
+   }
+
+   moveArmy(army, startNode, endNode, percent) {
+     if(percent >= 100) {
+       percent = 100;
+     }
+     var xDist = endNode.x - startNode.x;
+     var yDist = endNode.y - startNode.y;
+     army.x = startNode.x + (xDist * (percent/100));
+     army.y = startNode.y + (yDist * (percent/100));
+     return percent;
    }
    onPlayerDisconnect(){
       this.removePlayer(this.id);
@@ -133,6 +134,25 @@ class Game{
            return null;
        }
    }
+
+   battle(node, army1, army2) {
+     var battleLoser = army1.battle(army2);
+     if(army1.id == battleLoser) {
+       node.army = army2;
+       army2.buff = node.buff;
+       army2.x = node.x;
+       army2.y = node.y;
+       this.findPlayerById(army1.player).removeArmy(army1.id);
+     }
+     else {
+       node.army = army1;
+       army1.buff = node.buff;
+       army1.x = node.x;
+       army1.y = node.y;
+       this.findPlayerById(army2.player).removeArmy(army2.id);
+     }
+   }
+
    tick(){
         var troopsToAdd = 0;
         this.gameSocket.emit('update_armies', {players:this.players});
@@ -154,50 +174,47 @@ class Game{
             }, this.constTimeTillStart);
         }
         if(this.started){
-            if(troopsToAdd > 0){
-               this.incrementTroops(troopsToAdd);
+          if(troopsToAdd > 0){
+            this.incrementTroops(troopsToAdd);
+          }
+          // Move all the armies (Done backwards because of splicing within for loop)
+          for(var i = this.movingArmies.length - 1; i >= 0; i--){
+            var currentMoving = this.movingArmies[i];
+            var startNode = this.map.nodes[currentMoving.nodes[0]];
+            var endNode = this.map.nodes[currentMoving.nodes[1]];
+            currentMoving.percentage += 5;
+            // if the army is done moving
+            if(this.moveArmy(currentMoving.army, startNode, endNode, currentMoving.percentage) >= 100){
+              // Adds a dummy army for the army to "fight" if none exists
+              if(endNode.army == null) {
+                endNode.army = this.dummyPlayer.addArmy(0, endNode);
+              }
+              //battle the occupying army
+              this.battle(endNode, currentMoving.army, endNode.army);
+              //Remove the finished movingArmy from the list
+              var finished  = this.movingArmies.splice(i,1)[0];
+              //Call moveArmies again if the swipelist continues
+              if(finished.nodes.length > 2){
+                finished.nodes.shift();
+                this.queueMoveArmy(finished.nodes, finished.army.id, this.findPlayerById(finished.army.player));
+              }
             }
-
-            this.gameSocket.emit('move_armies', {moving:this.movingArmies});
-            // Move all the armies
-            for(var i = 0; i < this.movingArmies.length; i++){
-              var currentMoving = this.movingArmies[i];
-              var startNode = this.map.nodes[this.movingArmies[i].nodes[0]];
-              var endNode = this.map.nodes[this.movingArmies[i].nodes[1]];
-              currentMoving.percentage += 5;
-                if(currentMoving.percentage >= 100){
-                    var battleLoser = currentMoving.army.battle(endNode.army);
-                    //Remove the army from the players list
-                    if(battleLoser.player != null) {
-                      this.findPlayerById(battleLoser.player).removeArmy(battleLoser.id);
-                    }
-                    //Replace the end node's army with the moving army if it won.
-                    if(battleLoser.id != currentMoving.army.id) {
-                      endNode.army = currentMoving.army;
-                    }
-                    var finished  = this.movingArmies.splice(i,1)[0];
-                    // Check for end consition
-                    if(finished.nodes.length > 2){
-                       finished.nodes.shift();
-                       this.moveArmy(finished.nodes, finished.army, this.findPlayerById(finished.army.player));
-                    }
-                }
+          }
+          // Check for end condition (1 Player + DummyPlayer remaining)
+          //TODO: Change to check for 2 Players and no Dummy Player
+          if(this.players.length <= 2 && this.started){
+            if(this.players[0].id == this.dummyPlayer.id){
+              this.winner = this.players[1];
             }
-            // Check for end condition (1 Player + DummyPlayer remaining)
-            if(this.players.length <= 2 && this.started){
-                if(this.players[0].id == this.dummyPlayer.id){
-                  this.winner = this.players[1];
-                }
-                else {
-                  this.winner = this.players[0];
-                }
-                this.finished = true;
+            else {
+              this.winner = this.players[0];
             }
-        }else if(this.starting){
-            this.timeTillStart = this.constTimeTillStart - (new Date().getTime() - this.timeGameBeganStarting);
-            this.gameSocket.emit('updateTime',{time:this.timeTillStart});
+            this.finished = true;
+          }
+        } else if(this.starting){
+          this.timeTillStart = this.constTimeTillStart - (new Date().getTime() - this.timeGameBeganStarting);
+          this.gameSocket.emit('updateTime',{time:this.timeTillStart});
         }
-        this.doInputs();
     }
 }
 

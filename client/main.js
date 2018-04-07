@@ -107,7 +107,6 @@ function onsocketConnected (data) {
 		*/
 		gameSocket.on('updateTime', onUpdateTime);
 		gameSocket.on('startGame',onStart);
-		gameSocket.on('move_armies', moveArmies);
 
 		//when the player receives the new input
 	ClientPlayer = addNewPlayer(this.id);
@@ -264,10 +263,10 @@ function mouseOver() {
 // Emits an 'input_fired' if the swipe has two or more nodes in it, otherwise it discards the swipe.
 function endSwipe() {
 	if(swipePath.length > 1) {
-                var swipeNodes = [];
-                for(node of swipePath){
-                   swipeNodes.push(node.id);
-                }
+    var swipeNodes = [];
+    for(node of swipePath){
+      swipeNodes.push(node.id);
+    }
 		console.log("emitting: "+ swipeNodes);
 		socket.emit('input_fired', {game:gameId, nodes: swipeNodes});
 	}
@@ -325,6 +324,7 @@ function findnodebyloc (x, y) {
 
 // Called when the map is originated. Creates all the nodes with the data from the server.
 function createNodes(data) {
+	/*
 	for(var i = 0; i < data.nodes.length; i++) {
 		console.log("NodeID: " + data.nodes[i].id + " x: " + data.nodes[i].x + "  y: " + data.nodes[i].y);
 		for(var j = 0; j < data.nodes[i].adj.length; j++) {
@@ -337,6 +337,7 @@ function createNodes(data) {
 			console.log("  army" + j + ": " + data.players[i].armies[j].id + "  count: " + data.players[i].armies[j].count + "  buff: " + data.players[i].armies[j].buff + "  node: " + data.players[i].armies[j].node + "  x:" + data.players[i].armies[j].x + ",y:" + data.players[i].armies[j].y);
 		}
 	}
+	*/
 	for (var i = 0; i < data.nodes.length; i++) {
 		// Creates a node from the data given and sets the callbacks for the node.
 		node_data = data.nodes[i];
@@ -363,7 +364,7 @@ function createNodes(data) {
 			var newArmy = clientPlayer.addArmy(0, currentArmy.id, clientNode.x, clientNode.y);
 			newArmy.graphics.events.onInputDown.add(swipe, {army: newArmy});
 			newArmy.graphics.events.onInputOver.add(mouseOver, {node: clientNode});
-			clientPlayer.updateArmy(currentArmy.count, currentArmy.id);
+			clientPlayer.updateArmy(currentArmy.count, currentArmy.id, currentArmy.x, currentArmy.y);
 		}
 	}
 	game.camera.setPosition(ClientPlayer.armies[0].x-canvas_width/2, ClientPlayer.armies[0].y-canvas_height/2);
@@ -374,25 +375,8 @@ function createNodes(data) {
 		});
 }
 
-function moveArmies(data) {
-	console.log("MOVEARMIES");
-	for(var i = 0; i < data.moving.length; i++) {
-		console.log("Start:" + data.moving[i].nodes[0] + "  End:" + data.moving[i].nodes[1] + "  Player:" + data.moving[i].army.player + "  Percent:" + data.moving[i].percentage);
-	}
-	for(var i = 0; i < data.moving.length; i++) {
-		startNode = findnodebyid(data.moving[i].nodes[0]);
-		currentPath = startNode.pathTo(findnodebyid(data.moving[i].nodes[1]));
-		currentPlayer = findplayerbyid(data.moving[i].army.player);
-		console.log("CurrentPlayer:" + currentPlayer.id + "  x:" + currentPath.percentToX(data.moving[i].percentage/100) + "  y:" + currentPath.percentToY(data.moving[i].percentage/100) + "  armyID:" + data.moving[i].army.id);
-		currentPlayer.moveArmy(
-			currentPath.percentToX(data.moving[i].percentage/100),
-			currentPath.percentToY(data.moving[i].percentage/100),
-			data.moving[i].army.id);
-	}
-}
-
 function updateArmies(data){
-	/*
+/*
 	console.log("UPDATE ARMIES");
 	for(var i = 0; i < data.players.length; i++) {
 		console.log("  Player: " + data.players[i].id)
@@ -401,17 +385,18 @@ function updateArmies(data){
 			console.log("    army" + j + "- count:" + temp.count + "  x:" + temp.x + ",y:" + temp.y + "  id:" + temp.id)
 		}
 	}
-	*/
+*/
 	for(var i = 0; i < data.players.length; i++) {
-		var currentPlayer = findplayerbyid(data.players[i].id);
-		for(var j = 0; j < data.players[i].armies.length; j++) {
-			currentArmy = data.players[i].armies[j];
-			if(currentPlayer.getArmyByID(currentArmy.id) == null) {
-				var newArmy = currentPlayer.addArmy(0, currentArmy.id, currentArmy.x, currentArmy.y);
+		var currentPlayer = data.players[i];
+		var currentClientPlayer = findplayerbyid(currentPlayer.id);
+		for(var j = 0; j < currentPlayer.armies.length; j++) {
+			currentArmy = currentPlayer.armies[j];
+			if(currentClientPlayer.getArmyByID(currentArmy.id) == null) {
+				var newArmy = currentClientPlayer.addArmy(0, currentArmy.id, currentArmy.x, currentArmy.y);
 				newArmy.graphics.events.onInputDown.add(swipe, {army: newArmy});
 				newArmy.graphics.events.onInputOver.add(mouseOver, {node: findnodebyid(currentArmy.node)});
 			}
-			currentPlayer.updateArmy(currentArmy.count, currentArmy.id);
+			currentClientPlayer.updateArmy(currentArmy.count, currentArmy.id, currentArmy.x, currentArmy.y);
 		}
 	}
 	for(var j = 0; j < players.length; j++) {
