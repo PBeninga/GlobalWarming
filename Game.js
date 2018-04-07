@@ -43,10 +43,8 @@ class Game{
    queueMoveArmy(nodes, armyID, player){
      //TODO: Fix hacky solution
      var currentPlayerArmyListLength = player.armies.length;
-     console.log("Moving Army:" + armyID + "  Player:" + player.id);
      var movingArmy = player.moveArmy(armyID, this.map.nodes[nodes[0]]);
      if(currentPlayerArmyListLength == player.armies.length) {
-       console.log("Removed the army from node " + nodes[0]);
        this.map.nodes[nodes[0]].army = null;
      }
      this.movingArmies.push({nodes:nodes, army:movingArmy, percentage:0});
@@ -70,7 +68,7 @@ class Game{
          console.log("Attempting to remove player that doesn't exist.");
          return;
       }
-      console.log("removing player: "+id+" from game"+this.roomid);
+      console.log("removing player " + id + " from game " + this.roomid);
       //find any army in a mapnode that is owned by removed player
       var toRemove = [];
       for(var i = 0; i < this.map.nodes.length; i++){
@@ -137,7 +135,7 @@ class Game{
 
    battle(node, army1, army2) {
      var battleLoser = army1.battle(army2);
-     if(army1.id == battleLoser) {
+     if(army1.id == battleLoser.id) {
        node.army = army2;
        army2.buff = node.buff;
        army2.x = node.x;
@@ -206,12 +204,7 @@ class Game{
           // Check for end condition (1 Player + DummyPlayer remaining)
           //TODO: Change to check for 2 Players and no Dummy Player
           if(this.players.length <= 2 && this.started){
-            if(this.players[0].id == this.dummyPlayer.id){
-              this.winner = this.players[1];
-            }
-            else {
-              this.winner = this.players[0];
-            }
+            this.winner = this.players[1];
             this.finished = true;
           }
         } else if(this.starting){
