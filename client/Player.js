@@ -63,7 +63,7 @@ class Player {
   removeArmies() {
     for(var i = 0; i < this.updated.length; i++) {
       if(!this.updated[i]) {
-        this.removeArmy(i);
+        this.removeArmy(this.armies[i].id);
       }
     }
   }

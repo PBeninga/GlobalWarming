@@ -376,7 +376,7 @@ function createNodes(data) {
 }
 
 function updateArmies(data){
-/*
+
 	console.log("UPDATE ARMIES");
 	for(var i = 0; i < data.players.length; i++) {
 		console.log("  Player: " + data.players[i].id)
@@ -385,7 +385,7 @@ function updateArmies(data){
 			console.log("    army" + j + "- count:" + temp.count + "  x:" + temp.x + ",y:" + temp.y + "  id:" + temp.id)
 		}
 	}
-*/
+
 	for(var i = 0; i < data.players.length; i++) {
 		var currentPlayer = data.players[i];
 		var currentClientPlayer = findplayerbyid(currentPlayer.id);

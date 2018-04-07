@@ -142,6 +142,7 @@ class Game{
        army2.buff = node.buff;
        army2.x = node.x;
        army2.y = node.y;
+       console.log("Battle is removing army " + army1.id + " from " + army1.player);
        this.findPlayerById(army1.player).removeArmy(army1.id);
      }
      else {
@@ -149,6 +150,7 @@ class Game{
        army1.buff = node.buff;
        army1.x = node.x;
        army1.y = node.y;
+       console.log("Battle is removing army " + army2.id + " from " + army2.player);
        this.findPlayerById(army2.player).removeArmy(army2.id);
      }
    }
@@ -188,6 +190,7 @@ class Game{
               // Adds a dummy army for the army to "fight" if none exists
               if(endNode.army == null) {
                 endNode.army = this.dummyPlayer.addArmy(0, endNode);
+                console.log("Created army " + endNode.army.id + " as a dummy army");
               }
               //battle the occupying army
               this.battle(endNode, currentMoving.army, endNode.army);
