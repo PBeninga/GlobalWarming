@@ -172,7 +172,7 @@ class Game{
 
       var tickStartTime = new Date().getTime();
       if(tickStartTime - this.time >= 500){
-         troopsToAdd = Math.floor((tickStartTime -this.time)/100);
+         troopsToAdd = Math.floor((tickStartTime -this.time)/500);
          this.time = tickStartTime - (tickStartTime%500);
       }
       // If there are more than 1 player (DummyPlayer doesnt count) and the game isn't started or starting
