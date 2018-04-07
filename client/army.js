@@ -11,7 +11,6 @@ class Army {
     this.graphics.drawCircle(0, 0, 45);
     this.graphics.anchor.setTo(0.5,0.5);
     this.graphics.endFill();
-    this.graphics.inputEnabled = true;
 
     this.countGraphics = null;
   }

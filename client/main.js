@@ -11,6 +11,9 @@ var nodes = [];
 var swipePath = [];
 var gameId;
 var lines = [];
+// Used for image heirarchy in phaser
+var nodeGroup = null;
+var armyGroup = null;
 
 var colors = [0xFF0000,	0xFF9F00, 0xF8FF00, 0x7AFF00,0x0000FF,
 										 0x8900FF, 0xFF00F6, 0x097B00, 0x980842];
@@ -200,7 +203,7 @@ function swipe() {
 	if(this.army.owner.id != ClientPlayer.id) {
 		console.log("That's not your army! Army at " + this.army.x + "," + this.army.y + " is owned by " + this.army.owner.id);
 	}
-	else {
+	else if(swipePath.length == 0){
 		console.log("Army at " + this.army.x + "," + this.army.y + " is owned by " + this.army.owner.id);
 		swipePath.push(findnodebyloc(this.army.x, this.army.y));
 		lines.push(new Phaser.Line(this.army.x, this.army.y, game.input.mousePointer.x, game.input.mousePointer.y));
@@ -212,12 +215,10 @@ function swipe() {
 function mouseOver() {
 	console.log("Mouse is over node " + this.node.x + ", " + this.node.y);
 	if(swipePath.length != 0) {
-		if(swipePath[swipePath.length-1].pathTo(this.node) != null) {
+		if(swipePath[swipePath.length-1].pathTo(this.node) != null && swipePath[swipePath.length-1].id != this.node.id) {
 			swipePath.push(this.node);
 			lines[lines.length-1].end = new Phaser.Point(this.node.x, this.node.y);
 			lines.push(new Phaser.Line(this.node.x, this.node.y, game.input.mousePointer.x + game.camera.x, game.input.mousePointer.y+ game.camera.y));
-		}
-		else {
 		}
 	}
 }
@@ -289,6 +290,7 @@ function createNodes(data) {
 		// Creates a node from the data given and sets the callbacks for the node.
 		node_data = data.nodes[i];
 		let newNode = new MapNode(node_data.id, node_data.x, node_data.y);
+		nodeGroup.add(newNode.graphics);
 		newNode.graphics.inputEnabled = true;
 		newNode.graphics.events.onInputOver.add(mouseOver, {node: newNode});
 		// Pushes the node into the node buffer and displays it.
@@ -298,7 +300,7 @@ function createNodes(data) {
 	// Adds all the paths from adjacency lists
 	for(var i = 0; i < nodes.length; i++) {
 		for(var j = 0; j < data.nodes[i].adj.length; j++) {
-			nodes[i].addPath(findnodebyid(data.nodes[i].adj[j]));
+			nodeGroup.add(nodes[i].addPath(findnodebyid(data.nodes[i].adj[j])).graphics);
 		}
 	}
 
@@ -311,9 +313,13 @@ function createNodes(data) {
 			var currentArmy = currentPlayer.armies[j];
 			var clientNode = nodes[currentArmy.node];
 			// Creates the army in the client and initializes the army's callbacks
+			console.log("Adding client " + clientPlayer.id + " army");
 			var newArmy = clientPlayer.addArmy(0, currentArmy.id, clientNode.x, clientNode.y);
-			newArmy.graphics.events.onInputDown.add(swipe, {army: newArmy});
-			newArmy.graphics.events.onInputOver.add(mouseOver, {node: clientNode});
+			console.log(clientPlayer.id + " now has " + clientPlayer.armies.length + " armies");
+			armyGroup.add(newArmy.graphics);
+			armyGroup.add(newArmy.countGraphics);
+			clientNode.graphics.events.onInputDown.forget();
+			clientNode.graphics.events.onInputDown.add(swipe, {army: newArmy});
 			clientPlayer.updateArmy(currentArmy.count, currentArmy.id, currentArmy.x, currentArmy.y); //Not necessary
 		}
 	}
@@ -327,28 +333,37 @@ function createNodes(data) {
 
 // Called every tick
 function updateArmies(data){
+	var updated = [];
+	for(var i = 0; i < nodes.length; i++) {
+		updated.push(false);
+	}
 	for(var i = 0; i < data.players.length; i++) {
 		var currentPlayer = data.players[i];
 		var currentClientPlayer = findplayerbyid(currentPlayer.id);
 		// Goes through every army of every player
 		for(var j = 0; j < currentPlayer.armies.length; j++) {
-			currentArmy = currentPlayer.armies[j];
+			var currentArmy = currentPlayer.armies[j];
+			var clientNode = findnodebyloc(currentArmy.x, currentArmy.y);
 			// If the client doesn't have that army, it is created and initialized
 			if(currentClientPlayer.getArmyByID(currentArmy.id) == null) {
-				var newArmy = currentClientPlayer.addArmy(0, currentArmy.id, currentArmy.x, currentArmy.y);
-				newArmy.graphics.events.onInputDown.add(swipe, {army: newArmy});
-				newArmy.graphics.events.onInputOver.add(mouseOver, {node: findnodebyid(currentArmy.node)});
+				var newClientArmy = currentClientPlayer.addArmy(0, currentArmy.id, currentArmy.x, currentArmy.y);
+				armyGroup.add(newClientArmy.graphics);
+				armyGroup.add(newClientArmy.countGraphics);
 			}
 			// The army is updated with all relevant values from the server
 			currentClientPlayer.updateArmy(currentArmy.count, currentArmy.id, currentArmy.x, currentArmy.y);
-			// Deletes the old onInputOver and replaces it with a new one. This is inefficient, and a better solution
-			// for keeping the army's callbacks when it moves would be welcome. Possibly by making it possible to
-			// click through them, and having the callbacks be completely on the node?
-			var newMouseOverNode = findnodebyloc(currentArmy.x, currentArmy.y);
-			if(newMouseOverNode != null) {
-				currentClientArmy = currentClientPlayer.getArmyByID(currentArmy.id);
-				currentClientArmy.graphics.events.onInputOver.forget();
-				currentClientArmy.graphics.events.onInputOver.add(mouseOver, {node: newMouseOverNode});
+			// Deletes the old onInputDown and replaces it with the one for the current army.
+			// TODO: There is a better way to do this.
+			if(clientNode != null) {
+				var currentClientArmy = currentClientPlayer.getArmyByID(currentArmy.id);
+				clientNode.graphics.events.onInputDown.forget();
+				clientNode.graphics.events.onInputDown.add(swipe, {army: currentClientArmy});
+				updated[clientNode.id] = true;
+			}
+		}
+		for(var j = 0; j < nodes.length; j++) {
+			if(!updated) {
+				nodes[j].graphics.events.onInputDown.forget();
 			}
 		}
 	}
@@ -366,6 +381,9 @@ main.prototype = {
 	create: function () {
 		game.world.setBounds(-canvas_width*2, -canvas_height*2, canvas_width * 4, canvas_height * 4);
 		game.stage.backgroundColor = 0x000000;
+		nodeGroup = game.add.group();
+		armyGroup = game.add.group();
+		game.world.bringToTop(armyGroup);
 		game.input.onUp.add(endSwipe);
 /*
 		leaveButton = game.add.button(game.camera.x + window.innerWidth, game.camera.y + window.innerHeight, 'button1', function() {

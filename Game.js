@@ -142,13 +142,15 @@ class Game{
    // puts the winner into the node, giving it the node's buff
    battle(node, army1, army2) {
      var battleLoser = army1.battle(army2);
+     var losingPlayer = null;
      if(army1.id == battleLoser.id) {
        node.army = army2;
        army2.buff = node.buff;
        army2.x = node.x;
        army2.y = node.y;
        console.log("Battle is removing army " + army1.id + " from " + army1.player);
-       this.findPlayerById(army1.player).removeArmy(army1.id);
+       losingPlayer = this.findPlayerById(army1.player);
+       losingPlayer.removeArmy(army1.id);
      }
      else {
        node.army = army1;
@@ -156,68 +158,72 @@ class Game{
        army1.x = node.x;
        army1.y = node.y;
        console.log("Battle is removing army " + army2.id + " from " + army2.player);
-       this.findPlayerById(army2.player).removeArmy(army2.id);
+       losingPlayer = this.findPlayerById(army2.player);
+       losingPlayer.removeArmy(army2.id);
+     }
+     if(losingPlayer.armies.length == 0) {
+       this.players.splice(this.findPlayerIndexById(losingPlayer.id),1);
      }
    }
 
    tick(){
-        var troopsToAdd = 0;
-        this.gameSocket.emit('update_armies', {players:this.players});
+      var troopsToAdd = 0;
+      this.gameSocket.emit('update_armies', {players:this.players});
 
-        var tickStartTime = new Date().getTime();
-        if(tickStartTime - this.time >= 500){
-           troopsToAdd = Math.floor((tickStartTime -this.time)/500);
-           this.time = tickStartTime - (tickStartTime%500);
+      var tickStartTime = new Date().getTime();
+      if(tickStartTime - this.time >= 500){
+         troopsToAdd = Math.floor((tickStartTime -this.time)/100);
+         this.time = tickStartTime - (tickStartTime%500);
+      }
+      // If there are more than 1 player (DummyPlayer doesnt count) and the game isn't started or starting
+      if(this.players.length > 2 && !this.starting && !this.started){
+          this.starting = true;
+          console.log("Game starting.");
+          let game = this;
+          this.timeGameBeganStarting = new Date().getTime();
+          setTimeout(function(){
+              game.started = true;
+              game.gameSocket.emit('startGame');
+          }, this.constTimeTillStart);
+      }
+      if(this.started){
+        if(troopsToAdd > 0){
+          this.incrementTroops(troopsToAdd);
         }
-        // If there are more than 1 player (DummyPlayer doesnt count) and the game isn't started or starting
-        if(this.players.length > 2 && !this.starting && !this.started){
-            this.starting = true;
-            console.log("Game starting.");
-            let game = this;
-            this.timeGameBeganStarting = new Date().getTime();
-            setTimeout(function(){
-                game.started = true;
-                game.gameSocket.emit('startGame');
-            }, this.constTimeTillStart);
-        }
-        if(this.started){
-          if(troopsToAdd > 0){
-            this.incrementTroops(troopsToAdd);
-          }
-          // Move all the armies (Done backwards because of splicing within for loop)
-          for(var i = this.movingArmies.length - 1; i >= 0; i--){
-            var currentMoving = this.movingArmies[i];
-            var startNode = this.map.nodes[currentMoving.nodes[0]];
-            var endNode = this.map.nodes[currentMoving.nodes[1]];
-            currentMoving.percentage += 5;
-            // if the army is done moving
-            if(this.moveArmy(currentMoving.army, startNode, endNode, currentMoving.percentage) >= 100){
-              // Adds a dummy army for the army to "fight" if none exists
-              if(endNode.army == null) {
-                endNode.army = this.dummyPlayer.addArmy(0, endNode);
-                console.log("Created army " + endNode.army.id + " as a dummy army");
-              }
-              //battle the occupying army
-              this.battle(endNode, currentMoving.army, endNode.army);
-              //Remove the finished movingArmy from the list
-              var finished  = this.movingArmies.splice(i,1)[0];
-              //Call moveArmies again if the swipelist continues
-              if(finished.nodes.length > 2){
-                finished.nodes.shift();
-                this.queueMoveArmy(finished.nodes, finished.army.id, this.findPlayerById(finished.army.player));
-              }
+        // Move all the armies (Done backwards because of splicing within for loop)
+        for(var i = this.movingArmies.length - 1; i >= 0; i--){
+          var currentMoving = this.movingArmies[i];
+          var startNode = this.map.nodes[currentMoving.nodes[0]];
+          var endNode = this.map.nodes[currentMoving.nodes[1]];
+          currentMoving.percentage += 5;
+          // if the army is done moving
+          if(this.moveArmy(currentMoving.army, startNode, endNode, currentMoving.percentage) >= 100){
+            // Adds a dummy army for the army to "fight" if none exists
+            if(endNode.army == null) {
+              endNode.army = this.dummyPlayer.addArmy(0, endNode);
+              console.log("Created army " + endNode.army.id + " as a dummy army");
+            }
+            //battle the occupying army
+            this.battle(endNode, currentMoving.army, endNode.army);
+            //Remove the finished movingArmy from the list
+            var finished  = this.movingArmies.splice(i,1)[0];
+            //Call moveArmies again if the swipelist continues
+            if(finished.nodes.length > 2){
+              finished.nodes.shift();
+              this.queueMoveArmy(finished.nodes, finished.army.id, this.findPlayerById(finished.army.player));
             }
           }
-          // Check for end condition (1 Player + DummyPlayer remaining)
-          //TODO: Change to check for 2 Players and no Dummy Player
-          if(this.players.length <= 2 && this.started){
-            this.winner = this.players[1];
-            this.finished = true;
-          }
-        } else if(this.starting){
-          this.timeTillStart = this.constTimeTillStart - (new Date().getTime() - this.timeGameBeganStarting);
-          this.gameSocket.emit('updateTime',{time:this.timeTillStart});
         }
+        // Check for end condition (1 Player + DummyPlayer remaining)
+        //TODO: Change to check for 2 Players and no Dummy Player
+        if(this.players.length <= 2 && this.started){
+          this.winner = this.players[1];
+          this.finished = true;
+        }
+      } else if(this.starting){
+        this.timeTillStart = this.constTimeTillStart - (new Date().getTime() - this.timeGameBeganStarting);
+        this.gameSocket.emit('updateTime',{time:this.timeTillStart});
+      }
     }
 }
 
