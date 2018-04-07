@@ -64,51 +64,14 @@ function onsocketConnected (data) {
 	gameId = data.game
 	console.log(gameId);
 	gameSocket = io(gameId);
-		/*
-			Sends the data we will need to update the game, which is the armies and the owners.
-			data sent:
-			{
-				nodes[
-					army: Variable holding the army values.
-						count: Strength of the army.
-						player: ID of the player that owns it.
-				]
-			}
-			ex. data.nodes[0].army.count
-		*/
-		gameSocket.on('update_armies', updateArmies);
 
-		/*
-			Sends the id of a player which has left the game
-			data sent:
-			{
-				id: ID of the player which has left.
-			}
-			ex. data.id
-		*/
-		gameSocket.on('remove_player', onRemovePlayer);
-		/* data  =
-		{
-			winner: the id of the winner of the game
-		}
-		*/
-		gameSocket.on('endGame',endGame);
-		/*
-		data =
-		{
-			id: new player id
-		}
-		*/
-		gameSocket.on('newPlayer', onNewPlayer);
-		/*data =
-		 {
-			time: time left untill game starts
-		 }
-		*/
-		gameSocket.on('updateTime', onUpdateTime);
-		gameSocket.on('startGame',onStart);
+	gameSocket.on('update_armies', updateArmies);
+	gameSocket.on('remove_player', onRemovePlayer);
+	gameSocket.on('endGame',endGame);
+	gameSocket.on('newPlayer', onNewPlayer);
+	gameSocket.on('updateTime', onUpdateTime);
+	gameSocket.on('startGame',onStart);
 
-		//when the player receives the new input
 	ClientPlayer = addNewPlayer(this.id);
 	for(var i = 0; i < data.players.length; i++) {
 		if(data.players[i].id !=  this.id){
@@ -339,16 +302,19 @@ function createNodes(data) {
 		}
 	}
 
+	// Initializes the starting armies through the players
 	for(var i = 0; i < data.players.length; i++) {
 		var currentPlayer = data.players[i];
 		var clientPlayer = addNewPlayer(currentPlayer.id);
+		// Goes through all armies the player controls
 		for(var j = 0; j < currentPlayer.armies.length; j++) {
 			var currentArmy = currentPlayer.armies[j];
 			var clientNode = nodes[currentArmy.node];
+			// Creates the army in the client and initializes the army's callbacks
 			var newArmy = clientPlayer.addArmy(0, currentArmy.id, clientNode.x, clientNode.y);
 			newArmy.graphics.events.onInputDown.add(swipe, {army: newArmy});
 			newArmy.graphics.events.onInputOver.add(mouseOver, {node: clientNode});
-			clientPlayer.updateArmy(currentArmy.count, currentArmy.id, currentArmy.x, currentArmy.y);
+			clientPlayer.updateArmy(currentArmy.count, currentArmy.id, currentArmy.x, currentArmy.y); //Not necessary
 		}
 	}
 	game.camera.setPosition(ClientPlayer.armies[0].x-canvas_width/2, ClientPlayer.armies[0].y-canvas_height/2);
@@ -359,29 +325,25 @@ function createNodes(data) {
 		});
 }
 
+// Called every tick
 function updateArmies(data){
-/*
-	console.log("UPDATE ARMIES");
-	for(var i = 0; i < data.players.length; i++) {
-		console.log("  Player: " + data.players[i].id)
-		for(var j = 0; j < data.players[i].armies.length; j++) {
-			var temp = data.players[i].armies[j];
-			console.log("    army" + j + "- count:" + temp.count + "  x:" + temp.x + ",y:" + temp.y + "  id:" + temp.id)
-		}
-	}
-*/
 	for(var i = 0; i < data.players.length; i++) {
 		var currentPlayer = data.players[i];
 		var currentClientPlayer = findplayerbyid(currentPlayer.id);
+		// Goes through every army of every player
 		for(var j = 0; j < currentPlayer.armies.length; j++) {
 			currentArmy = currentPlayer.armies[j];
+			// If the client doesn't have that army, it is created and initialized
 			if(currentClientPlayer.getArmyByID(currentArmy.id) == null) {
-				console.log("ADDING ARMY");
 				var newArmy = currentClientPlayer.addArmy(0, currentArmy.id, currentArmy.x, currentArmy.y);
 				newArmy.graphics.events.onInputDown.add(swipe, {army: newArmy});
 				newArmy.graphics.events.onInputOver.add(mouseOver, {node: findnodebyid(currentArmy.node)});
 			}
+			// The army is updated with all relevant values from the server
 			currentClientPlayer.updateArmy(currentArmy.count, currentArmy.id, currentArmy.x, currentArmy.y);
+			// Deletes the old onInputOver and replaces it with a new one. This is inefficient, and a better solution
+			// for keeping the army's callbacks when it moves would be welcome. Possibly by making it possible to
+			// click through them, and having the callbacks be completely on the node?
 			var newMouseOverNode = findnodebyloc(currentArmy.x, currentArmy.y);
 			if(newMouseOverNode != null) {
 				currentClientArmy = currentClientPlayer.getArmyByID(currentArmy.id);
@@ -390,32 +352,14 @@ function updateArmies(data){
 			}
 		}
 	}
+	// Clears any armies that no longer exist in the server.
+	// We keep track of this by making the player objects track which armies get updated, and removing the ones that don't.
 	for(var j = 0; j < players.length; j++) {
 		players[j].removeArmies();
 		players[j].clearUpdated();
 		players[j].updateArmies(); // Does nothing
 	}
 }
-
-/*
-// Prints data passed to createnode
-function printCreateNodeData(data) {
-	for(var i = 0; i < data.nodes.length; i++) {
-		console.log("node " + i + ": {");
-		console.log("	x: " + data.nodes[i].x +  ", y: " + data.nodes[i].y);
-		var adj = "	adj:{";
-		for(var j = 0; j < data.nodes[i].adj.length - 1; j++) {
-			adj += data.nodes[i].adj[j] + ",";
-		}
-		console.log(adj + data.nodes[i].adj[data.nodes[i].adj.length - 1] + "}");
-		if(data.castles.includes(i)) {
-			console.log("	army: {");
-			console.log("		player: " + data.nodes[i].army.player);
-			console.log("		count: " + data.nodes[i].army.count);
-		}
-	}
-}
-*/
 
 main.prototype = {
 
@@ -442,54 +386,8 @@ main.prototype = {
 		*/
 
 		console.log("client started");
-    	socket.emit("client_started",{});
-
-		/*
-			sends the initial player data
-			data sent:
-			{
-				id: The id automatically generated for the player.
-				players[]: The ids of the players that are already in the game
-			}
-			ex. data.id -> Your player id.
-			ex. data.players[0] -> Other player ids
-		*/
+    socket.emit("client_started",{});
 		socket.on('connected', onsocketConnected);
-		/*
-			get initial positions of nodes.
-			data sent:
-			{
-				nodes[
-					int x: xcoord
-					int y: ycoord
-					int[] adj: list of nodes that can be accessed by this node. Corresponds to index.
-					(optional)army army:
-					 	player: id of the player owning the army
-						count: amount of the army
-				]
-				castles[]: index of where the optional armies lie
-			}
-			ex. data.nodes[0].x
-					data.nodes[data.castles[0]].army.player
-
-			CHANGE TO
-			{
-				nodes[
-					x: xcoord
-					y: ycoord
-					adj[]: list of node ids that can be accessed by this node
-				]
-				players[
-					id: Player ID
-					armies[
-						count: Strength of the army
-						location: Where the army is located (index of node)
-					]
-				]
-			}
-			ex. data.nodes[0].adj[0]
-					data.players[0].armies[0].location.x
-		*/
 		socket.on('send_nodes', createNodes);
 	},
 

@@ -1,5 +1,8 @@
 var miscFunc = require('./MiscFunctions.js');
 
+// *********************************************
+// IMPORTANT - ARMY ONLY HOLDS IDS. DOES NOT HOLD OBJECTS
+// *********************************************
 class Army{
    constructor(player,count,node,x,y,buff){
       this.id = miscFunc.generateID(20);
@@ -14,7 +17,7 @@ class Army{
       this.buff = buff;
    }
 
-   // returns the loser
+   // returns the loser, so it can be removed from it's node and it's players list
    battle(army) {
      console.log("Commencing battle!");
      //if end node contains your army, just combine armies
@@ -28,7 +31,8 @@ class Army{
          console.log(army.player + " won the battle!");
          army.count -= this.count;
          return this;
-       }else{//conquer the node with your remaning troops (the difference)
+       //otherwise, conquer the node with your remaning troops.
+       }else{
          console.log(this.player + " won the battle!");
          this.count -= army.count;
          this.buff = army.buff;

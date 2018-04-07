@@ -17,6 +17,7 @@ class MapNode{
       this.army = null;
    }
 
+   // Checks for a valid path to the given node
    validPath(nodeid) {
      for(var i = 0; i < this.adj.length; i++) {
        if(nodeid == adj[i]) {
@@ -27,6 +28,7 @@ class MapNode{
    }
 }
 
+// Just MapNode, but with a buff
 class Castle extends MapNode{
    constructor(x,y,adj,id){
       super(x,y,adj,id);

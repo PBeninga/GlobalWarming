@@ -1,14 +1,3 @@
-function merge(army1, army2) {
-  if(army1.owner == army2.owner) {
-    let newArmy = new Army(army1.count + army2.count, army1.owner, army1.node);
-    newArmy.graphics = army1.graphics;
-    army2.destroyGraphics();
-    newArmy.display();
-    return newArmy;
-  }
-  return null;
-}
-
 class Army {
   constructor(count, owner, x, y) {
     this.count = count;

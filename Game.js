@@ -35,11 +35,13 @@ class Game{
        }
    }
 
+   // Increments all armies that have the 'castle' buff
    incrementTroops(num){
       for(var i = 0; i < this.players.length; i++) {
         this.players[i].incrementArmies(num);
       }
    }
+   // Adds the given input to the queue of inputs to be processed in tick()
    queueMoveArmy(nodes, armyID, player){
      //TODO: Fix hacky solution
      var currentPlayerArmyListLength = player.armies.length;
@@ -47,9 +49,12 @@ class Game{
      if(currentPlayerArmyListLength == player.armies.length) {
        this.map.nodes[nodes[0]].army = null;
      }
+     // nodes - the indices of nodes of the swipe path
+     // army - the server object of the army
      this.movingArmies.push({nodes:nodes, army:movingArmy, percentage:0});
    }
 
+   // Moves the given army the given percent between the start and end nodes. Return the percent complete.
    moveArmy(army, startNode, endNode, percent) {
      if(percent >= 100) {
        percent = 100;
@@ -133,6 +138,8 @@ class Game{
        }
    }
 
+   // Conducts a battle between two armies for the node. Removes the loser from the players list and
+   // puts the winner into the node, giving it the node's buff
    battle(node, army1, army2) {
      var battleLoser = army1.battle(army2);
      if(army1.id == battleLoser.id) {

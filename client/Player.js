@@ -37,6 +37,7 @@ class Player {
     return null;
   }
 
+  // Finds the army with the given id and moves it
   moveArmy(x, y, id) {
     for(var i = 0; i < this.armies.length; i++) {
       if(this.armies[i].id == id) {
