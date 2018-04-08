@@ -217,7 +217,7 @@ class Game{
         // Check for end condition (1 Player + DummyPlayer remaining)
         //TODO: Change to check for 2 Players and no Dummy Player
         if(this.players.length <= 2 && this.started){
-          this.winner = this.players[1];
+          this.winner = this.players[1].id;
           this.finished = true;
         }
       } else if(this.starting){
