@@ -37,21 +37,20 @@ class Player {
     return null;
   }
 
+  // Finds the army with the given id and moves it
   moveArmy(x, y, id) {
     for(var i = 0; i < this.armies.length; i++) {
-      console.log("Current Army ID: " + this.armies[i].id);
-      console.log("Target Army ID: " + id);
       if(this.armies[i].id == id) {
-        console.log("MOVING ARMY " + this.armies[i].id);
         this.armies[i].moveTo(x, y);
       }
     }
   }
   // Updates the army at the given node by the given count
-  updateArmy(count, id) {
+  updateArmy(count, id, x, y) {
     for(var i = 0; i < this.armies.length; i++) {
       if(this.armies[i].id == id) {
         this.armies[i].count = count;
+        this.armies[i].moveTo(x, y);
         this.updated[i] = true;
         return;
       }
@@ -62,7 +61,7 @@ class Player {
   removeArmies() {
     for(var i = 0; i < this.updated.length; i++) {
       if(!this.updated[i]) {
-        this.removeArmy(i);
+        this.removeArmy(this.armies[i].id);
       }
     }
   }
@@ -83,6 +82,7 @@ class Player {
 
   // Adds a new army to the armies list. Does not initialize their callback.
   addArmy(count, id, x, y) {
+    console.log("addArmy called for " + this.id);
     let newArmy = new Army(count, this, x, y);
     newArmy.id = id;
     newArmy.display();

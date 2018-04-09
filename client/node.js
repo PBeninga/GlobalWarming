@@ -4,8 +4,7 @@ class MapNode {
     this.x = x;
     this.y = y;
     this.paths = [];
-    this.owned = false;
-    this.graphics = game.add.sprite(x, y, 'node_img');
+    this.graphics = game.add.image(x, y, 'node_img');
     this.graphics.anchor.setTo(0.5,0.5);
     this.graphics.height = 50;
     this.graphics.width = 50;
@@ -22,6 +21,7 @@ class MapNode {
     let newPath = new Path(this, endNode);
     newPath.display();
     this.paths.push(newPath);
+    return newPath;
   }
 
   // Checks for a path between this node and the node parameter

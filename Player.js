@@ -20,9 +20,10 @@ class Player{
 
     removeArmy(id) {
       for(var i = 0; i < this.armies.length; i++){
-          if(this.armies[i] == id){
-              return this.armies.splice(i, 1);
-          }
+        if(this.armies[i].id == id){
+          var removedArmy = this.armies.splice(i, 1);
+          return removedArmy;
+        }
       }
       return null;
     }
@@ -30,7 +31,7 @@ class Player{
     removeArmyAtNode(node) {
       for(var i = 0; i < this.armies.length; i++){
           if(this.armies[i].node == node.id){
-              return this.armies.splice(i, 1);
+            return this.armies.splice(i, 1);
           }
       }
       return null;
@@ -60,16 +61,15 @@ class Player{
     }
 
     moveArmy(id, node) {
-      console.log("Moving Army ID: " + id);
       var moveArmy = this.findArmyById(id);
-      // If the army is on a castle
+      // If the army is on a castle, create an army to send
       if(moveArmy.buff != null){
         var toMove = Math.floor(moveArmy.count/2);
-        moveArmy -= toMove;
-        moveArmy = this.addArmy(toMove, node)
-        this.armies.push(moveArmy);
-      }
-      else {
+        moveArmy.count -= toMove;
+        moveArmy = this.addArmy(toMove, node);
+        if(moveArmy.buff == 'castle') {
+          moveArmy.buff = null;
+        }
       }
       return moveArmy;
     }

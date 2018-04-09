@@ -1,14 +1,3 @@
-function merge(army1, army2) {
-  if(army1.owner == army2.owner) {
-    let newArmy = new Army(army1.count + army2.count, army1.owner, army1.node);
-    newArmy.graphics = army1.graphics;
-    army2.destroyGraphics();
-    newArmy.display();
-    return newArmy;
-  }
-  return null;
-}
-
 class Army {
   constructor(count, owner, x, y) {
     this.count = count;
@@ -17,12 +6,11 @@ class Army {
     this.color = owner.color;
     this.x = x;
     this.y = y;
-    this.graphics = game.add.graphics();
+    this.graphics = game.add.graphics(this.x, this.y);
     this.graphics.beginFill(this.color, 0.5);
-    this.graphics.drawCircle(this.x, this.y, 45);
+    this.graphics.drawCircle(0, 0, 45);
     this.graphics.anchor.setTo(0.5,0.5);
     this.graphics.endFill();
-    this.graphics.inputEnabled = true;
 
     this.countGraphics = null;
   }
