@@ -223,5 +223,8 @@ socket.on('new_account', onNewAccount);
 
 module.exports = {
    generateID : generateID,
-   makeMap : makeMap
+   makeMap : makeMap,
+   findGame: findGame,
+   games: games,
+   makeNewGame: makeNewGame
 }
