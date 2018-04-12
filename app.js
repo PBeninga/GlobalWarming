@@ -178,13 +178,6 @@ function onInputFired(data) {
 ///////////////////////////////////////////////////////////////////////////////
 // New Game
 
-function makeNewGame(){
-	
-	 var game  = new gameObject.Game(io);
-	 games.set(game.roomid,game);
-	 return game;
-}
-
 function findGame(id){
 	gamesIter = games.values();
 	element = gamesIter.next();
@@ -197,7 +190,8 @@ function findGame(id){
 		element = gamesIter.next();
 	}
 	//if there are no open games add the player.
-	game = makeNewGame();
+	game  = new gameObject.Game(io);
+	games.set(game.roomid,game);
 	game.addPlayer(id);
 	return game;
 }

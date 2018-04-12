@@ -5,48 +5,27 @@ class Map{
       this.startingCastles = [];//which of the castles are suitable for starting positions
       this.buffer = [];
       //this.paths = [];
-      this.makeMap();
+      this.readMap();
+      //this.makeMap();
    }
    
-   makeMap(){
-       var nodes = [];
-       var high = 5;
-       var count = 0;
-       var castles = [0,4,24,20,10,14,12,2,22,18,6];
-       for(var i = 1; i <= high; i++){
-           for(var j = 1; j <= high; j++){
-               let x =  i*100;
-               let y =  j*100;
-               var adj = [];
-               // If the node isn't on the left layer, push the node on the left.
-               if(i != 1){
-                   adj.push(count-5);
-               }
-               // If the node isn't on the top layer, push the node on top.
-               if(j != 1){
-                   adj.push(count-1);
-               }
-               // If the node isn't on the right layer, push the node on the right.
-               if(i < high){
-                   adj.push(count+5);
-               }
-               // If the node isn't on the bottom layer, push the node on bottom.
-               if(j < high){
-                   adj.push(count+1);
-               }
-               if(castles.indexOf(count) == -1){
-                   nodes[count] = new MapNode(x,y,adj, count);
-               }else{
-                   nodes[count] = new Castle(x,y,adj, count);
-               }
-               count++;
-           }
-       }
-       this.startingCastles = [0,24,4,20];
-       this.nodes = nodes;
-       this.castles = castles;
+   readMap(){
+      const fs = require("fs");
+      var buffer = JSON.parse(fs.readFileSync("./maps/MapOne.txt", "utf-8"));
+      
+      this.castles = buffer.castles;
+      this.startingCastles = buffer.startingCastles;
+      
+      for(var i=0; i<buffer.nodes.length; i++){
+         var tNode = buffer.nodes[i];
+         if(this.castles.indexOf(i) == -1){
+             this.nodes[i] = new MapNode(tNode.x, tNode.y, tNode.adj, i);
+         }else{
+             this.nodes[i] = new Castle(tNode.x, tNode.y, tNode.adj, i);
+         }
+      }
+      
    }
-
 }
 class MapNode{
    constructor(x,y,adj,id){
@@ -77,6 +56,7 @@ class Castle extends MapNode{
    }
 }
 
+// For unit testing
 module.exports = {
     MapNode:MapNode,
     Castle:Castle,
