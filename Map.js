@@ -11,7 +11,7 @@ class Map{
    
    readMap(){
       const fs = require("fs");
-      var buffer = JSON.parse(fs.readFileSync("./maps/MapOne.txt", "utf-8"));
+      var buffer = JSON.parse(fs.readFileSync("./maps/random.txt", "utf-8"));
       
       this.castles = buffer.castles;
       this.startingCastles = buffer.startingCastles;

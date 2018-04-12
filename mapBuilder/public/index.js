@@ -125,11 +125,7 @@ function place_node(){
 //creates a node at the given location then references it as a castle
 function place_castle(){
     place_node();
-    
-    var c = {
-        nodes.length-1
-    }
-    castles.push(c);
+    castles.push(nodes.length-1);
 }
 
 function place_path(){
@@ -216,6 +212,7 @@ function draw_nodes(g){
     } 
 }
 
+
 function draw_castles(g){
     g.fillStyle=BLACK;
     for( var i=0; i<castles.length; i++){
@@ -284,10 +281,17 @@ function build_map_payload(){
         height: GRID_DIM,
         width: GRID_DIM,
         
-        nodes: nodes,
+        nodes: nodes.slice(),
         castles: castles,
+        startingCastles: castles,
         paths: paths
              
+    }
+    
+    //Game takes nodes with spaces of increments 100 pixels
+    for(var i=0; i<payload.nodes.length; i++){
+       payload.nodes[i].x = payload.nodes[i].x * 100;
+       payload.nodes[i].y = payload.nodes[i].y * 100;
     }
     
     return payload;
@@ -296,10 +300,10 @@ function build_map_payload(){
 
 function getPath(){
     
-    var path = "/Users/adamb/GlobalWarming/mapBuilder/newFile.txt"
+    var path = "/Users/adamb/GlobalWarming/maps/newFile.txt"
     
     path = prompt("Enter the file path in the form \'/folder/fileName.txt\'" +
-                "\nWhere the file path starts at your root directory or C drive");
+               "\nWhere the file path starts at your root directory or C drive");
     
     return path;
 }

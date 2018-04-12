@@ -7,8 +7,6 @@ const fs = require('fs');
 class Game{
    constructor(io){ 
      
-      //This is ugly, lets fix it <3 Adam
-      
       let id = "/"+miscFunc.generateID(20)
 	  let gameSocket = io.of(id);
       this.roomid = id;
