@@ -127,7 +127,7 @@ function place_castle(){
     place_node();
     
     var c = {
-        node_index: nodes.length-1
+        nodes.length-1
     }
     castles.push(c);
 }
@@ -219,7 +219,7 @@ function draw_nodes(g){
 function draw_castles(g){
     g.fillStyle=BLACK;
     for( var i=0; i<castles.length; i++){
-        var temp = nodes[castles[i].node_index];
+        var temp = nodes[castles[i]];
         g.fillRect(temp.x*block_size, temp.y*block_size, block_size, block_size);
     }
 }
