@@ -377,7 +377,6 @@ function updateArmies(data){
 }
 
 main.prototype = {
-
 	create: function () {
 		game.world.setBounds(-canvas_width*2, -canvas_height*2, canvas_width * 4, canvas_height * 4);
 		game.stage.backgroundColor = 0x000000;

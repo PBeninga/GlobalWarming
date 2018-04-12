@@ -85,7 +85,6 @@ class Player {
     console.log("addArmy called for " + this.id);
     let newArmy = new Army(count, this, x, y);
     newArmy.id = id;
-    newArmy.display();
     this.armies.push(newArmy);
     this.updated.push(true);
     return newArmy;

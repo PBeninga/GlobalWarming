@@ -6,16 +6,12 @@ class Army {
     this.color = owner.color;
     this.x = x;
     this.y = y;
-    this.graphics = game.add.graphics(this.x, this.y);
-    this.graphics.beginFill(this.color, 0.5);
-    this.graphics.drawCircle(0, 0, 45);
+    this.graphics = game.add.sprite(x, y, 'army');
+    this.walk = this.graphics.animations.add('walk',[3,4,5],1);
+
+    this.graphics.animations.play('walk', 30, true);
     this.graphics.anchor.setTo(0.5,0.5);
-    this.graphics.endFill();
 
-    this.countGraphics = null;
-  }
-
-  display() {
     this.countGraphics = game.add.text(this.x, this.y, this.count, {
       font: "14px Arial",
       fill: this.color,
