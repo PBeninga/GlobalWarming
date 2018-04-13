@@ -5,16 +5,15 @@ var playerObject = require('./Player.js');
 const fs = require('fs');
 
 class Game{
-   constructor(io){ 
-      
+   constructor(io){
+
       let id = "/"+miscFunc.generateID(20)
 	  let gameSocket = io.of(id);
       this.roomid = id;
       this.gameSocket = gameSocket;
       //Useful game data
-      this.players = [];
-      this.dummyPlayer = new playerObject.Player(null);
-      this.players.push(this.dummyPlayer);
+      this.playerPool = new playerObject.PlayerPool();
+      this.dummyPlayer = this.playerPool.addPlayer(null);
       this.map = new gameMap.Map();
       this.movingArmies = [];
       //To be replaced when we explicitly put in matchmaking
@@ -36,14 +35,14 @@ class Game{
        this.map.nodes[moveNodes[0]].army.count > 0 && //the start node's army has enough troops
        this.map.nodes[moveNodes[0]].army.player == id && //the start node's army is equal to
        this.started){
-         this.queueMoveArmy(moveNodes, this.map.nodes[moveNodes[0]].army.id, this.findPlayerById(id));
+         this.queueMoveArmy(moveNodes, this.map.nodes[moveNodes[0]].army.id, this.playerPool.getPlayer(id));
        }
    }
 
    // Increments all armies that have the 'castle' buff
    incrementTroops(num){
-      for(var i = 0; i < this.players.length; i++) {
-        this.players[i].incrementArmies(num);
+      for(var i = 0; i < this.playerPool.activePlayers.length; i++) {
+        this.playerPool.activePlayers[i].incrementArmies(num);
       }
    }
    // Adds the given input to the queue of inputs to be processed in tick()
@@ -74,9 +73,10 @@ class Game{
       this.removePlayer(this.id);
    }
    removePlayer(id){
-      if(this.findPlayerIndexById(id) == -1){
+     var poolFlag = this.playerPool.contains(id);
+      if(poolFlag == 0 || poolFlag == 2){
          console.log("Attempting to remove player that doesn't exist.");
-         return;
+         return false;
       }
       console.log("removing player " + id + " from game " + this.roomid);
       //find any army in a mapnode that is owned by removed player
@@ -95,11 +95,12 @@ class Game{
          }
       }
 
-      this.players.splice(this.findPlayerIndexById(id),1);
+      this.playerPool.removePlayer(id);
    }
    //return true on player succesfully added
    addPlayer(id){
-      if(this.players.includes(id)){
+     var poolFlag = this.playerPool.contains(id);
+      if(poolFlag == 1){
          console.log("Attempting to add player that already exists.");
          return false;
       }
@@ -112,35 +113,18 @@ class Game{
             break;
          }
       }
-      if(destination == -1 || this.players.length == this.maxPlayers){
+      if(destination == -1 || this.playerPool.activePlayers.length == this.maxPlayers){
           console.log("Could not find a castle.");
           return false;
       }
       console.log("Player assigned castle.");
-      let player = new playerObject.Player(id);
-      this.players.push(player);
+      var player = this.playerPool.addPlayer(id);
       this.dummyPlayer.removeArmyAtNode(this.map.nodes[destination]);
       this.map.nodes[destination].army = player.addArmy(50,this.map.nodes[destination]);
       return true;
    }
    endGame(){
        this.gameSocket.emit("endGame",{winner:this.winner});
-   }
-   findPlayerIndexById(id){
-       for(var i = 0; i <  this.players.length; i++){
-           if(this.players[i].id == id){
-               return i;
-           }
-       }
-       return -1;
-   }
-   findPlayerById(id){
-       var index = this.findPlayerIndexById(id);
-       if(index > -1){
-           return this.players[index];
-       }else{
-           return null;
-       }
    }
 
    // Conducts a battle between two armies for the node. Removes the loser from the players list and
@@ -154,7 +138,7 @@ class Game{
        army2.x = node.x;
        army2.y = node.y;
        console.log("Battle is removing army " + army1.id + " from " + army1.player);
-       losingPlayer = this.findPlayerById(army1.player);
+       losingPlayer = this.playerPool.getPlayer(army1.player);
        losingPlayer.removeArmy(army1.id);
      }
      else {
@@ -163,17 +147,17 @@ class Game{
        army1.x = node.x;
        army1.y = node.y;
        console.log("Battle is removing army " + army2.id + " from " + army2.player);
-       losingPlayer = this.findPlayerById(army2.player);
+       losingPlayer = this.playerPool.getPlayer(army2.player);
        losingPlayer.removeArmy(army2.id);
      }
      if(losingPlayer.armies.length == 0) {
-       this.players.splice(this.findPlayerIndexById(losingPlayer.id),1);
+       this.playerPool.removePlayer(id);
      }
    }
 
    tick(){
       var troopsToAdd = 0;
-      this.gameSocket.emit('update_armies', {players:this.players});
+      this.gameSocket.emit('update_armies', {players:this.playerPool.activePlayers});
 
       var tickStartTime = new Date().getTime();
       if(tickStartTime - this.time >= 500){
@@ -181,7 +165,7 @@ class Game{
          this.time = tickStartTime - (tickStartTime%500);
       }
       // If there are more than 1 player (DummyPlayer doesnt count) and the game isn't started or starting
-      if(this.players.length > 2 && !this.starting && !this.started){
+      if(this.playerPool.activePlayers.length > 2 && !this.starting && !this.started){
           this.starting = true;
           console.log("Game starting.");
           let game = this;
@@ -215,14 +199,14 @@ class Game{
             //Call moveArmies again if the swipelist continues
             if(finished.nodes.length > 2){
               finished.nodes.shift();
-              this.queueMoveArmy(finished.nodes, finished.army.id, this.findPlayerById(finished.army.player));
+              this.queueMoveArmy(finished.nodes, finished.army.id, this.playerPool.getPlayer(finished.army.player));
             }
           }
         }
         // Check for end condition (1 Player + DummyPlayer remaining)
         //TODO: Change to check for 2 Players and no Dummy Player
-        if(this.players.length <= 2 && this.started){
-          this.winner = this.players[1].id;
+        if(this.playerPool.activePlayers.length <= 2 && this.started){
+          this.winner = this.playerPool.activePlayers[1].id;
           this.finished = true;
         }
       } else if(this.starting){
