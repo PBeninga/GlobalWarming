@@ -15,7 +15,7 @@ class Game{
       this.players = [];
       this.dummyPlayer = new playerObject.Player(null);
       this.players.push(this.dummyPlayer);
-      this.map = new gameMap.Map();
+      this.map = new gameMap.MapFactory().getMap(null);
       this.movingArmies = [];
       for(var i = 0; i < this.map.castles.length; i++){
          this.map.nodes[this.map.castles[i]].army = 
