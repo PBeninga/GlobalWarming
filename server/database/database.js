@@ -82,13 +82,12 @@ class Database{
          var model = null;
          if(modelName == 'Player') model = this.Player;
          else {
-            console.log('Enter valid model name');
+            reject('Enter valid model name');
             return;
          }
          var data = new model(doc);
          data.save(function(err) {
             if(err) reject(err);
-            console.log("Successfully saved in collection " + modelName + "s");
          });
       });
    }
