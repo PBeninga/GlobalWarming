@@ -40,8 +40,10 @@ class Map{
       var type = "Intersection";
       for(var i=0; i<buffer.nodes.length; i++){
          var tNode = buffer.nodes[i];
-         if(this.castles.indexOf(i) != -1){
-             type = "Castle";
+         if(this.castles.indexOf(i) == -1){
+             type = "Intersection";
+         }else{
+           type = "Castle";
          }
          this.nodes[i] = nodeFactory.getNode(type, tNode.x, tNode.y, tNode.adj, i);
       }
