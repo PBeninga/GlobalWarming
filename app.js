@@ -128,30 +128,29 @@ function onNewClient(){
     game = findGame(this.id);
     this.join(game.roomid)
     io.of(game.roomid).emit('newPlayer',{id:this.id, starting:game.starting});
-    this.emit('connected',{id:this.id, players:game.players, game:game.roomid, timeTillStart:game.timeTillStart, starting:game.starting});//send the players id, the players, and the room id
+    this.emit('connected',{id:this.id, players:game.playerPool.activePlayers, game:game.roomid, timeTillStart:game.timeTillStart, starting:game.starting});//send the players id, the players, and the room id
     playersToGames.set(this.id, game);
-    this.emit('send_nodes', {nodes:game.map.nodes, castles:game.map.castles});
-    io.of(game.roomid).emit('update_nodes', {nodes:game.map.nodes});
+    this.emit('send_nodes', {nodes:game.map.nodes, players:game.playerPool.activePlayers});
 }
 
 //call when a client disconnects and tell the clients except sender to remove the disconnected player
 //TODO have client send which game player is in, so we can remove them from it.
 function onClientdisconnect(data) {
-   
+
    console.log('disconnect');
 
    if(playersToGames.has(this.id)){
 	  playersToGames.get(this.id).removePlayer(this.id);
       // If the game has no players in it, we remove it.
-      if(playersToGames.get(this.id).players.length == 0) {
+      if(playersToGames.get(this.id).playerPool.activePlayers.length == 0) {
          playersToGames.delete(this.id);
          console.log("removing game associated with " + this.id);
          console.log("current number of games is " + playersToGames.size);
       }
       else {
          console.log("game still contains");
-         for(var i = 0; i < playersToGames.get(this.id).players.length; i++) {
-             console.log("	" + playersToGames.get(this.id).players.id);
+         for(var i = 0; i < playersToGames.get(this.id).playerPool.activePlayers.length; i++) {
+             console.log("	" + playersToGames.get(this.id).playerPool.activePlayers[i].id);
          }
        }
 	}
@@ -177,7 +176,6 @@ function onInputFired(data) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // New Game
-
 function findGame(id){
 	gamesIter = games.values();
 	element = gamesIter.next();
