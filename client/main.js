@@ -417,23 +417,23 @@ main.prototype = {
 		if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) ||
 				game.input.keyboard.isDown(Phaser.Keyboard.A))
 		{
-			game.camera.x -= 4;
+			game.camera.x -= 10;
 		}
 		else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT) ||
 						 game.input.keyboard.isDown(Phaser.Keyboard.D))
 		{
-			game.camera.x += 4;
+			game.camera.x += 10;
 		}
 
 		if (game.input.keyboard.isDown(Phaser.Keyboard.UP) ||
 				game.input.keyboard.isDown(Phaser.Keyboard.W))
 		{
-			game.camera.y -= 4;
+			game.camera.y -= 10;
 		}
 		else if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN) ||
 						 game.input.keyboard.isDown(Phaser.Keyboard.S))
 		{
-			game.camera.y += 4;
+			game.camera.y += 10;
 		}
 /*
 		leaveButton.x = game.camera.x + window.innerWidth - leaveButton.width;
