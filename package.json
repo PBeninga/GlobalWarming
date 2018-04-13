@@ -18,8 +18,7 @@
     "fs": "0.0.1-security",
     "mongoose": "^5.0.7",
     "p2": "^0.7.1",
-    "socket.io": "^2.0.4"
-
+    "socket.io": "^2.0.4",
     "request": "^2.85.0",
     "jasmine-node": "~1.14.5",
     "istanbul": "~0.4.5"
