@@ -4,13 +4,16 @@ var gameSocket;
 //the player list
 var players = [];
 var ClientPlayer = null;
-var DummyPlayer = new Player(-1, 0x000000);
+var DummyPlayer = new Player(null, 0x000000);
 players.push(DummyPlayer);
 
 var nodes = [];
 var swipePath = [];
 var gameId;
 var lines = [];
+// Used for image heirarchy in phaser
+var nodeGroup = null;
+var armyGroup = null;
 
 var colors = [0xFF0000,	0xFF9F00, 0xF8FF00, 0x7AFF00,0x0000FF,
 										 0x8900FF, 0xFF00F6, 0x097B00, 0x980842];
@@ -64,56 +67,18 @@ function onsocketConnected (data) {
 	gameId = data.game
 	console.log(gameId);
 	gameSocket = io(gameId);
-		/*
-			Sends the data we will need to update the game, which is the armies and the owners.
-			data sent:
-			{
-				nodes[
-					army: Variable holding the army values.
-						count: Strength of the army.
-						player: ID of the player that owns it.
-				]
-			}
-			ex. data.nodes[0].army.count
-		*/
-		gameSocket.on('update_nodes', updateNodes);
 
-		/*
-			Sends the id of a player which has left the game
-			data sent:
-			{
-				id: ID of the player which has left.
-			}
-			ex. data.id
-		*/
-		gameSocket.on('remove_player', onRemovePlayer);
-		/* data  =
-		{
-			winner: the id of the winner of the game
-		}
-		*/
-		gameSocket.on('endGame',endGame);
-		/*
-		data =
-		{
-			id: new player id
-		}
-		*/
-		gameSocket.on('newPlayer', onNewPlayer);
-		/*data =
-		 {
-			time: time left untill game starts
-		 }
-		*/
-		gameSocket.on('updateTime', onUpdateTime);
-		gameSocket.on('startGame',onStart);
-		gameSocket.on('move_armies', moveArmies);
+	gameSocket.on('update_armies', updateArmies);
+	gameSocket.on('remove_player', onRemovePlayer);
+	gameSocket.on('endGame',endGame);
+	gameSocket.on('newPlayer', onNewPlayer);
+	gameSocket.on('updateTime', onUpdateTime);
+	gameSocket.on('startGame',onStart);
 
-		//when the player receives the new input
 	ClientPlayer = addNewPlayer(this.id);
 	for(var i = 0; i < data.players.length; i++) {
-		if(data.players[i] !=  this.id){
-			addNewPlayer(data.players[i]);
+		if(data.players[i].id !=  this.id){
+			addNewPlayer(data.players[i].id);
 		}
 	}
 	// send the server our initial position and tell it we are connected
@@ -191,13 +156,17 @@ function addNewPlayer(id) {
 	if(id == null) {
 		return DummyPlayer;
 	}
+	var newPlayer = findplayerbyid(id);
+	if(newPlayer.id != DummyPlayer.id) {
+		return newPlayer;
+	}
 	var color;
 	if(id == socket.id){
 		color =  0x00B2EE;
 	}else{
 		color = getColor();
 	}
-	player = new Player(id, color);
+	let player = new Player(id, color);
 	players.push(player);
 	return player;
 }
@@ -234,7 +203,7 @@ function swipe() {
 	if(this.army.owner.id != ClientPlayer.id) {
 		console.log("That's not your army! Army at " + this.army.x + "," + this.army.y + " is owned by " + this.army.owner.id);
 	}
-	else {
+	else if(swipePath.length == 0){
 		console.log("Army at " + this.army.x + "," + this.army.y + " is owned by " + this.army.owner.id);
 		swipePath.push(findnodebyloc(this.army.x, this.army.y));
 		lines.push(new Phaser.Line(this.army.x, this.army.y, game.input.mousePointer.x, game.input.mousePointer.y));
@@ -246,12 +215,10 @@ function swipe() {
 function mouseOver() {
 	console.log("Mouse is over node " + this.node.x + ", " + this.node.y);
 	if(swipePath.length != 0) {
-		if(swipePath[swipePath.length-1].pathTo(this.node) != null) {
+		if(swipePath[swipePath.length-1].pathTo(this.node) != null && swipePath[swipePath.length-1].id != this.node.id) {
 			swipePath.push(this.node);
 			lines[lines.length-1].end = new Phaser.Point(this.node.x, this.node.y);
 			lines.push(new Phaser.Line(this.node.x, this.node.y, game.input.mousePointer.x + game.camera.x, game.input.mousePointer.y+ game.camera.y));
-		}
-		else {
 		}
 	}
 }
@@ -260,10 +227,10 @@ function mouseOver() {
 // Emits an 'input_fired' if the swipe has two or more nodes in it, otherwise it discards the swipe.
 function endSwipe() {
 	if(swipePath.length > 1) {
-                var swipeNodes = [];
-                for(node of swipePath){
-                   swipeNodes.push(node.id);
-                }
+    var swipeNodes = [];
+    for(node of swipePath){
+      swipeNodes.push(node.id);
+    }
 		console.log("emitting: "+ swipeNodes);
 		socket.emit('input_fired', {game:gameId, nodes: swipeNodes});
 	}
@@ -304,7 +271,6 @@ function findnodebyid (id) {
 			return nodes[i];
 		}
 	}
-	console.log("Failure to find node id " + id);
 	return null;
 }
 
@@ -315,7 +281,6 @@ function findnodebyloc (x, y) {
 			return nodes[i];
 		}
 	}
-	console.log("Failure to find node id " + id);
 	return null;
 }
 
@@ -324,7 +289,8 @@ function createNodes(data) {
 	for (var i = 0; i < data.nodes.length; i++) {
 		// Creates a node from the data given and sets the callbacks for the node.
 		node_data = data.nodes[i];
-		let newNode = new MapNode(i, node_data.x, node_data.y);
+		let newNode = new MapNode(node_data.id, node_data.x, node_data.y);
+		nodeGroup.add(newNode.graphics);
 		newNode.graphics.inputEnabled = true;
 		newNode.graphics.events.onInputOver.add(mouseOver, {node: newNode});
 		// Pushes the node into the node buffer and displays it.
@@ -334,143 +300,90 @@ function createNodes(data) {
 	// Adds all the paths from adjacency lists
 	for(var i = 0; i < nodes.length; i++) {
 		for(var j = 0; j < data.nodes[i].adj.length; j++) {
-			nodes[i].addPath(findnodebyid(data.nodes[i].adj[j]));
+			nodeGroup.add(nodes[i].addPath(findnodebyid(data.nodes[i].adj[j])).graphics);
 		}
 	}
 
-// TODO: REPLACE EVERYTHING BELOW THIS ONCE DATA GETS RESTRUCTURED
-/*
+	// Initializes the starting armies through the players
 	for(var i = 0; i < data.players.length; i++) {
-		var player = addNewPlayer(daya.players[i].id);
-		for(var j = 0; j < data.players[i].armies.length; j++) {
-			var newArmy = player.addArmy(data.players[i].armies[j].count, nodes[data.players[i].armies[j].location]);
-			newArmy.graphics.events.onInputDown.add(swipe, {army: newArmy});
-			newArmy.graphics.events.onInputOver.add(mouseOver, {node: newArmy.node});
+		var currentPlayer = data.players[i];
+		var clientPlayer = addNewPlayer(currentPlayer.id);
+		// Goes through all armies the player controls
+		for(var j = 0; j < currentPlayer.armies.length; j++) {
+			var currentArmy = currentPlayer.armies[j];
+			var clientNode = nodes[currentArmy.node];
+			// Creates the army in the client and initializes the army's callbacks
+			console.log("Adding client " + clientPlayer.id + " army");
+			var newArmy = clientPlayer.addArmy(0, currentArmy.id, clientNode.x, clientNode.y);
+			console.log(clientPlayer.id + " now has " + clientPlayer.armies.length + " armies");
+			armyGroup.add(newArmy.graphics);
+			armyGroup.add(newArmy.countGraphics);
+			clientNode.graphics.events.onInputDown.forget();
+			clientNode.graphics.events.onInputDown.add(swipe, {army: newArmy});
+			clientPlayer.updateArmy(currentArmy.count, currentArmy.id, currentArmy.x, currentArmy.y); //Not necessary
 		}
 	}
-*/
-
-	// Iterates through all castles in the node list.
-	for(var i = 0; i < data.castles.length; i++){
-		var castlePosition = data.castles[i];
-		var currentArmy = data.nodes[castlePosition].army;
-		var included = false;
-		var player;
-		// Checks the client player list to see if it contains the army owner specified in the data.
-		for(var j = 0; j < players.length; j++) {
-			if(currentArmy.player == players[j].id) {
-				included = true;
-				player = players[j];
-				break;
-			}
-		}
-		// If no such player exists, it creates the player and pushes it to the list.
-		if(!included) {
-			player = addNewPlayer(currentArmy.player);
-		}
-		if(currentArmy.player){
-			console.log("HERHEHRHEHE" + currentArmy.player + " " + ClientPlayer.id);
-		}
-		if(currentArmy.player == ClientPlayer.id){
-			game.camera.setPosition(data.nodes[castlePosition].x-canvas_width/2, data.nodes[castlePosition].y-canvas_height/2);
-			bannerGFX = game.add.text(game.camera.x ,game.camera.y, "Waiting for players",{
-				font: "70px Arial",
-				fill: "#FFFFFF",
-				align: "center"
-			  });
-		}
-
-		// Updates the army counts and the new owners of the castles.
-		var newArmy = player.addArmy(currentArmy.count, nodes[castlePosition].x, nodes[castlePosition].y);
-		newArmy.graphics.events.onInputDown.add(swipe, {army: newArmy});
-		newArmy.graphics.events.onInputOver.add(mouseOver, {node: nodes[castlePosition]});
-	}
+	game.camera.setPosition(ClientPlayer.armies[0].x-canvas_width/2, ClientPlayer.armies[0].y-canvas_height/2);
+	bannerGFX = game.add.text(game.camera.x ,game.camera.y, "Waiting for players",{
+		font: "70px Arial",
+		fill: "#FFFFFF",
+		align: "center"
+		});
 }
 
-function moveArmies(data) {
-	//console.log("moveArmies");
-	for(var i = 0; i < data.moving.length; i++) {
-		startNode = findnodebyid(data.moving[i].nodes[0]);
-		currentPath = startNode.pathTo(findnodebyid(data.moving[i].nodes[1]));
-		sentArmy = data.moving[i].army;
-		currentPlayer = findplayerbyid(data.moving[i].army.player);
-		currentPlayer.addArmy(sentArmy.count,
-			currentPath.percentToX(data.moving[i].percentage /100),
-			currentPath.percentToY(data.moving[i].percentage/100));
+// Called every tick
+function updateArmies(data){
+	var updated = [];
+	for(var i = 0; i < nodes.length; i++) {
+		updated.push(false);
 	}
-}
-
-function updateNodes(data){
-	//TODO: REPLACE EVERYTHING BELOW THIS WHEN DATA GETS RESTRUCTURED
-/*
 	for(var i = 0; i < data.players.length; i++) {
-		var currentPlayer = findplayerbyid(data.players[i].id);
-		for(var j = 0; j < data.players[i].armies.length; j++) {
-			currentArmy = data.players[i].armies[j];
-			if(currentArmy.id >= currentPlayer.armies.length) {
-				var newArmy = currentPlayer.addArmy(0, nodes[currentArmy.location]);
-				newArmy.graphics.events.onInputDown.add(swipe, {army: newArmy});
-				newArmy.graphics.events.onInputOver.add(mouseOver, {node: newArmy.node});
+		var currentPlayer = data.players[i];
+		var currentClientPlayer = findplayerbyid(currentPlayer.id);
+		// Goes through every army of every player
+		for(var j = 0; j < currentPlayer.armies.length; j++) {
+			var currentArmy = currentPlayer.armies[j];
+			var clientNode = findnodebyloc(currentArmy.x, currentArmy.y);
+			// If the client doesn't have that army, it is created and initialized
+			if(currentClientPlayer.getArmyByID(currentArmy.id) == null) {
+				var newClientArmy = currentClientPlayer.addArmy(0, currentArmy.id, currentArmy.x, currentArmy.y);
+				armyGroup.add(newClientArmy.graphics);
+				armyGroup.add(newClientArmy.countGraphics);
 			}
-			playerOwner.updateArmy(currentArmy.count, nodes[i]);
+			// The army is updated with all relevant values from the server
+			currentClientPlayer.updateArmy(currentArmy.count, currentArmy.id, currentArmy.x, currentArmy.y);
+			// Deletes the old onInputDown and replaces it with the one for the current army.
+			// TODO: There is a better way to do this.
+			if(clientNode != null) {
+				var currentClientArmy = currentClientPlayer.getArmyByID(currentArmy.id);
+				clientNode.graphics.events.onInputDown.forget();
+				clientNode.graphics.events.onInputDown.add(swipe, {army: currentClientArmy});
+				updated[clientNode.id] = true;
+			}
+		}
+		for(var j = 0; j < nodes.length; j++) {
+			if(!updated) {
+				nodes[j].graphics.events.onInputDown.forget();
+			}
 		}
 	}
+	// Clears any armies that no longer exist in the server.
+	// We keep track of this by making the player objects track which armies get updated, and removing the ones that don't.
 	for(var j = 0; j < players.length; j++) {
 		players[j].removeArmies();
 		players[j].clearUpdated();
-		players[j].updateArmies();
-	}
-*/
-
-	var sentNodes = data.nodes;
-	for(var i = 0; i < sentNodes.length; i++){
-		// If the sent node has an army, update it.
-		if(sentNodes[i].army){
-			var currentArmy = sentNodes[i].army;
-			// If our nodes didn't hold an army, initialize that node's army
-			playerOwner = findplayerbyid(currentArmy.player);
-			if(playerOwner.getArmyId(nodes[i].x, nodes[i].y) == -1) {
-				var newArmy = playerOwner.addArmy(0, nodes[i].x, nodes[i].y);
-				newArmy.graphics.events.onInputDown.add(swipe, {army: newArmy});
-				newArmy.graphics.events.onInputOver.add(mouseOver, {node: nodes[i]});
-			}
-			// Update our clients army variables
-			playerOwner.updateArmy(currentArmy.count, nodes[i].x, nodes[i].y);
-		}
-
-	}
-	for(var j = 0; j < players.length; j++) {
-		players[j].removeArmies();
-		players[j].clearUpdated();
-		players[j].updateArmies();
+		players[j].updateArmies(); // Does nothing
 	}
 }
-
-/*
-// Prints data passed to createnode
-function printCreateNodeData(data) {
-	for(var i = 0; i < data.nodes.length; i++) {
-		console.log("node " + i + ": {");
-		console.log("	x: " + data.nodes[i].x +  ", y: " + data.nodes[i].y);
-		var adj = "	adj:{";
-		for(var j = 0; j < data.nodes[i].adj.length - 1; j++) {
-			adj += data.nodes[i].adj[j] + ",";
-		}
-		console.log(adj + data.nodes[i].adj[data.nodes[i].adj.length - 1] + "}");
-		if(data.castles.includes(i)) {
-			console.log("	army: {");
-			console.log("		player: " + data.nodes[i].army.player);
-			console.log("		count: " + data.nodes[i].army.count);
-		}
-	}
-}
-*/
 
 main.prototype = {
 
 	create: function () {
 		game.world.setBounds(-canvas_width*2, -canvas_height*2, canvas_width * 4, canvas_height * 4);
 		game.stage.backgroundColor = 0x000000;
+		nodeGroup = game.add.group();
+		armyGroup = game.add.group();
+		game.world.bringToTop(armyGroup);
 		game.input.onUp.add(endSwipe);
 /*
 		leaveButton = game.add.button(game.camera.x + window.innerWidth, game.camera.y + window.innerHeight, 'button1', function() {
@@ -491,54 +404,8 @@ main.prototype = {
 		*/
 
 		console.log("client started");
-    	socket.emit("client_started",{});
-
-		/*
-			sends the initial player data
-			data sent:
-			{
-				id: The id automatically generated for the player.
-				players[]: The ids of the players that are already in the game
-			}
-			ex. data.id -> Your player id.
-			ex. data.players[0] -> Other player ids
-		*/
+    socket.emit("client_started",{});
 		socket.on('connected', onsocketConnected);
-		/*
-			get initial positions of nodes.
-			data sent:
-			{
-				nodes[
-					int x: xcoord
-					int y: ycoord
-					int[] adj: list of nodes that can be accessed by this node. Corresponds to index.
-					(optional)army army:
-					 	player: id of the player owning the army
-						count: amount of the army
-				]
-				castles[]: index of where the optional armies lie
-			}
-			ex. data.nodes[0].x
-					data.nodes[data.castles[0]].army.player
-
-			CHANGE TO
-			{
-				nodes[
-					x: xcoord
-					y: ycoord
-					adj[]: list of node ids that can be accessed by this node
-				]
-				players[
-					id: Player ID
-					armies[
-						count: Strength of the army
-						location: Where the army is located (index of node)
-					]
-				]
-			}
-			ex. data.nodes[0].adj[0]
-					data.players[0].armies[0].location.x
-		*/
 		socket.on('send_nodes', createNodes);
 	},
 
@@ -550,23 +417,23 @@ main.prototype = {
 		if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) ||
 				game.input.keyboard.isDown(Phaser.Keyboard.A))
 		{
-			game.camera.x -= 4;
+			game.camera.x -= 10;
 		}
 		else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT) ||
 						 game.input.keyboard.isDown(Phaser.Keyboard.D))
 		{
-			game.camera.x += 4;
+			game.camera.x += 10;
 		}
 
 		if (game.input.keyboard.isDown(Phaser.Keyboard.UP) ||
 				game.input.keyboard.isDown(Phaser.Keyboard.W))
 		{
-			game.camera.y -= 4;
+			game.camera.y -= 10;
 		}
 		else if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN) ||
 						 game.input.keyboard.isDown(Phaser.Keyboard.S))
 		{
-			game.camera.y += 4;
+			game.camera.y += 10;
 		}
 /*
 		leaveButton.x = game.camera.x + window.innerWidth - leaveButton.width;

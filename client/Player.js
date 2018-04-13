@@ -9,11 +9,12 @@ class Player {
   // Removes the army with the given ID, destroying it's graphics and removing
   // it from the updated and armies list.
   removeArmy(id) {
-    this.armies[id].destroyGraphics();
-    this.armies.splice(id, 1);
-    this.updated.splice(id, 1);
-    for(var i = id; i < this.armies.length; i++) {
-      this.armies[i].id -= 1;
+    for(var i = 0; i < this.armies.length; i++) {
+      if(this.armies[i].id == id) {
+        this.armies[i].destroyGraphics();
+        this.armies.splice(i, 1);
+        this.updated.splice(i, 1);
+      }
     }
   }
 
@@ -36,6 +37,7 @@ class Player {
     return null;
   }
 
+  // Finds the army with the given id and moves it
   moveArmy(x, y, id) {
     for(var i = 0; i < this.armies.length; i++) {
       if(this.armies[i].id == id) {
@@ -44,10 +46,11 @@ class Player {
     }
   }
   // Updates the army at the given node by the given count
-  updateArmy(count, x, y) {
+  updateArmy(count, id, x, y) {
     for(var i = 0; i < this.armies.length; i++) {
-      if(this.armies[i].x == x && this.armies[i].y == y) {
+      if(this.armies[i].id == id) {
         this.armies[i].count = count;
+        this.armies[i].moveTo(x, y);
         this.updated[i] = true;
         return;
       }
@@ -58,7 +61,7 @@ class Player {
   removeArmies() {
     for(var i = 0; i < this.updated.length; i++) {
       if(!this.updated[i]) {
-        this.removeArmy(i);
+        this.removeArmy(this.armies[i].id);
       }
     }
   }
@@ -78,9 +81,10 @@ class Player {
   }
 
   // Adds a new army to the armies list. Does not initialize their callback.
-  addArmy(count, x, y) {
+  addArmy(count, id, x, y) {
+    console.log("addArmy called for " + this.id);
     let newArmy = new Army(count, this, x, y);
-    newArmy.id = this.armies.length;
+    newArmy.id = id;
     newArmy.display();
     this.armies.push(newArmy);
     this.updated.push(true);
