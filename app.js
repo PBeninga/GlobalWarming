@@ -130,14 +130,13 @@ function onNewClient(){
     io.of(game.roomid).emit('newPlayer',{id:this.id, starting:game.starting});
     this.emit('connected',{id:this.id, players:game.players, game:game.roomid, timeTillStart:game.timeTillStart, starting:game.starting});//send the players id, the players, and the room id
     playersToGames.set(this.id, game);
-    this.emit('send_nodes', {nodes:game.map.nodes, castles:game.map.castles});
-    io.of(game.roomid).emit('update_nodes', {nodes:game.map.nodes});
+    this.emit('send_nodes', {nodes:game.map.nodes, players:game.players});
 }
 
 //call when a client disconnects and tell the clients except sender to remove the disconnected player
 //TODO have client send which game player is in, so we can remove them from it.
 function onClientdisconnect(data) {
-   
+
    console.log('disconnect');
 
    if(playersToGames.has(this.id)){
@@ -179,7 +178,7 @@ function onInputFired(data) {
 // New Game
 
 function makeNewGame(){
-	
+
 	 var game  = new gameObject.Game(io);
 	 makeMap(game); //should move into objects.js
 	 games.set(game.roomid,game);
