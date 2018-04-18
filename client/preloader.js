@@ -3,7 +3,7 @@ var preloader = {
     // Add a loading label
 
     // Load all assets.
-    game.load.spritesheet('army', 'client/assets/army.png', 64, 59);
+    game.load.spritesheet('armies', 'client/assets/armies.png', 16, 16);
     game.load.image('node_img', 'client/assets/circle.png');
     game.load.image('button1', 'client/assets/blue_button00.png');
     game.load.image('button2', 'client/assets/blue_button01.png');

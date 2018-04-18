@@ -6,10 +6,12 @@ class Army {
     this.color = owner.color;
     this.x = x;
     this.y = y;
-    this.graphics = game.add.sprite(x, y, 'army');
-    this.walk = this.graphics.animations.add('walk',[3,4,5],1);
+    this.graphics = game.add.sprite(x, y, 'armies');
+    this.right = this.graphics.animations.add('right',[0,1,2],1);
+    this.down = this.graphics.animations.add('down',[36,37,38],1);
+    this.down = this.graphics.animations.add('up',[72,73,74],1);
 
-    this.graphics.animations.play('walk', 30, true);
+    this.graphics.animations.play('up', 30, true);
     this.graphics.anchor.setTo(0.5,0.5);
 
     this.countGraphics = game.add.text(this.x, this.y, this.count, {
@@ -41,6 +43,18 @@ class Army {
   }
 
   moveTo(x, y) {
+    if(x > this.x && y == this.y){
+       this.graphics.animations.play('right', 30, true);
+    }
+    if(x == this.x && y > this.y){
+       this.graphics.animations.play('up', 30, true);
+    }
+    if(x == this.x && y < this.y){
+       this.graphics.animations.play('down', 30, true);
+    }
+    if(x < this.x && y == this.y){
+       this.graphics.animations.play('right', 30, true);
+    }
     this.graphics.x = x;
     this.countGraphics.x = x;
     this.graphics.y = y;
