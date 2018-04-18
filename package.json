@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "istanbul cover jasmine",
-    "cucumber": "cucumber-js ./myFeatures -r ./mySteps"
+    "cucumber": "cucumber-js ./features -r ./steps"
   },
   "repository": {
     "type": "git",
