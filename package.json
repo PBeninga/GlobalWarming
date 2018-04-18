@@ -22,7 +22,6 @@
     "request": "^2.85.0",
     "jasmine-node": "~1.14.5",
     "istanbul": "~0.4.5"
-
   },
   "bugs": {
     "url": "https://github.com/PBeninga/GlobalWarming/issues"
@@ -30,6 +29,7 @@
   "homepage": "https://github.com/PBeninga/GlobalWarming#readme",
   "devDependencies": {
     "@orange-games/phaser-input": "^2.0.5",
+    "cucumber": "^4.2.1",
     "jasmine": "^3.1.0",
     "phaser-input": "^1.2.6"
   }
