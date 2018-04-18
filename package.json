@@ -4,7 +4,8 @@
   "description": "rts server",
   "main": "app.js",
   "scripts": {
-    "test": "istanbul cover jasmine"
+    "test": "istanbul cover jasmine",
+    "cucumber": "cucumber-js ./myFeatures -r ./mySteps"
   },
   "repository": {
     "type": "git",
