@@ -351,7 +351,7 @@ function updateArmies(data){
 				armyGroup.add(newClientArmy.countGraphics);
 			}
 			// The army is updated with all relevant values from the server
-			currentClientPlayer.updateArmy(currentArmy.count, currentArmy.id, currentArmy.x, currentArmy.y);
+			currentClientPlayer.updateArmy(currentArmy.count, currentArmy.id, currentArmy.x, currentArmy.y,clientNode);
 			// Deletes the old onInputDown and replaces it with the one for the current army.
 			// TODO: There is a better way to do this.
 			if(clientNode != null) {
