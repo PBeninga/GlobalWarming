@@ -6,22 +6,23 @@ class Army {
     this.color = owner.color;
     this.x = x;
     this.y = y;
- //   this.circle = game.add.graphics(x,y);
-    this.graphics = game.add.sprite(x, y, 'armies');
-    var unit = 3;
-    this.right = this.graphics.animations.add('right',[unit,unit +1 , unit +2],1);
-    this.down = this.graphics.animations.add('down',[unit + 36,unit + 37,unit + 38],1);
-    this.down = this.graphics.animations.add('up',[unit + 72,unit + 73,unit + 74],1);
-    this.down = this.graphics.animations.add('hidden',[30],1);
+    this.sprite = game.add.sprite(x, y, 'armies');
+    var unit = 6;
+    this.right = this.sprite.animations.add('right',[unit,unit +1 , unit +2],1);
+    this.down = this.sprite.animations.add('down',[unit + 36,unit + 37,unit + 38],1);
+    this.up = this.sprite.animations.add('up',[unit + 72,unit + 73,unit + 74],1);
+    this.standing = this.sprite.animations.add('standing',[unit+36],1);
+    this.castle = this.sprite.animations.add('castle',[30],1);
+    this.sprite.anchor.setTo(0.5,0.5);
+    this.sprite.scale.setTo(1.75,1.75);
 
-/*    this.circle.beginFill(this.color, 0.5);
-    this.circle.drawCircle(0, 0, 45);
-    this.circle.anchor.setTo(0.5,0.5);
-    this.circle.endFill();
-*/
+
+    this.graphics = game.add.graphics(x,y);
+    this.graphics.beginFill(this.color, 0.5);
+    this.graphics.drawCircle(0, 0, 45);
     this.graphics.anchor.setTo(0.5,0.5);
-    this.graphics.scale.setTo(1.5,1.5);
-
+    this.graphics.endFill();
+    
     this.countGraphics = game.add.text(this.x, this.y, this.count, {
       font: "14px Arial",
       fill: this.color,
@@ -32,15 +33,15 @@ class Army {
 
   // Destroys all graphics associated with this object
   destroyGraphics() {
-    if(this.graphics != null) {
-      this.graphics.destroy();
+    if(this.sprite != null) {
+      this.sprite.destroy();
     }
     if(this.countGraphics != null) {
       this.countGraphics.destroy();
     }
- //   if(this.circle != null_{
- //      this.circle.destroy();
- //   }
+    if(this.graphics != null){
+       this.graphics.destroy();
+    }
   }
 
   update() {
@@ -54,29 +55,33 @@ class Army {
   }
 
   moveTo(x, y,clientNode) {
-    if(x > this.x && y == this.y){
-       this.graphics.scale.x = 1;
-       this.graphics.animations.play('right', 30, true);
+    if(x > this.x && y == this.y && this.sprite.animations.currentAnim != 'right'){
+       this.sprite.scale.x = 1.75;
+       this.sprite.animations.play('right', 30, true);
     }
-    if(x == this.x && y < this.y){
-       this.graphics.animations.play('up', 30, true);
+    if(x == this.x && y < this.y && this.sprite.animations.currentAnim != 'up'){
+       this.sprite.animations.play('up', 30, true);
     }
-    if(x == this.x && y > this.y){
-       this.graphics.animations.play('down', 30, true);
+    if(x == this.x && y > this.yi && this.sprite.animations.currentAnim != 'down'){
+       this.sprite.animations.play('down', 30, true);
     }
-    if(x < this.x && y == this.y){
-       this.graphics.scale.x = -1;
-       this.graphics.animations.play('right', 30, true);
+    if(x < this.x && y == this.y && this.sprite.animations.currentAnim != 'right'){
+       this.sprite.scale.x = -1.75;
+       this.sprite.animations.play('right', 30, true);
     }
     if(clientNode != null){
-       this.graphics.animations.play('hidden',1,false);
+       if(clientNode.castle){
+         this.sprite.animations.play('castle',1,false);
+       }else{
+         this.sprite.animations.play('standing',1,false);
+       }
     }
-    this.graphics.x = x;
+    this.sprite.x = x;
+    this.sprite.y = y
     this.countGraphics.x = x;
-    this.graphics.y = y;
     this.countGraphics.y = y;
-//    this.circle.x = x;
-//    this.circle.y = y;
+    this.graphics.x = x;
+    this.graphics.y = y;
     this.x = x;
     this.y = y;
   }

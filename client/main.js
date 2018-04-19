@@ -286,13 +286,18 @@ function findnodebyloc (x, y) {
 
 // Called when the map is originated. Creates all the nodes with the data from the server.
 function createNodes(data) {
+        console.log(data);
 	for (var i = 0; i < data.nodes.length; i++) {
 		// Creates a node from the data given and sets the callbacks for the node.
 		node_data = data.nodes[i];
-		let newNode = new MapNode(node_data.id, node_data.x, node_data.y);
-		nodeGroup.add(newNode.graphics);
-		newNode.graphics.inputEnabled = true;
-		newNode.graphics.events.onInputOver.add(mouseOver, {node: newNode});
+                var castle = false;
+		if(data.castles.includes(node_data.id)){
+                  castle = true;
+                }
+                let newNode = new MapNode(node_data.id, node_data.x, node_data.y,castle);
+	        nodeGroup.add(newNode.graphics);
+	        newNode.graphics.inputEnabled = true;
+	        newNode.graphics.events.onInputOver.add(mouseOver, {node: newNode});
 		// Pushes the node into the node buffer and displays it.
 		nodes.push(newNode);
 	}
