@@ -19,7 +19,7 @@ class Army {
 
     this.graphics = game.add.graphics(x,y);
     this.graphics.beginFill(this.color, 0.5);
-    this.graphics.drawCircle(0, 0, 45);
+    this.graphics.drawCircle(0, 15, 25);
     this.graphics.anchor.setTo(0.5,0.5);
     this.graphics.endFill();
     
@@ -62,7 +62,7 @@ class Army {
     if(x == this.x && y < this.y && this.sprite.animations.currentAnim != 'up'){
        this.sprite.animations.play('up', 30, true);
     }
-    if(x == this.x && y > this.yi && this.sprite.animations.currentAnim != 'down'){
+    if(x == this.x && y > this.y && this.sprite.animations.currentAnim != 'down'){
        this.sprite.animations.play('down', 30, true);
     }
     if(x < this.x && y == this.y && this.sprite.animations.currentAnim != 'right'){

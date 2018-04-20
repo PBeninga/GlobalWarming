@@ -388,6 +388,7 @@ main.prototype = {
 		nodeGroup = game.add.group();
 		armyGroup = game.add.group();
 		game.world.bringToTop(armyGroup);
+                game.world.bringToTop(nodeGroup);
 		game.input.onUp.add(endSwipe);
 /*
 		leaveButton = game.add.button(game.camera.x + window.innerWidth, game.camera.y + window.innerHeight, 'button1', function() {
