@@ -119,6 +119,7 @@ class Player{
       return newArmy;
     }
 
+    // Returns the army object that will be moved
     moveArmy(id, node) {
       var moveArmy = this.findArmyById(id);
       // If the army is on a castle, create an army to send

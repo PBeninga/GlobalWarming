@@ -6,7 +6,7 @@ const fs = require('fs');
 
 class Game{
 
-   constructor(io){ 
+   constructor(io){
       let id = "/"+miscFunc.generateID(20)
 	    let gameSocket = io.of(id);
       this.roomid = id;
@@ -18,10 +18,10 @@ class Game{
       this.dummyPlayer = this.playerPool.addPlayer(null);
       this.movingArmies = [];
       for(var i = 0; i < this.map.castles.length; i++){
-         this.map.nodes[this.map.castles[i]].army = 
+         this.map.nodes[this.map.castles[i]].army =
             this.dummyPlayer.addArmy(50, this.map.nodes[this.map.castles[i]]);
       }
-          
+
       //To be replaced when we explicitly put in matchmaking
       this.started = false;
       this.starting = false;
@@ -35,7 +35,7 @@ class Game{
       this.timeGameBeganStarting = null;
       this.time = new Date().getTime();
    }
-   
+
    addInput(moveNodes, id){
      if(this.map.nodes[moveNodes[0]].army && //the start node has an army
        this.map.nodes[moveNodes[0]].army.count > 0 && //the start node's army has enough troops
@@ -75,6 +75,7 @@ class Game{
      army.y = startNode.y + (yDist * (percent/100));
      return percent;
    }
+
    onPlayerDisconnect(){
       this.removePlayer(this.id);
    }
