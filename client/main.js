@@ -15,10 +15,14 @@ var lines = [];
 var nodeGroup = null;
 var armyGroup = null;
 
-var colors = [0xFF0000,	0xFF9F00, 0xF8FF00, 0x7AFF00,0x0000FF,
-										 0x8900FF, 0xFF00F6, 0x097B00, 0x980842];
-var colorTaken = [false, false, false, false, false,
-									false, false, false, false];
+// selected units are 
+var colors = [6,12,15,18,21,432,435,438,441,444,447,450,453,456,459,462,465, 756,762,765,771,774,780]
+var colorTaken = [];
+for(color of colors){
+   colorTaken.push(false);
+}
+//var colors = [0xFF0000,	0xFF9F00, 0xF8FF00, 0x7AFF00,0x0000FF,0x8900FF, 0xFF00F6, 0x097B00, 0x980842];
+//var colorTaken = [false, false, false, false, false, false, false, false, false];
 var bannerGFX;
 //var leaveButton;
 
@@ -162,7 +166,7 @@ function addNewPlayer(id) {
 	}
 	var color;
 	if(id == socket.id){
-		color =  0x00B2EE;
+		color =  3;
 	}else{
 		color = getColor();
 	}
