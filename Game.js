@@ -6,13 +6,14 @@ const fs = require('fs');
 
 class Game{
 
-   constructor(io){ 
+   constructor(removeGame, io){ 
       let id = "/"+miscFunc.generateID(20)
-	    let gameSocket = io.of(id);
+	  let gameSocket = io.of(id);
       this.roomid = id;
       this.gameSocket = gameSocket;
+      this.removeGame = removeGame;
+      
       //Useful game data
-
       this.map = new gameMap.MapFactory().getMap(null);
       this.playerPool = new playerObject.PlayerPool();
       this.dummyPlayer = this.playerPool.addPlayer(null);
@@ -21,13 +22,10 @@ class Game{
          this.map.nodes[this.map.castles[i]].army = 
             this.dummyPlayer.addArmy(50, this.map.nodes[this.map.castles[i]]);
       }
-          
+      
       //To be replaced when we explicitly put in matchmaking
       this.started = false;
       this.starting = false;
-      //Finishing Variables
-      this.finished =  false;
-      this.winner = null;
       //Game Variables
       this.maxPlayers = 4;
       this.constTimeTillStart = 3000;
@@ -75,9 +73,8 @@ class Game{
      army.y = startNode.y + (yDist * (percent/100));
      return percent;
    }
-   onPlayerDisconnect(){
-      this.removePlayer(this.id);
-   }
+   
+   
    removePlayer(id){
      var poolFlag = this.playerPool.contains(id);
       if(poolFlag == 0 || poolFlag == 2){
@@ -103,6 +100,8 @@ class Game{
 
       this.playerPool.removePlayer(id);
    }
+   
+   
    //return true on player succesfully added
    addPlayer(id){
      var poolFlag = this.playerPool.contains(id);
@@ -129,10 +128,14 @@ class Game{
       this.map.nodes[destination].army = player.addArmy(50,this.map.nodes[destination]);
       return true;
    }
-   endGame(){
-       this.gameSocket.emit("endGame",{winner:this.winner});
+   
+   
+   endGame(winner){
+       this.removeGame(this.roomid);
+       this.gameSocket.emit("endGame",{winner:winner});
    }
 
+    
    // Conducts a battle between two armies for the node. Removes the loser from the players list and
    // puts the winner into the node, giving it the node's buff
    battle(node, army1, army2) {
@@ -212,8 +215,8 @@ class Game{
         // Check for end condition (1 Player + DummyPlayer remaining)
         //TODO: Change to check for 2 Players and no Dummy Player
         if(this.playerPool.activePlayers.length <= 2 && this.started){
-          this.winner = this.playerPool.activePlayers[1].id;
-          this.finished = true;
+          var winner = this.playerPool.activePlayers[1].id;
+          this.endGame(winner);
         }
       } else if(this.starting){
         this.timeTillStart = this.constTimeTillStart - (new Date().getTime() - this.timeGameBeganStarting);

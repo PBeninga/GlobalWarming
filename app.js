@@ -53,8 +53,6 @@ function tick(){
 
    tickGames(); //Iterates through all games and calls their tick methods
 
-   removeFinishedGames();
-
    forceTickRate(startTime); // Wait until the minimum tick-time has passed
 
 }
@@ -79,15 +77,12 @@ function tickGames(){
 
 }
 
-function removeFinishedGames(){
 
-   for(var i = 0; i < gamesToRemove.length; i++){
-      games.get(gamesToRemove[i]).endGame();
-      games.delete(gamesToRemove[i]);
-   }
-   gamesToRemove = [];
-
+function removeGame(gameId){
+    console.log("removing game "+ gameId);
+    games.delete(gameId);
 }
+
 
 function forceTickRate(startTime){
 
@@ -188,8 +183,8 @@ function findGame(id){
 		element = gamesIter.next();
 	}
 	//if there are no open games add the player.
-	game  = new gameObject.Game(io);
-	games.set(game.roomid,game);
+	game  = new gameObject.Game(removeGame, io);
+	games.set(game.roomid,game);  // Add the game to the map with key roomid
 	game.addPlayer(id);
 	return game;
 }
