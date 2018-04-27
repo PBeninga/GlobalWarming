@@ -18,9 +18,9 @@ app.get('/',function(req, res) {
 });
 
 app.use('/client',express.static(__dirname + '/client'));
-
+port = process.env.PORT || 2000
 serv.listen(process.env.PORT || 2000);
-console.log("Server started on port 2000");
+console.log("Server started on port " + port);
 
 
 //////////////
@@ -128,30 +128,29 @@ function onNewClient(){
     game = findGame(this.id);
     this.join(game.roomid)
     io.of(game.roomid).emit('newPlayer',{id:this.id, starting:game.starting});
-    this.emit('connected',{id:this.id, players:game.players, game:game.roomid, timeTillStart:game.timeTillStart, starting:game.starting});//send the players id, the players, and the room id
+    this.emit('connected',{id:this.id, players:game.playerPool.activePlayers, game:game.roomid, timeTillStart:game.timeTillStart, starting:game.starting});//send the players id, the players, and the room id
     playersToGames.set(this.id, game);
-    this.emit('send_nodes', {nodes:game.map.nodes, castles:game.map.castles});
-    io.of(game.roomid).emit('update_nodes', {nodes:game.map.nodes});
+    this.emit('send_nodes', {nodes:game.map.nodes, players:game.playerPool.activePlayers});
 }
 
 //call when a client disconnects and tell the clients except sender to remove the disconnected player
 //TODO have client send which game player is in, so we can remove them from it.
 function onClientdisconnect(data) {
-   
+
    console.log('disconnect');
 
    if(playersToGames.has(this.id)){
 	  playersToGames.get(this.id).removePlayer(this.id);
       // If the game has no players in it, we remove it.
-      if(playersToGames.get(this.id).players.length == 0) {
+      if(playersToGames.get(this.id).playerPool.activePlayers.length == 0) {
          playersToGames.delete(this.id);
          console.log("removing game associated with " + this.id);
          console.log("current number of games is " + playersToGames.size);
       }
       else {
          console.log("game still contains");
-         for(var i = 0; i < playersToGames.get(this.id).players.length; i++) {
-             console.log("	" + playersToGames.get(this.id).players.id);
+         for(var i = 0; i < playersToGames.get(this.id).playerPool.activePlayers.length; i++) {
+             console.log("	" + playersToGames.get(this.id).playerPool.activePlayers[i].id);
          }
        }
 	}
@@ -177,55 +176,6 @@ function onInputFired(data) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // New Game
-
-function makeNewGame(){
-	
-	 var game  = new gameObject.Game(io);
-	 makeMap(game); //should move into objects.js
-	 games.set(game.roomid,game);
-	 return game;
-}
-
-function makeMap(game){
-	var nodes = [];
-	var high = 5;
-	var count = 0;
-	var castles = [0,4,24,20,10,14,12,2,22,18,6];
-	for(var i = 1; i <= high; i++){
-		for(var j = 1; j <= high; j++){
-			let x =  i*100;
-			let y =  j*100;
-			var adj = [];
-			// If the node isn't on the left layer, push the node on the left.
-			if(i != 1){
-				adj.push(count-5);
-			}
-			// If the node isn't on the top layer, push the node on top.
-			if(j != 1){
-				adj.push(count-1);
-			}
-			// If the node isn't on the right layer, push the node on the right.
-			if(i < high){
-				adj.push(count+5);
-			}
-			// If the node isn't on the bottom layer, push the node on bottom.
-			if(j < high){
-				adj.push(count+1);
-			}
-			if(castles.indexOf(count) == -1){
-				nodes[count] = new mapObjects.MapNode(x,y,adj, count);
-			}else{
-				nodes[count] = new mapObjects.Castle(x,y,adj, count);
-				nodes[count].army = game.dummyPlayer.addArmy(50, nodes[count]);
-			}
-			count++;
-		}
-	}
-	game.map.startingCastles = [0,24,4,20];
-	game.map.nodes = nodes;
-	game.map.castles = castles;
-}
-
 function findGame(id){
 	gamesIter = games.values();
 	element = gamesIter.next();
@@ -238,7 +188,8 @@ function findGame(id){
 		element = gamesIter.next();
 	}
 	//if there are no open games add the player.
-	game = makeNewGame();
+	game  = new gameObject.Game(io);
+	games.set(game.roomid,game);
 	game.addPlayer(id);
 	return game;
 }

@@ -4,7 +4,8 @@
   "description": "rts server",
   "main": "app.js",
   "scripts": {
-    "test": "jasmine"
+    "test": "istanbul cover jasmine",
+    "cucumber": "cucumber-js ./features -r ./steps"
   },
   "repository": {
     "type": "git",
@@ -18,7 +19,10 @@
     "fs": "0.0.1-security",
     "mongoose": "^5.0.7",
     "p2": "^0.7.1",
-    "socket.io": "^2.0.4"
+    "socket.io": "^2.0.4",
+    "request": "^2.85.0",
+    "jasmine-node": "~1.14.5",
+    "istanbul": "~0.4.5"
   },
   "bugs": {
     "url": "https://github.com/PBeninga/GlobalWarming/issues"
@@ -26,6 +30,7 @@
   "homepage": "https://github.com/PBeninga/GlobalWarming#readme",
   "devDependencies": {
     "@orange-games/phaser-input": "^2.0.5",
+    "cucumber": "^4.2.1",
     "jasmine": "^3.1.0",
     "phaser-input": "^1.2.6"
   }

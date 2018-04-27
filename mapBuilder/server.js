@@ -31,7 +31,10 @@ app.post('/', function (req, res) {
     console.log(data);
     
     fs.writeFile( path, data, function(err){
-        if (err) throw err;
+        if (err){
+           console.log(path);
+           throw err;
+        }
     });
     
 })
