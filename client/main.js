@@ -295,7 +295,7 @@ function createNodes(data) {
 		// Creates a node from the data given and sets the callbacks for the node.
 		node_data = data.nodes[i];
                 var castle = false;
-		if(data.castles.includes(node_data.id)){
+		if(node_data.buff == 'castle'){
                   castle = true;
                 }
                 let newNode = new MapNode(node_data.id, node_data.x, node_data.y,castle);
