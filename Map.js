@@ -2,7 +2,7 @@
 class MapFactory{
   constructor(){
       this.mapNames = ["inOut", "innerRing",
-                       "random",	"threeByThree",	"twoByTwo"];
+                       "random",	"threeByThree",	"twoByTwo", "fourPlayer"];
       this.map = null;
    }
   getMap(specifier){
@@ -14,7 +14,7 @@ class MapFactory{
       let num = Math.floor(Math.random() * this.mapNames.length)
       let mapString = this.mapNames[Math.floor(Math.random() * this.mapNames.length)];
       //this.map.readMap(mapString);
-      this.map.readMap(mapString);  
+      this.map.readMap("fourPlayer");  
     }
     return this.map
   }

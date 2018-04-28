@@ -387,8 +387,9 @@ function updateArmies(data){
 
 main.prototype = {
 	create: function () {
-		game.world.setBounds(-canvas_width*2, -canvas_height*2, canvas_width * 4, canvas_height * 4);
-		game.stage.backgroundColor = 0x000000;
+		game.world.setBounds(-canvas_width*20, -canvas_height*20, canvas_width * 40, canvas_height * 40);
+                game.add.image(350, 30, 'background_img');
+		game.stage.backgroundColor = 0x00d4e8;
 		nodeGroup = game.add.group();
 		armyGroup = game.add.group();
 		game.world.bringToTop(armyGroup);
