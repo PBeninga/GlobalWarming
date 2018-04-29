@@ -105,7 +105,8 @@ function createAccount() {
       login.text.destroy();
       login.destroy();
       menuFlag = 0;
-      socket.emit("new_account", {'playerID': playerID, 'data' : {'username': userName.value, 'password' : password.value}});
+      socket.emit("new_account", // Send the following data as doc. Encrypted through sockets.
+      /* doc: */{'playerID': playerID, 'data' : {'username': userName.value, 'password' : password.value}});
       createBaseButtons();
    });
 }
@@ -178,7 +179,8 @@ function login() {
     login.text.destroy();
     login.destroy();
     menuFlag = 0;
-    socket.emit("login", {'playerID': playerID, 'data' : {'username': userName.value, 'password' : password.value}});
+    socket.emit("login", // Send the following data as doc. Encrypted through sockets.
+      /* doc: */ {'playerID': playerID, 'data' : {'username': userName.value, 'password' : password.value}});
     createBaseButtons();
   });
 }
