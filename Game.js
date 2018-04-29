@@ -17,6 +17,7 @@ class Game{
       this.playerPool = new playerObject.PlayerPool();
       this.dummyPlayer = this.playerPool.addPlayer(null);
       this.movingArmies = [];
+      this.battles = [];
       for(var i = 0; i < this.map.castles.length; i++){
          this.map.nodes[this.map.castles[i]].army = this.dummyPlayer.addArmy(50, this.map.nodes[this.map.castles[i]]);
       }

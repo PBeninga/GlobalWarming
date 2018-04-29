@@ -132,7 +132,7 @@ class Player{
          moveArmy.count -= toMove;
          moveArmy = this.addArmy(toMove, node);
          if(moveArmy.buff == 'castle') {
-            moveArmy.buff = null;
+            moveArmy.updateBuff(null);
          }
       }
       return moveArmy;

@@ -15,6 +15,10 @@ class Army{
       this.y = y;
       this.count = count;
       this.buff = buff;
+      
+      this.movementSpeed = 1.0;
+      this.attackModifier = 1.0;
+      this.defenseModifier = 1.0;
    }
 
    // returns the loser, so it can be removed from it's node and it's players list
@@ -37,9 +41,8 @@ class Army{
        }
      }
    }
-
    // TODO: In the future, we should use this function to update buff values
-   buff(buff) {
+   updateBuff(buff) {
       this.buff = buff;
    }
 }
