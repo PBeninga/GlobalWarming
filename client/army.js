@@ -25,16 +25,16 @@ class Army {
 
     this.graphics = game.add.graphics(x,y);
     this.graphics.beginFill(this.color, 0.5);
-    this.graphics.drawCircle(0, 15, 25);
+    this.graphics.drawCircle(0, 15, 32);
     this.graphics.anchor.setTo(0.5,0.5);
     this.graphics.endFill();
     
     this.countGraphics = game.add.text(this.x, this.y, this.count, {
       font: "14px Arial",
       fill: this.color,
-      align: "center"
+      align: "right"
     });
-    this.countGraphics.anchor.setTo(.5, .5);
+    this.countGraphics.anchor.setTo(1.5, 1.5);
   }
 
   // Destroys all graphics associated with this object
@@ -63,17 +63,17 @@ class Army {
   moveTo(x, y,clientNode) {
     if(x > this.x && y == this.y && this.sprite.animations.currentAnim != 'right'){
        this.sprite.scale.x = 1.75;
-       this.sprite.animations.play('right', 30, true);
+       this.sprite.animations.play('right', 3, true);
     }
     if(x == this.x && y < this.y && this.sprite.animations.currentAnim != 'up'){
-       this.sprite.animations.play('up', 30, true);
+       this.sprite.animations.play('up', 3, true);
     }
     if(x == this.x && y > this.y && this.sprite.animations.currentAnim != 'down'){
-       this.sprite.animations.play('down', 30, true);
+       this.sprite.animations.play('down', 3, true);
     }
     if(x < this.x && y == this.y && this.sprite.animations.currentAnim != 'right'){
        this.sprite.scale.x = -1.75;
-       this.sprite.animations.play('right', 30, true);
+       this.sprite.animations.play('right', 3, true);
     }
     if(clientNode != null){
        if(clientNode.castle){

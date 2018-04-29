@@ -11,9 +11,9 @@ class MapNode {
       this.graphics = game.add.image(x, y, 'node_img');
     }
     this.graphics.anchor.setTo(0.5,0.5);
-    this.graphics.height = 50;
-    this.graphics.width = 50;
-    
+    this.graphics.height = 35;
+    this.graphics.width = 35;
+    //this.graphics.scale.setTo(0.5, 0.5);
   }
 
   display() {
