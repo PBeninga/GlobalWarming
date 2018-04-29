@@ -62,8 +62,9 @@ class MapNodeFactory{
 class MapNode{
    constructor(x,y,adj,id){
       this.id = id;
-      this.x = x;
-      this.y = y;
+      // Conversion from 100 pixel interval to 48 pixel interval
+      this.x = (x / 100) * 48;
+      this.y = (y / 100) * 48;
       this.adj = adj;
       this.buff = null;
       this.army = null;
