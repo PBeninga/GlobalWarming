@@ -160,7 +160,7 @@ class Game{
        losingPlayer.removeArmy(army2.id);
      }
      if(losingPlayer.armies.length == 0) {
-       this.playerPool.removePlayer(id);
+       this.playerPool.removePlayer(losingPlayer.id);
      }
    }
 
