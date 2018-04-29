@@ -15,8 +15,8 @@ class Army{
       this.y = y;
       this.count = count;
       this.buff = buff;
-      
-      this.movementSpeed = 1.0;
+
+      this.movementSpeed = 6.0;
       this.attackModifier = 1.0;
       this.defenseModifier = 1.0;
    }

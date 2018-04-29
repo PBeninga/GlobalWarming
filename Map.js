@@ -11,10 +11,11 @@ class MapFactory{
          this.map.readMap(specifier);
       }
       else{
+
          let num = Math.floor(Math.random() * this.mapNames.length)
          let mapString = this.mapNames[Math.floor(Math.random() * this.mapNames.length)];
          //this.map.readMap(mapString);
-         this.map.readMap(mapString);
+         this.map.readMap("twoByTwo"); //TODO: Change back to mapString when not testing
       }
       return this.map
    }

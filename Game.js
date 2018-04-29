@@ -2,6 +2,8 @@ var gameMap = require('./Map.js');
 var miscFunc = require('./MiscFunctions.js');
 var armyObject = require('./Army.js');
 var playerObject = require('./Player.js');
+var movingArmyObject = require('./MovingArmy.js');
+var battleObject = require('./Battle.js');
 const fs = require('fs');
 
 class Game{
@@ -36,12 +38,25 @@ class Game{
       this.time = new Date().getTime();
    }
 
+   // TODO: add checking for if the client tries to send an incorrect swipe
    addInput(moveNodes, id){
       if(this.map.nodes[moveNodes[0]].army && //the start node has an army
          this.map.nodes[moveNodes[0]].army.count > 0 && //the start node's army has enough troops
-         this.map.nodes[moveNodes[0]].army.player == id && //the start node's army is equal to
+         this.map.nodes[moveNodes[0]].army.player == id && //the start node's army is equal to the sending sockets id
          this.started){
-            this.queueMoveArmy(moveNodes, this.map.nodes[moveNodes[0]].army.id, this.playerPool.getPlayer(id));
+            var swipePath = new Array();
+            // converts the moveNodes list from nodeIds to x and y variables
+            for(var i = 0; i < moveNodes.length; i++) {
+               swipePath.push({x:this.map.nodes[moveNodes[i]].x, y:this.map.nodes[moveNodes[i]].y});
+            }
+            // Gets the army to be moved, and removes it from its node if necessary
+            var player = this.playerPool.getPlayer(id);
+            var currentPlayerArmyListLength = player.armies.length;
+            var movingArmy = player.moveArmy(this.map.nodes[moveNodes[0]].army.id, this.map.nodes[moveNodes[0]]);
+            if(currentPlayerArmyListLength == player.armies.length) {
+               this.map.nodes[moveNodes[0]].army = null;
+            }
+            this.movingArmies.push(new movingArmyObject.MovingArmy(movingArmy, swipePath, moveNodes));
          }
       }
 
@@ -50,31 +65,6 @@ class Game{
          for(var i = 0; i < this.playerPool.activePlayers.length; i++) {
             this.playerPool.activePlayers[i].incrementArmies(num);
          }
-      }
-
-      // Adds the given input to the queue of inputs to be processed in tick()
-      queueMoveArmy(nodes, armyID, player){
-         //TODO: Fix hacky solution
-         var currentPlayerArmyListLength = player.armies.length;
-         var movingArmy = player.moveArmy(armyID, this.map.nodes[nodes[0]]);
-         if(currentPlayerArmyListLength == player.armies.length) {
-            this.map.nodes[nodes[0]].army = null;
-         }
-         // nodes - the indices of nodes of the swipe path
-         // army - the server object of the army
-         this.movingArmies.push({nodes:nodes, army:movingArmy, percentage:0});
-      }
-
-      // Moves the given army the given percent between the start and end nodes. Return the percent complete.
-      moveArmy(army, startNode, endNode, percent) {
-         if(percent >= 100) {
-            percent = 100;
-         }
-         var xDist = endNode.x - startNode.x;
-         var yDist = endNode.y - startNode.y;
-         army.x = startNode.x + (xDist * (percent/100));
-         army.y = startNode.y + (yDist * (percent/100));
-         return percent;
       }
 
       onPlayerDisconnect(){
@@ -135,34 +125,6 @@ class Game{
          this.gameSocket.emit("endGame",{winner:this.winner});
       }
 
-      // Conducts a battle between two armies for the node. Removes the loser from the players list and
-      // puts the winner into the node, giving it the node's buff
-      battle(node, army1, army2) {
-         var battleLoser = army1.battle(army2);
-         var losingPlayer = null;
-         if(army1.id == battleLoser.id) {
-            node.army = army2;
-            army2.buff = node.buff;
-            army2.x = node.x;
-            army2.y = node.y;
-            console.log("Battle is removing army " + army1.id + " from " + army1.player);
-            losingPlayer = this.playerPool.getPlayer(army1.player);
-            losingPlayer.removeArmy(army1.id);
-         }
-         else {
-            node.army = army1;
-            army1.buff = node.buff;
-            army1.x = node.x;
-            army1.y = node.y;
-            console.log("Battle is removing army " + army2.id + " from " + army2.player);
-            losingPlayer = this.playerPool.getPlayer(army2.player);
-            losingPlayer.removeArmy(army2.id);
-         }
-         if(losingPlayer.armies.length == 0) {
-            this.playerPool.removePlayer(id);
-         }
-      }
-
       tick(){
          var troopsToAdd = 0;
          this.gameSocket.emit('update_armies', {players:this.playerPool.activePlayers});
@@ -188,27 +150,65 @@ class Game{
                this.incrementTroops(troopsToAdd);
             }
             // Move all the armies (Done backwards because of splicing within for loop)
+            // TODO: Make this not viscerally disgusting
             for(var i = this.movingArmies.length - 1; i >= 0; i--){
-               var currentMoving = this.movingArmies[i];
-               var startNode = this.map.nodes[currentMoving.nodes[0]];
-               var endNode = this.map.nodes[currentMoving.nodes[1]];
-               currentMoving.percentage += 5;
-               // if the army is done moving
-               if(this.moveArmy(currentMoving.army, startNode, endNode, currentMoving.percentage) >= 100){
-                  // Adds a dummy army for the army to "fight" if none exists
-                  if(endNode.army == null) {
-                     endNode.army = this.dummyPlayer.addArmy(0, endNode);
-                     console.log("Created army " + endNode.army.id + " as a dummy army");
+               var currentArmy = this.movingArmies[i];
+               var crossed = new Array();
+               // Creates a list of every MovingArmy moving opposite the current MovingArmy
+               for(var j = 0; j < this.movingArmies.length; j++) {
+                  if((this.movingArmies[j].nodeList[this.movingArmies[j].startIndex] == currentArmy.nodeList[currentArmy.startIndex + 1])
+                     && (this.movingArmies[j].nodeList[this.movingArmies[j].startIndex + 1] == currentArmy.nodeList[currentArmy.startIndex])
+                     && (j != i)) {
+                     // Adds the crossing armies index and current MovingArmys x and y position
+                     crossed.push({index:j, x:currentArmy.army.x, y:currentArmy.army.y});
                   }
-                  //battle the occupying army
-                  this.battle(endNode, currentMoving.army, endNode.army);
-                  //Remove the finished movingArmy from the list
-                  var finished  = this.movingArmies.splice(i,1)[0];
-                  //Call moveArmies again if the swipelist continues
-                  if(finished.nodes.length > 2){
-                     finished.nodes.shift();
-                     this.queueMoveArmy(finished.nodes, finished.army.id, this.playerPool.getPlayer(finished.army.player));
+               }
+               // Ticks the MovingArmy and checks for completion
+               if(!currentArmy.tick()) {
+                  var currentNode = this.map.nodes[currentArmy.nodeList[currentArmy.startIndex+1]]; // The ending node of the MovingArmy
+                  // if the node is occupied, initialize a battle and remove the MovingArmy from the list
+                  if(currentNode.army != null) {
+                     this.battles.push(new battleObject.Battle(
+                        currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player),
+                        currentNode.army, currentNode.army,
+                        currentArmy.army.x, currentArmy.army.y,
+                        currentNode
+                     ));
+                     this.movingArmies.splice(i,1);
                   }
+                  // Otherwise, check to see if the MovingArmy has reached its destination
+                  else if(!currentArmy.moveUpList()) {
+                     // If it has, remove it from the list and add it to the final nodes army var
+                     var finished  = this.movingArmies.splice(i,1);
+                     this.map.nodes[finished.nodeList[finished.nodeList.length-1]].army = finished.army;
+                  }
+               }
+               // If the army isn't done moving, check the list of crossing armies to see if they've met yet
+               else {
+                  for(var j = 0; j < crossed.length; j++) {
+                     // If they have met, create a new battle object and remove both armies from the movingarmies list
+                     if(
+                        ((currentArmy.x > this.movingArmies[crossed.index].x) != (currentArmy.x > crossed.x))
+                     || ((currentArmy.y > this.movingArmies[crossed.index].y) != (currentArmy.y > crossed.y))
+                     ) {
+                        this.battles.push(new battleObject.Battle(
+                           currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player),
+                           this.movingArmies[crossed.index], this.playerPool.getPlayer(this.movingArmies[crossed.index].player),
+                           currentArmy.army.x, currentArmy.army.y,
+                           null
+                        ));
+                        this.movingArmies.splice(i,1);
+                        this.movingArmies.splice(crossed.index, 1);
+                        if(crossed.index < i) {
+                           i--;
+                        }
+                     }
+                  }
+               }
+            }
+            for(var i = this.battles.length - 1; i >= 0; i--) {
+               if(!this.battles[i].tick()) {
+                  this.battles.splice(i, 1);
                }
             }
             // Check for end condition (1 Player + DummyPlayer remaining)

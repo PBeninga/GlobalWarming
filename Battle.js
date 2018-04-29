@@ -1,4 +1,5 @@
 class Battle {
+	// Should be able to handle the players and nodes completely internally.
 	constructor(army1, player1, army2, player2, x, y, node) {
 		this.army1 = army1;
 		this.player1 = player1;
@@ -18,6 +19,7 @@ class Battle {
 		}
 	}
 
+	// Updates the winner with the spoils of the loser
 	updateWinner(winner, loser) {
 		if(this.node != null) {
 			this.node.army = winner;
@@ -40,18 +42,25 @@ class Battle {
 	tick() {
 		this.attack();
 		if(this.army1.count <= 0 || this.army2.count <= 0) {
+			// If both armies get destroyed
 			if(this.army1.count <= 0 && this.army2.count <= 0) {
-				updatePlayers(this.army1);
-				updatePlayers(this.army2);
+				this.updatePlayers(this.army1);
+				this.updatePlayers(this.army2);
 			}
 			if(this.army1.count <= 0) {
-				updateWinner(this.army2, this.army1);
-				updatePlayers(this.army1);
+				this.updateWinner(this.army2, this.army1);
+				this.updatePlayers(this.army1);
 			}
 			if(this.army2.count <= 0) {
-				updateWinner(this.army1, this.army2);
-				updatePlayers(this.army2);
+				this.updateWinner(this.army1, this.army2);
+				this.updatePlayers(this.army2);
 			}
+			return false;
 		}
+		return true;
 	}
 }
+
+module.exports = {
+   Battle:Battle
+};
