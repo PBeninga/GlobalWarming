@@ -38,7 +38,7 @@ class Game{
       this.time = new Date().getTime();
 
       this.running = true;
-      tickParent(this);
+      this.tickParent(this);
    }
 
    // TODO: add checking for if the client tries to send an incorrect swipe
@@ -230,35 +230,35 @@ class Game{
       }
     
     
-tickParent(game){
+    tickParent(game){
 
-   var startTime = new Date().getTime();
+       var startTime = new Date().getTime();
 
-   game.tickChild();
+       game.tickChild();
 
-   if( game.running ){
-       forceTickRate(startTime, game); // Wait until the minimum tick-time has passed
-   }
+       if( game.running ){
+           game.forceTickRate(startTime, game); // Wait until the minimum tick-time has passed
+       }
 
-}
-
-
-forceTickRate(startTime, game){
-
-    var tickTime =  new Date().getTime() - startTime;
-
-    if(tickTime < 0){
-        tickTime = 0;
     }
 
-   if(tickTime > tickLength){
-      console.log("Dropping Frame");
-      setTimeout(tickParent,(Math.floor(tickTime/tickLength)+1)*tickLength-tickTime, game);
-   }else{
-      setTimeout(tickParent, tickLength-tickTime, game);
-   }
 
-}
+    forceTickRate(startTime, game){
+
+        var tickTime =  new Date().getTime() - startTime;
+
+        if(tickTime < 0){
+            tickTime = 0;
+        }
+
+       if(tickTime > tickLength){
+          console.log("Dropping Frame");
+          setTimeout(game.tickParent,(Math.floor(tickTime/tickLength)+1)*tickLength-tickTime, game);
+       }else{
+          setTimeout(game.tickParent, tickLength-tickTime, game);
+       }
+
+    }
     
 }
 
