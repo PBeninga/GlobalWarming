@@ -33,78 +33,7 @@ var io = require('socket.io')(serv,{});
 // Global varibales
 
 var playersToGames = new Map();
-var gamesToRemove = [];// all games;
 var games = new Map();
-let tickLength = 50;
-
-
-/////////////////
-// Start ticking
-
-tick();
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Tick functions
-
-function tick(){
-
-   startTime = new Date().getTime();
-
-   tickGames(); //Iterates through all games and calls their tick methods
-
-   removeFinishedGames();
-
-   forceTickRate(startTime); // Wait until the minimum tick-time has passed
-
-}
-
-
-/////////////
-// tick helpers
-
-function tickGames(){
-
-   gamesIter = games.values();
-   element = gamesIter.next();
-
-   while(!element.done){
-      game = element.value
-      game.tick();
-      if(game.finished){
-         gamesToRemove.push(game.roomid);
-      }
-      element = gamesIter.next();
-   }
-
-}
-
-function removeFinishedGames(){
-
-   for(var i = 0; i < gamesToRemove.length; i++){
-      games.get(gamesToRemove[i]).endGame();
-      games.delete(gamesToRemove[i]);
-   }
-   gamesToRemove = [];
-
-}
-
-function forceTickRate(startTime){
-
-   var tickTime =  new Date().getTime() - startTime;
-
-   if(tickTime < 0){
-      tickTime = 0;
-   }
-
-   if(tickTime > tickLength){
-      console.log("Dropping Frame");
-      setTimeout(tick,(Math.floor(tickTime/tickLength)+1)*tickLength-tickTime);
-   }else{
-      setTimeout(tick, tickLength-tickTime);
-   }
-
-}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -140,22 +69,22 @@ function onClientdisconnect(data) {
    console.log('disconnect');
 
    if(playersToGames.has(this.id)){
-	  playersToGames.get(this.id).removePlayer(this.id);
-      // If the game has no players in it, we remove it.
-      if(playersToGames.get(this.id).playerPool.activePlayers.length == 0) {
-         playersToGames.delete(this.id);
-         console.log("removing game associated with " + this.id);
-         console.log("current number of games is " + playersToGames.size);
-      }
-      else {
-         console.log("game still contains");
-         for(var i = 0; i < playersToGames.get(this.id).playerPool.activePlayers.length; i++) {
-             console.log("	" + playersToGames.get(this.id).playerPool.activePlayers[i].id);
-         }
+       playersToGames.get(this.id).removePlayer(this.id);
+       // If the game has no players in it, we remove it.
+       if(playersToGames.get(this.id).playerPool.activePlayers.length == 0) {
+           playersToGames.delete(this.id);
+           console.log("removing game associated with " + this.id);
+           console.log("current number of games is " + playersToGames.size);
        }
-	}
-	console.log("removing player " + this.id);
-	//send message to every connected client except the sender
+       else {
+           console.log("game still contains");
+           for(var i = 0; i < playersToGames.get(this.id).playerPool.activePlayers.length; i++) {
+               console.log("	" + playersToGames.get(this.id).playerPool.activePlayers[i].id);
+           }
+       }
+   }
+   console.log("removing player " + this.id);
+   //send message to every connected client except the sender
 }
 
 function onLogin(data){
@@ -188,8 +117,14 @@ function findGame(id){
 		element = gamesIter.next();
 	}
 	//if there are no open games add the player.
-	game  = new gameObject.Game(io);
-	games.set(game.roomid,game);
+	game  = new gameObject.Game(removeGame, io);
+	games.set(game.roomid,game);  // Add the game to the map with key roomid
 	game.addPlayer(id);
 	return game;
 }
+
+function removeGame(gameId){
+    console.log("removing game "+ gameId);
+    games.delete(gameId);
+}
+

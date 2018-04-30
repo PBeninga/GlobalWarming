@@ -1,13 +1,19 @@
 class MapNode {
-  constructor(node_id, x, y) {
+  constructor(node_id, x, y,castle) {
     this.id = node_id;
     this.x = x;
     this.y = y;
+    this.castle = castle;
     this.paths = [];
-    this.graphics = game.add.image(x, y, 'node_img');
+    if(castle){
+      this.graphics = game.add.image(x, y, 'castle_img');
+    }else{
+      this.graphics = game.add.image(x, y, 'node_img');
+    }
     this.graphics.anchor.setTo(0.5,0.5);
-    this.graphics.height = 50;
-    this.graphics.width = 50;
+    this.graphics.height = 35;
+    this.graphics.width = 35;
+    //this.graphics.scale.setTo(0.5, 0.5);
   }
 
   display() {

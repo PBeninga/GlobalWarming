@@ -4,36 +4,69 @@
  *    init()
  */
 
-let mongoose = require('mongoose');
+var mongoose = require('mongoose'),
+    Schema = mongoose.Schema,
+    bcrypt = require('bcrypt'),
+    SALT_WORK_FACTOR = 10;
+
 const uri = 'mongodb://glAdmin:GlobalWarming2018@ds243798.mlab.com:43798/heroku_s7k63t29'
+
+var UserSchema = new Schema({
+    username: { type: String, required: true, index: { unique: true } },
+    password: { type: String, required: true },
+    stats:      {
+       gamesWon:   Number,
+       gamesLost:  Number
+    },
+    friends: [{
+       name: String,
+    }]
+});
+
+UserSchema.pre('save', function(next) {
+    var user = this;
+
+    // only hash the password if it has been modified (or is new)
+    if (!user.isModified('password')) return next();
+
+    // generate a salt
+    bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
+        if (err) return next(err);
+
+        // hash the password using our new salt
+        bcrypt.hash(user.password, salt, function(err, hash) {
+            if (err) return next(err);
+
+            // override the cleartext password with the hashed one
+            user.password = hash;
+            next();
+        });
+    });
+});
+
+UserSchema.methods.comparePassword = function(candidatePassword, cb) {
+    bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
+        if (err) return cb(err);
+        cb(null, isMatch);
+    });
+};
+
 
 class Database{
    constructor() {
       mongoose.connect(uri, function(err){
          if(err) throw err;
+         console.log('Successfully connected to MongoDB');
       });
-   
-      this.Player = mongoose.model(
-         'Player',
-         mongoose.Schema({
-            username:   String,
-            password:   String,
-            stats:      {
-               gamesWon:   Number,
-               gamesLost:  Number
-            },
-            friends: [{
-               name: String,
-            }]
-         })
-      );
+      this.Player = mongoose.model('Player', UserSchema);
    }
 
    findAll(modelName) {
       return new Promise((resolve,reject)=>{
          var model = null;
          var data = null;
-         if(modelName == 'Player') model = this.Player;
+         if(modelName == 'Player') 
+            model = this.Player;
          else {
             console.log('Enter valid model name');
             return;
@@ -61,6 +94,33 @@ class Database{
       });
    }
 
+   // Move this logic into onLogin in login.js?
+   compareHash(modelName, query) {  //query: {'username', 'password'}
+      return new Promise((resolve,reject)=>{
+        var model = null;
+        var data = null;
+        if(modelName == 'Player') model = this.Player;
+        else {
+          console.log('Enter valid model name');
+          return
+        }
+
+        model.findOne({"username": query["username"]}, function(err, docs) {
+          if(err) reject(err);
+          if (docs == null){
+            console.log("Username not found");
+            return (false);
+          }
+          docs.comparePassword(query['password'], function(err, isMatch) {
+            if (err) throw err;
+            console.log("Hashed passwords match: ", isMatch);
+            resolve(isMatch);
+          });
+        });
+        
+      });
+   }
+
    remove(modelName, query) {
       return new Promise((resolve,reject)=>{
          var model = null;
@@ -77,7 +137,8 @@ class Database{
       });
    }
 
-   insertOne(modelName, doc) {
+   //doc: {'username': userName.value, 'password' : password.value}
+   insertOne(modelName, doc) { 
       return new Promise((resolve,reject)=>{
          var model = null;
          if(modelName == 'Player') model = this.Player;

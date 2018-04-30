@@ -15,12 +15,18 @@ var lines = [];
 var nodeGroup = null;
 var armyGroup = null;
 
-var colors = [0xFF0000,	0xFF9F00, 0xF8FF00, 0x7AFF00,0x0000FF,
-										 0x8900FF, 0xFF00F6, 0x097B00, 0x980842];
-var colorTaken = [false, false, false, false, false,
-									false, false, false, false];
+// selected units are 
+var colors = [6,12,15,18,21,432,435,438,441,444,447,450,453,456,459,462,465, 756,762,765,771,774,780]
+var colorTaken = [];
+for(color of colors){
+   colorTaken.push(false);
+}
+//var colors = [0xFF0000,	0xFF9F00, 0xF8FF00, 0x7AFF00,0x0000FF,0x8900FF, 0xFF00F6, 0x097B00, 0x980842];
+//var colorTaken = [false, false, false, false, false, false, false, false, false];
 var bannerGFX;
 //var leaveButton;
+
+var march;
 
 var main = function(game){
 };
@@ -162,7 +168,7 @@ function addNewPlayer(id) {
 	}
 	var color;
 	if(id == socket.id){
-		color =  0x00B2EE;
+		color =  3;
 	}else{
 		color = getColor();
 	}
@@ -232,6 +238,7 @@ function endSwipe() {
       swipeNodes.push(node.id);
     }
 		console.log("emitting: "+ swipeNodes);
+                march.play();
 		socket.emit('input_fired', {game:gameId, nodes: swipeNodes});
 	}
 	else {
@@ -286,13 +293,18 @@ function findnodebyloc (x, y) {
 
 // Called when the map is originated. Creates all the nodes with the data from the server.
 function createNodes(data) {
+        console.log(data);
 	for (var i = 0; i < data.nodes.length; i++) {
 		// Creates a node from the data given and sets the callbacks for the node.
 		node_data = data.nodes[i];
-		let newNode = new MapNode(node_data.id, node_data.x, node_data.y);
-		nodeGroup.add(newNode.graphics);
-		newNode.graphics.inputEnabled = true;
-		newNode.graphics.events.onInputOver.add(mouseOver, {node: newNode});
+                var castle = false;
+		if(node_data.buff == 'castle'){
+                  castle = true;
+                }
+                let newNode = new MapNode(node_data.id, node_data.x, node_data.y,castle);
+	        nodeGroup.add(newNode.graphics);
+	        newNode.graphics.inputEnabled = true;
+	        newNode.graphics.events.onInputOver.add(mouseOver, {node: newNode});
 		// Pushes the node into the node buffer and displays it.
 		nodes.push(newNode);
 	}
@@ -313,9 +325,7 @@ function createNodes(data) {
 			var currentArmy = currentPlayer.armies[j];
 			var clientNode = nodes[currentArmy.node];
 			// Creates the army in the client and initializes the army's callbacks
-			console.log("Adding client " + clientPlayer.id + " army");
 			var newArmy = clientPlayer.addArmy(0, currentArmy.id, clientNode.x, clientNode.y);
-			console.log(clientPlayer.id + " now has " + clientPlayer.armies.length + " armies");
 			armyGroup.add(newArmy.graphics);
 			armyGroup.add(newArmy.countGraphics);
 			clientNode.graphics.events.onInputDown.forget();
@@ -351,7 +361,7 @@ function updateArmies(data){
 				armyGroup.add(newClientArmy.countGraphics);
 			}
 			// The army is updated with all relevant values from the server
-			currentClientPlayer.updateArmy(currentArmy.count, currentArmy.id, currentArmy.x, currentArmy.y);
+			currentClientPlayer.updateArmy(currentArmy.count, currentArmy.id, currentArmy.x, currentArmy.y,clientNode);
 			// Deletes the old onInputDown and replaces it with the one for the current army.
 			// TODO: There is a better way to do this.
 			if(clientNode != null) {
@@ -377,14 +387,17 @@ function updateArmies(data){
 }
 
 main.prototype = {
-
 	create: function () {
-		game.world.setBounds(-canvas_width*2, -canvas_height*2, canvas_width * 4, canvas_height * 4);
-		game.stage.backgroundColor = 0x000000;
+		game.world.setBounds(-canvas_width*20, -canvas_height*20, canvas_width * 40, canvas_height * 40);
+        game.add.image(0, 0, 'background_img');
+		game.stage.backgroundColor = 0x68c1d1;
 		nodeGroup = game.add.group();
 		armyGroup = game.add.group();
 		game.world.bringToTop(armyGroup);
+        game.world.bringToTop(nodeGroup);
 		game.input.onUp.add(endSwipe);
+                
+                march = game.add.audio('march')
 /*
 		leaveButton = game.add.button(game.camera.x + window.innerWidth, game.camera.y + window.innerHeight, 'button1', function() {
 			if(gameSocket != null) {

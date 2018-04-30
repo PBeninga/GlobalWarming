@@ -46,11 +46,11 @@ class Player {
     }
   }
   // Updates the army at the given node by the given count
-  updateArmy(count, id, x, y) {
+  updateArmy(count, id, x, y, clientNode) {
     for(var i = 0; i < this.armies.length; i++) {
       if(this.armies[i].id == id) {
         this.armies[i].count = count;
-        this.armies[i].moveTo(x, y);
+        this.armies[i].moveTo(x, y,clientNode);
         this.updated[i] = true;
         return;
       }
@@ -82,10 +82,8 @@ class Player {
 
   // Adds a new army to the armies list. Does not initialize their callback.
   addArmy(count, id, x, y) {
-    console.log("addArmy called for " + this.id);
     let newArmy = new Army(count, this, x, y);
     newArmy.id = id;
-    newArmy.display();
     this.armies.push(newArmy);
     this.updated.push(true);
     return newArmy;
