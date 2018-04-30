@@ -3,6 +3,10 @@ var miscFunc = require('./MiscFunctions.js');
 var armyObject = require('./Army.js');
 var playerObject = require('./Player.js');
 const fs = require('fs');
+let tickLength = 50;
+
+// State variables
+var running;
 
 class Game{
 
@@ -32,6 +36,9 @@ class Game{
       this.timeTillStart = 3000;
       this.timeGameBeganStarting = null;
       this.time = new Date().getTime();
+       
+      running = true;
+      tickParent(this);
    }
    
    addInput(moveNodes, id){
@@ -131,6 +138,7 @@ class Game{
    
    
    endGame(winner){
+       running = false;
        this.removeGame(this.roomid);
        this.gameSocket.emit("endGame",{winner:winner});
    }
@@ -163,8 +171,10 @@ class Game{
        this.playerPool.removePlayer(losingPlayer.id);
      }
    }
+    
 
-   tick(){
+
+   tickChild(){
       var troopsToAdd = 0;
       this.gameSocket.emit('update_armies', {players:this.playerPool.activePlayers});
 
@@ -224,6 +234,41 @@ class Game{
       }
     }
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Tick functions
+
+function tickParent(game){
+
+   var startTime = new Date().getTime();
+
+   game.tickChild(); 
+
+   if( running ){
+       forceTickRate(startTime, game); // Wait until the minimum tick-time has passed
+   }
+
+}
+
+
+function forceTickRate(startTime, game){
+
+   var tickTime =  new Date().getTime() - startTime;
+
+   if(tickTime < 0){
+      tickTime = 0;
+   }
+
+   if(tickTime > tickLength){
+      console.log("Dropping Frame");
+      setTimeout(tickParent,(Math.floor(tickTime/tickLength)+1)*tickLength-tickTime, game);
+   }else{
+      setTimeout(tickParent, tickLength-tickTime, game);
+   }
+
+}
+
 
 module.exports = {
     Game:Game

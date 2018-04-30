@@ -35,71 +35,6 @@ var io = require('socket.io')(serv,{});
 var playersToGames = new Map();
 var gamesToRemove = [];// all games;
 var games = new Map();
-let tickLength = 50;
-
-
-/////////////////
-// Start ticking
-
-tick();
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Tick functions
-
-function tick(){
-
-   startTime = new Date().getTime();
-
-   tickGames(); //Iterates through all games and calls their tick methods
-
-   forceTickRate(startTime); // Wait until the minimum tick-time has passed
-
-}
-
-
-/////////////
-// tick helpers
-
-function tickGames(){
-
-   gamesIter = games.values();
-   element = gamesIter.next();
-
-   while(!element.done){
-      game = element.value
-      game.tick();
-      if(game.finished){
-         gamesToRemove.push(game.roomid);
-      }
-      element = gamesIter.next();
-   }
-
-}
-
-
-function removeGame(gameId){
-    console.log("removing game "+ gameId);
-    games.delete(gameId);
-}
-
-
-function forceTickRate(startTime){
-
-   var tickTime =  new Date().getTime() - startTime;
-
-   if(tickTime < 0){
-      tickTime = 0;
-   }
-
-   if(tickTime > tickLength){
-      console.log("Dropping Frame");
-      setTimeout(tick,(Math.floor(tickTime/tickLength)+1)*tickLength-tickTime);
-   }else{
-      setTimeout(tick, tickLength-tickTime);
-   }
-
-}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -188,3 +123,9 @@ function findGame(id){
 	game.addPlayer(id);
 	return game;
 }
+
+function removeGame(gameId){
+    console.log("removing game "+ gameId);
+    games.delete(gameId);
+}
+
