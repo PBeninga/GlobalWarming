@@ -183,9 +183,11 @@ class Game{
                   var currentNode = this.map.nodes[currentArmy.nodeList[currentArmy.startIndex+1]]; // The ending node of the MovingArmy
                   // if the node is occupied, initialize a battle and remove the MovingArmy from the list
                   if(currentNode.army != null) {
+                     // If the current Node's army is the players, don't start a battle.
                      if(currentArmy.army.player == currentNode.army.player) {
                         currentNode.army.count += currentArmy.army.count;
                         this.playerPool.getPlayer(currentArmy.army.player).removeArmy(currentArmy.army.id);
+                        console.log("Removed Army");
                         this.movingArmies.splice(i,1);
                      }
                      else {
@@ -195,13 +197,14 @@ class Game{
                            currentArmy.army.x, currentArmy.army.y,
                            currentNode
                         ));
+                        console.log("Removed Army");
                         this.movingArmies.splice(i,1);
                      }
                   }
                   // Otherwise, check to see if the MovingArmy has reached its destination
                   else if(!currentArmy.moveUpList()) {
-                     // If it has, remove it from the list and add it to the final nodes army var
-                     var finished  = this.movingArmies.splice(i,1);
+                     // If it has, remove it from the list and add it to the final nodes army variable
+                     var finished  = this.movingArmies.splice(i,1)[0];
                      this.map.nodes[finished.nodeList[finished.nodeList.length-1]].army = finished.army;
                   }
                }

@@ -33,10 +33,11 @@ class MovingArmy {
 	// Moves the startIndex, and returns false if the swipePath is complete
 	moveUpList() {
 		this.startIndex++;
-		if(this.startIndex >= (this.swipeList.length + 1)) {
+		if(this.startIndex >= (this.swipeList.length - 1)) {
 			return false;
 		}
 		this.initialize();
+		return true;
 	}
 
 	// returns true if the army is still moving, false otherwise
