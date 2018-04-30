@@ -28,7 +28,6 @@ class Army {
     this.graphics.drawCircle(0, 15, 32);
     this.graphics.anchor.setTo(0.5,0.5);
     this.graphics.endFill();
-    
     this.countGraphics = game.add.text(this.x, this.y, this.count, {
       font: "14px Arial",
       fill: this.color,
@@ -55,7 +54,7 @@ class Army {
     if(ClientPlayer.id == this.owner.id){
       font  = "20px Arial";
     }
-    this.countGraphics.setText(this.count);
+    this.countGraphics.setText(Math.ceil(this.count));
     this.countGraphics.addColor(this.color, 0);
     this.countGraphics.addFontStyle(font, 0);
   }

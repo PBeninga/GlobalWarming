@@ -82,7 +82,6 @@ class Player {
 
   // Adds a new army to the armies list. Does not initialize their callback.
   addArmy(count, id, x, y) {
-    console.log("addArmy called for " + this.id);
     let newArmy = new Army(count, this, x, y);
     newArmy.id = id;
     this.armies.push(newArmy);
