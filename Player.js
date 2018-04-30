@@ -82,12 +82,15 @@ class Player{
    }
 
    removeArmy(id) {
+      console.log("Called Remove Army");
       for(var i = 0; i < this.armies.length; i++){
          if(this.armies[i].id == id){
+            console.log("Removed " + id);
             var removedArmy = this.armies.splice(i, 1);
             return removedArmy;
          }
       }
+      console.log("Failed!");
       return null;
    }
 

@@ -6,10 +6,7 @@ var miscFunc = require('./MiscFunctions.js');
 class Army{
    constructor(player,count,node,x,y,buff) {
       this.id = miscFunc.generateID(20);
-      this.player = null;
-      if(player != null) {
-        this.player = player.id;
-      }
+      this.player = player.id;
       this.node = node;
       this.x = x;
       this.y = y;

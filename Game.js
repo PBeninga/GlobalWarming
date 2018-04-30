@@ -91,7 +91,7 @@ class Game{
          //Alter the players nodes in some way.
          for(var i = 0; i < toRemove.length; i++){
             if(this.map.castles.indexOf(toRemove[i]) != -1){
-               this.map.nodes[toRemove[i]].army = new armyObject.Army(null,50,this.map.nodes[toRemove[i]]);
+               this.map.nodes[toRemove[i]].army = new armyObject.Army(this.dummyPlayer,50,this.map.nodes[toRemove[i]]);
             }else{
                this.map.nodes[toRemove[i]].army = null;
             }
@@ -137,7 +137,7 @@ class Game{
 
          var tickStartTime = new Date().getTime();
          if(tickStartTime - this.time >= 500){
-            troopsToAdd = Math.floor((tickStartTime -this.time)/500);
+            troopsToAdd = Math.floor((tickStartTime -this.time)/100); //return to 500
             this.time = tickStartTime - (tickStartTime%500);
          }
          // If there are more than 1 player (DummyPlayer doesnt count) and the game isn't started or starting
@@ -164,7 +164,8 @@ class Game{
                for(var j = 0; j < this.movingArmies.length; j++) {
                   if((this.movingArmies[j].nodeList[this.movingArmies[j].startIndex] == currentArmy.nodeList[currentArmy.startIndex + 1])
                      && (this.movingArmies[j].nodeList[this.movingArmies[j].startIndex + 1] == currentArmy.nodeList[currentArmy.startIndex])
-                     && (j != i)) {
+                     && (j != i)
+                     && (this.movingArmies[j].player != currentArmy.player)) {
                      // Adds the crossing armies index and current MovingArmys x and y position
                      crossed.push({index:j, x:currentArmy.army.x, y:currentArmy.army.y});
                   }
@@ -174,13 +175,20 @@ class Game{
                   var currentNode = this.map.nodes[currentArmy.nodeList[currentArmy.startIndex+1]]; // The ending node of the MovingArmy
                   // if the node is occupied, initialize a battle and remove the MovingArmy from the list
                   if(currentNode.army != null) {
-                     this.battles.push(new battleObject.Battle(
-                        currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player),
-                        currentNode.army, currentNode.army,
-                        currentArmy.army.x, currentArmy.army.y,
-                        currentNode
-                     ));
-                     this.movingArmies.splice(i,1);
+                     if(currentArmy.army.player == currentNode.army.player) {
+                        currentNode.army.count += currentArmy.army.count;
+                        this.playerPool.getPlayer(currentArmy.army.player).removeArmy(currentArmy.army.id);
+                        this.movingArmies.splice(i,1);
+                     }
+                     else {
+                        this.battles.push(new battleObject.Battle(
+                           currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player),
+                           currentNode.army, this.playerPool.getPlayer(currentNode.army.player),
+                           currentArmy.army.x, currentArmy.army.y,
+                           currentNode
+                        ));
+                        this.movingArmies.splice(i,1);
+                     }
                   }
                   // Otherwise, check to see if the MovingArmy has reached its destination
                   else if(!currentArmy.moveUpList()) {
@@ -214,6 +222,7 @@ class Game{
             }
             for(var i = this.battles.length - 1; i >= 0; i--) {
                if(!this.battles[i].tick()) {
+                  console.log("Removed a battle");
                   this.battles.splice(i, 1);
                }
             }
