@@ -83,6 +83,22 @@ class Database{
       return new Promise((resolve,reject)=>{
          var model = null;
          var data = null;
+         if(modelName == 'Player') model = this.Player;
+         else {
+            console.log('Enter valid model name');
+            return
+         }
+         model.findOne(query, function(err, docs) {
+            if(err) reject(err);
+            resolve(docs);
+         });
+      });
+   }
+
+   tryLogin(modelName, query) {
+      return new Promise((resolve,reject)=>{
+         var model = null;
+         var data = null;
          if(modelName == 'Player') 
             model = this.Player;
          else {
@@ -96,7 +112,6 @@ class Database{
               console.log("Username not found");
               return (false);
             }
-
             docs.comparePassword(query['password'], function(err, isMatch) {
               if (err) throw err;
               console.log("Hashed passwords match: ", isMatch);
