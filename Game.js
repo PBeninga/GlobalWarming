@@ -157,7 +157,7 @@ class Game{
             setTimeout(function(){
                game.started = true;
                game.gameSocket.emit('startGame');
-            }, this.CONSTANT_TIME_TILL_START);
+            }, CONSTANT_TIME_TILL_START);
          }
          if(this.started){
             if(troopsToAdd > 0){
@@ -246,7 +246,7 @@ class Game{
                this.endGame();
             }
          } else if(this.starting){
-            this.timeTillStart = this.CONSTANT_TIME_TILL_START - (new Date().getTime() - this.timeGameBeganStarting);
+            this.timeTillStart = CONSTANT_TIME_TILL_START - (new Date().getTime() - this.timeGameBeganStarting);
             this.gameSocket.emit('updateTime',{time:this.timeTillStart});
          }
       }
