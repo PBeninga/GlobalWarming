@@ -2,23 +2,22 @@
 class MapFactory{
    constructor(){
       this.mapNames = ["inOut", "innerRing",
-         "random", "threeByThree", "twoByTwo"];
+                       "random",	"threeByThree",	"twoByTwo", "fourPlayer"];
       this.map = null;
    }
-   getMap(specifier){
-      this.map = new Map();
-      if(this.mapNames.includes(specifier)){
-         this.map.readMap(specifier);
-      }
-      else{
-
-         let num = Math.floor(Math.random() * this.mapNames.length)
-         let mapString = this.mapNames[Math.floor(Math.random() * this.mapNames.length)];
-         //this.map.readMap(mapString);
-         this.map.readMap("twoByTwo"); //TODO: Change back to mapString when not testing
-      }
-      return this.map
-   }
+  getMap(specifier){
+    this.map = new Map();
+    if(this.mapNames.includes(specifier)){
+      this.map.readMap(specifier);
+    }
+    else{
+      let num = Math.floor(Math.random() * this.mapNames.length)
+      let mapString = this.mapNames[Math.floor(Math.random() * this.mapNames.length)];
+      //this.map.readMap(mapString);
+      this.map.readMap("fourPlayer");  
+    }
+    return this.map
+  }
 }
 class Map{
    constructor(){
@@ -63,8 +62,9 @@ class MapNodeFactory{
 class MapNode{
    constructor(x,y,adj,id){
       this.id = id;
-      this.x = x;
-      this.y = y;
+      // Conversion from 100 pixel interval to 48 pixel interval
+      this.x = (x / 100) * 48;
+      this.y = (y / 100) * 48;
       this.adj = adj;
       this.buff = null;
       this.army = null;

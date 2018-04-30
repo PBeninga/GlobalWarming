@@ -7,7 +7,7 @@ class Path {
   }
 
   display() {
-    this.graphics = game.add.graphics();
+    this.graphics = game.add.graphics();/*
     this.graphics.beginFill(0xFF3300);
     this.graphics.lineStyle(10, 0xffd900, 1);
     if(this.start.x < this.end.x) {
@@ -26,7 +26,7 @@ class Path {
       this.graphics.drawRect(this.end.x, this.end.y,
                                                   this.end.width, ydistance(this.start, this.end));
     }
-    this.graphics.endFill();
+    this.graphics.endFill();*/
   }
 
   percentToX(percent) {
