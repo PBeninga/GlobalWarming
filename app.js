@@ -69,22 +69,22 @@ function onClientdisconnect(data) {
    console.log('disconnect');
 
    if(playersToGames.has(this.id)){
-	  playersToGames.get(this.id).removePlayer(this.id);
-      // If the game has no players in it, we remove it.
-      if(playersToGames.get(this.id).playerPool.activePlayers.length == 0) {
-         playersToGames.delete(this.id);
-         console.log("removing game associated with " + this.id);
-         console.log("current number of games is " + playersToGames.size);
-      }
-      else {
-         console.log("game still contains");
-         for(var i = 0; i < playersToGames.get(this.id).playerPool.activePlayers.length; i++) {
-             console.log("	" + playersToGames.get(this.id).playerPool.activePlayers[i].id);
-         }
+       playersToGames.get(this.id).removePlayer(this.id);
+       // If the game has no players in it, we remove it.
+       if(playersToGames.get(this.id).playerPool.activePlayers.length == 0) {
+           playersToGames.delete(this.id);
+           console.log("removing game associated with " + this.id);
+           console.log("current number of games is " + playersToGames.size);
        }
-	}
-	console.log("removing player " + this.id);
-	//send message to every connected client except the sender
+       else {
+           console.log("game still contains");
+           for(var i = 0; i < playersToGames.get(this.id).playerPool.activePlayers.length; i++) {
+               console.log("	" + playersToGames.get(this.id).playerPool.activePlayers[i].id);
+           }
+       }
+   }
+   console.log("removing player " + this.id);
+   //send message to every connected client except the sender
 }
 
 function onLogin(data){
