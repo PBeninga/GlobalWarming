@@ -33,7 +33,6 @@ var io = require('socket.io')(serv,{});
 // Global varibales
 
 var playersToGames = new Map();
-var gamesToRemove = [];// all games;
 var games = new Map();
 
 
