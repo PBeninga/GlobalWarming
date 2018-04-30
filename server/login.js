@@ -10,10 +10,8 @@ class Login {
    }
 
    onLogin(data) {
-      db.findOne('Player', data).then(function(user) {
-         console.log(user);
-         if(user === null) playerSocket.emit('login', {'loginStatus' : 'false'});
-         else playerSocket.emit('login', {'loginStatus' : 'true'});
+      db.findOne('Player', data).then(function(isMatch) {
+         playerSocket.emit('login', {'loginStatus' : isMatch.toString()});
       });
    }
 

@@ -89,10 +89,22 @@ class Database{
             console.log('Enter valid model name');
             return
          }
-         model.findOne(query, function(err, docs) {
+
+         model.findOne({"username": query["username"]}, function(err, docs) {
             if(err) reject(err);
-            resolve(docs);
+            if (docs == null){
+              console.log("Username not found");
+              return (false);
+            }
+
+            docs.comparePassword(query['password'], function(err, isMatch) {
+              if (err) throw err;
+              console.log("Hashed passwords match: ", isMatch);
+              resolve(isMatch);
+            });
+
          });
+        
       });
    }
 
