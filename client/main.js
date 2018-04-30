@@ -26,6 +26,8 @@ for(color of colors){
 var bannerGFX;
 //var leaveButton;
 
+var march;
+
 var main = function(game){
 };
 
@@ -236,6 +238,7 @@ function endSwipe() {
       swipeNodes.push(node.id);
     }
 		console.log("emitting: "+ swipeNodes);
+                march.play();
 		socket.emit('input_fired', {game:gameId, nodes: swipeNodes});
 	}
 	else {
@@ -395,6 +398,8 @@ main.prototype = {
 		game.world.bringToTop(armyGroup);
         game.world.bringToTop(nodeGroup);
 		game.input.onUp.add(endSwipe);
+                
+                march = game.add.audio('march')
 /*
 		leaveButton = game.add.button(game.camera.x + window.innerWidth, game.camera.y + window.innerHeight, 'button1', function() {
 			if(gameSocket != null) {
