@@ -4,7 +4,7 @@ https://global-warming-rts.herokuapp.com/
 ##  Git 
 This is the process you should follow when you make a change
 
-git pull //pulls code from github 
+ffgit pull //pulls code from github 
 
 git checkout -b featureName // makes a new branch and will appened any changes you make onto it
 
