@@ -5,11 +5,13 @@ var playerObject = require('./Player.js');
 var movingArmyObject = require('./MovingArmy.js');
 var battleObject = require('./Battle.js');
 const fs = require('fs');
-let tickLength = 50;
 
-// State variables
+// Global Constants
+let tickLength = 50;
+let CONSTANT_TIME_TILL_START = 3000;
 
 class Game{
+    // TODO create a state variable
 
    constructor(removeGame, io){
       let id = "/"+miscFunc.generateID(20)
@@ -33,13 +35,12 @@ class Game{
       this.starting = false;
       //Game Variables
       this.maxPlayers = 4;
-      this.constTimeTillStart = 3000;
       this.timeTillStart = 3000;
       this.timeGameBeganStarting = null;
       this.time = new Date().getTime();
 
       this.running = true;
-      tickParent(this);
+      this.tickParent(this);
    }
 
    // TODO: add checking for if the client tries to send an incorrect swipe
@@ -149,7 +150,7 @@ class Game{
             setTimeout(function(){
                game.started = true;
                game.gameSocket.emit('startGame');
-            }, this.constTimeTillStart);
+            }, this.CONSTANT_TIME_TILL_START);
          }
          if(this.started){
             if(troopsToAdd > 0){
@@ -230,48 +231,47 @@ class Game{
             //TODO: Change to check for 2 Players and no Dummy Player
             if(this.playerPool.activePlayers.length <= 2 && this.started){
                this.winner = this.playerPool.activePlayers[1].id;
-               this.finished = true;
                this.endGame();
             }
          } else if(this.starting){
-            this.timeTillStart = this.constTimeTillStart - (new Date().getTime() - this.timeGameBeganStarting);
+            this.timeTillStart = this.CONSTANT_TIME_TILL_START - (new Date().getTime() - this.timeGameBeganStarting);
             this.gameSocket.emit('updateTime',{time:this.timeTillStart});
          }
       }
-   }
+    
+    tickParent(game){
+
+       var startTime = new Date().getTime();
+
+       game.tickChild();
+
+       if( game.running ){
+           game.forceTickRate(startTime, game); // Wait until the minimum tick-time has passed
+       }
+
+    }
+
+    forceTickRate(startTime, game){
+
+        var tickTime =  new Date().getTime() - startTime;
+
+        if(tickTime < 0){
+            tickTime = 0;
+        }
+
+       if(tickTime > tickLength){
+          console.log("Dropping Frame");
+          setTimeout(game.tickParent,(Math.floor(tickTime/tickLength)+1)*tickLength-tickTime, game);
+       }else{
+          setTimeout(game.tickParent, tickLength-tickTime, game);
+       }
+
+    }
+    
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Tick functions
-
-function tickParent(game){
-
-   var startTime = new Date().getTime();
-
-   game.tickChild();
-
-   if( game.running ){
-       forceTickRate(startTime, game); // Wait until the minimum tick-time has passed
-   }
-
-}
-
-
-function forceTickRate(startTime, game){
-
-   var tickTime =  new Date().getTime() - startTime;
-
-   if(tickTime < 0){
-      tickTime = 0;
-   }
-
-   if(tickTime > tickLength){
-      console.log("Dropping Frame");
-      setTimeout(tickParent,(Math.floor(tickTime/tickLength)+1)*tickLength-tickTime, game);
-   }else{
-      setTimeout(tickParent, tickLength-tickTime, game);
-   }
-
-}
 
    module.exports = {
       Game:Game
