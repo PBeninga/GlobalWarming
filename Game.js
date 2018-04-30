@@ -8,17 +8,16 @@ const fs = require('fs');
 let tickLength = 50;
 
 // State variables
-var running;
 
 class Game{
 
-   constructor(removeGame, io){ 
+   constructor(removeGame, io){
       let id = "/"+miscFunc.generateID(20)
 	  let gameSocket = io.of(id);
       this.roomid = id;
       this.gameSocket = gameSocket;
       this.removeGame = removeGame;
-      
+
       //Useful game data
       this.map = new gameMap.MapFactory().getMap(null);
       this.playerPool = new playerObject.PlayerPool();
@@ -28,7 +27,7 @@ class Game{
       for(var i = 0; i < this.map.castles.length; i++){
          this.map.nodes[this.map.castles[i]].army = this.dummyPlayer.addArmy(50, this.map.nodes[this.map.castles[i]]);
       }
-    
+
       //To be replaced when we explicitly put in matchmaking
       this.started = false;
       this.starting = false;
@@ -38,8 +37,8 @@ class Game{
       this.timeTillStart = 3000;
       this.timeGameBeganStarting = null;
       this.time = new Date().getTime();
-       
-      running = true;
+
+      this.running = true;
       tickParent(this);
    }
 
@@ -125,9 +124,9 @@ class Game{
          this.map.nodes[destination].army = player.addArmy(50,this.map.nodes[destination]);
          return true;
       }
-    
+
    endGame(winner){
-       running = false;
+       this.running = false;
        this.removeGame(this.roomid);
        this.gameSocket.emit("endGame",{winner:winner});
    }
@@ -223,6 +222,7 @@ class Game{
             if(this.playerPool.activePlayers.length <= 2 && this.started){
                this.winner = this.playerPool.activePlayers[1].id;
                this.finished = true;
+               this.endGame();
             }
          } else if(this.starting){
             this.timeTillStart = this.constTimeTillStart - (new Date().getTime() - this.timeGameBeganStarting);
@@ -238,9 +238,9 @@ function tickParent(game){
 
    var startTime = new Date().getTime();
 
-   game.tickChild(); 
+   game.tickChild();
 
-   if( running ){
+   if( game.running ){
        forceTickRate(startTime, game); // Wait until the minimum tick-time has passed
    }
 
