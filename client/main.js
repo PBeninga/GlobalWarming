@@ -313,9 +313,7 @@ function createNodes(data) {
 			var currentArmy = currentPlayer.armies[j];
 			var clientNode = nodes[currentArmy.node];
 			// Creates the army in the client and initializes the army's callbacks
-			console.log("Adding client " + clientPlayer.id + " army");
 			var newArmy = clientPlayer.addArmy(0, currentArmy.id, clientNode.x, clientNode.y);
-			console.log(clientPlayer.id + " now has " + clientPlayer.armies.length + " armies");
 			armyGroup.add(newArmy.graphics);
 			armyGroup.add(newArmy.countGraphics);
 			clientNode.graphics.events.onInputDown.forget();
