@@ -126,9 +126,16 @@ class Game{
          return true;
       }
 
-   endGame(winner){
+   endGame(){
        this.running = false;
        this.removeGame(this.roomid);
+       var winner = null;
+       for(var i = 0; i < this.playerPool.activePlayers.length; i++) {
+          if(this.playerPool.activePlayers[i].id != null) {
+             winner = this.playerPool.activePlayers[i].id;
+          }
+       }
+       console.log()
        this.gameSocket.emit("endGame",{winner:winner});
    }
 
@@ -227,6 +234,11 @@ class Game{
                   this.battles.splice(i, 1);
                }
             }
+            for(var i = 0; i < this.playerPool.activePlayers.length; i++) {
+               if(this.playerPool.activePlayers[i].armies.length == 0) {
+                  this.playerPool.removePlayer(this.playerPool.activePlayers[i].id);
+               }
+            }
             // Check for end condition (1 Player + DummyPlayer remaining)
             //TODO: Change to check for 2 Players and no Dummy Player
             if(this.playerPool.activePlayers.length <= 2 && this.started){
@@ -238,7 +250,7 @@ class Game{
             this.gameSocket.emit('updateTime',{time:this.timeTillStart});
          }
       }
-    
+
     tickParent(game){
 
        var startTime = new Date().getTime();
@@ -267,7 +279,7 @@ class Game{
        }
 
     }
-    
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
