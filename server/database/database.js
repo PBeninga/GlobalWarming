@@ -61,7 +61,6 @@ class Database{
       this.Player = mongoose.model('Player', UserSchema);
    }
 
-
    findAll(modelName) {
       return new Promise((resolve,reject)=>{
          var model = null;
@@ -95,30 +94,29 @@ class Database{
       });
    }
 
-   tryLogin(modelName, query) {
+   // Move this logic into onLogin in login.js?
+   compareHash(modelName, query) {  //query: {'username', 'password'}
       return new Promise((resolve,reject)=>{
-         var model = null;
-         var data = null;
-         if(modelName == 'Player') 
-            model = this.Player;
-         else {
-            console.log('Enter valid model name');
-            return
-         }
+        var model = null;
+        var data = null;
+        if(modelName == 'Player') model = this.Player;
+        else {
+          console.log('Enter valid model name');
+          return
+        }
 
-         model.findOne({"username": query["username"]}, function(err, docs) {
-            if(err) reject(err);
-            if (docs == null){
-              console.log("Username not found");
-              return (false);
-            }
-            docs.comparePassword(query['password'], function(err, isMatch) {
-              if (err) throw err;
-              console.log("Hashed passwords match: ", isMatch);
-              resolve(isMatch);
-            });
-
-         });
+        model.findOne({"username": query["username"]}, function(err, docs) {
+          if(err) reject(err);
+          if (docs == null){
+            console.log("Username not found");
+            return (false);
+          }
+          docs.comparePassword(query['password'], function(err, isMatch) {
+            if (err) throw err;
+            console.log("Hashed passwords match: ", isMatch);
+            resolve(isMatch);
+          });
+        });
         
       });
    }
@@ -139,8 +137,8 @@ class Database{
       });
    }
 
-   
-   insertOne(modelName, doc) { //doc: {'username': userName.value, 'password' : password.value}
+   //doc: {'username': userName.value, 'password' : password.value}
+   insertOne(modelName, doc) { 
       return new Promise((resolve,reject)=>{
          var model = null;
          if(modelName == 'Player') model = this.Player;

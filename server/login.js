@@ -10,7 +10,7 @@ class Login {
    }
 
    onLogin(data) { 
-      db.tryLogin('Player', data).then(function(isMatch) {
+      db.compareHash('Player', data).then(function(isMatch) {
          playerSocket.emit('login', {'loginStatus' : isMatch.toString()});
       });
    }
