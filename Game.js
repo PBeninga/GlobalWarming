@@ -7,41 +7,39 @@ var battleObject = require('./Battle.js');
 const fs = require('fs');
 let tickLength = 50;
 
-// State variables
-var running;
-
 class Game{
+    // TODO create a state variable
 
-   constructor(removeGame, io){ 
-      let id = "/"+miscFunc.generateID(20)
-	  let gameSocket = io.of(id);
-      this.roomid = id;
-      this.gameSocket = gameSocket;
-      this.removeGame = removeGame;
-      
-      //Useful game data
-      this.map = new gameMap.MapFactory().getMap(null);
-      this.playerPool = new playerObject.PlayerPool();
-      this.dummyPlayer = this.playerPool.addPlayer(null);
-      this.movingArmies = [];
-      this.battles = [];
-      for(var i = 0; i < this.map.castles.length; i++){
-         this.map.nodes[this.map.castles[i]].army = this.dummyPlayer.addArmy(50, this.map.nodes[this.map.castles[i]]);
-      }
-    
-      //To be replaced when we explicitly put in matchmaking
-      this.started = false;
-      this.starting = false;
-      //Game Variables
-      this.maxPlayers = 4;
-      this.constTimeTillStart = 3000;
-      this.timeTillStart = 3000;
-      this.timeGameBeganStarting = null;
-      this.time = new Date().getTime();
-       
-      running = true;
-      tickParent(this);
-   }
+    constructor(removeGame, io){ 
+        let id = "/"+miscFunc.generateID(20)
+        let gameSocket = io.of(id);
+        this.roomid = id;
+        this.gameSocket = gameSocket;
+        this.removeGame = removeGame;
+
+        //Useful game data
+        this.map = new gameMap.MapFactory().getMap(null);
+        this.playerPool = new playerObject.PlayerPool();
+        this.dummyPlayer = this.playerPool.addPlayer(null);
+        this.movingArmies = [];
+        this.battles = [];
+        for(var i = 0; i < this.map.castles.length; i++){
+            this.map.nodes[this.map.castles[i]].army = this.dummyPlayer.addArmy(50, this.map.nodes[this.map.castles[i]]);
+        }
+
+        //To be replaced when we explicitly put in matchmaking
+        this.started = false;
+        this.starting = false;
+        //Game Variables
+        this.maxPlayers = 4;
+        this.constTimeTillStart = 3000;
+        this.timeTillStart = 3000;
+        this.timeGameBeganStarting = null;
+        this.time = new Date().getTime();
+
+        running = true;
+        tickParent(this);
+    }
 
    // TODO: add checking for if the client tries to send an incorrect swipe
    addInput(moveNodes, id){
@@ -229,31 +227,28 @@ class Game{
             this.gameSocket.emit('updateTime',{time:this.timeTillStart});
          }
       }
-   }
-
-///////////////////////////////////////////////////////////////////////////////
-// Tick functions
-
-function tickParent(game){
+    
+    
+tickParent(game){
 
    var startTime = new Date().getTime();
 
    game.tickChild(); 
 
-   if( running ){
+   if( game.running ){
        forceTickRate(startTime, game); // Wait until the minimum tick-time has passed
    }
 
 }
 
 
-function forceTickRate(startTime, game){
+forceTickRate(startTime, game){
 
-   var tickTime =  new Date().getTime() - startTime;
+    var tickTime =  new Date().getTime() - startTime;
 
-   if(tickTime < 0){
-      tickTime = 0;
-   }
+    if(tickTime < 0){
+        tickTime = 0;
+    }
 
    if(tickTime > tickLength){
       console.log("Dropping Frame");
@@ -263,6 +258,11 @@ function forceTickRate(startTime, game){
    }
 
 }
+    
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Tick functions
 
    module.exports = {
       Game:Game
