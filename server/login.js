@@ -9,11 +9,9 @@ class Login {
       socketId = id;
    }
 
-   onLogin(data) {
-      db.findOne('Player', data).then(function(user) {
-         console.log(user);
-         if(user === null) playerSocket.emit('login', {'loginStatus' : 'false'});
-         else playerSocket.emit('login', {'loginStatus' : 'true'});
+   onLogin(data) { 
+      db.compareHash('Player', data).then(function(isMatch) {
+         playerSocket.emit('login', {'loginStatus' : isMatch.toString()});
       });
    }
 
@@ -23,7 +21,8 @@ class Login {
             console.log("Account already exists");
             playerSocket.emit('new_account', {'accountExists' : 'true'});
          }
-         else {
+         else{
+            console.log("New Account Created");
             db.insertOne('Player', data);
          }
       });
