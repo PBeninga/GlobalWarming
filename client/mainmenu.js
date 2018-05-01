@@ -6,12 +6,12 @@ var titleText;
 var startButton;
 var loginButton;
 var createAccountButton;
-
 var mainmenu = function(game){};
+var username = 'guest';
 
 function createBaseButtons() {
   startButton = createButton(game, "Game Start", 'button1', canvas_width/2, canvas_height/2 - 100, 1, function() {
-    game.state.start('main', true, false, socket);
+    game.state.start('main', true, false, [socket,username]);
   });
   loginButton = createButton(game, "Login", 'button1', canvas_width/2, canvas_height/2, 1, login);
   createAccountButton = createButton(game, "Create Account", 'button1', canvas_width/2, canvas_height/2 + 100, 1, createAccount);
@@ -171,6 +171,7 @@ function login() {
 
 
   login = createButton(game, "Login", 'button1', maxLeft + 250, maxTop + 280, 1, function() {
+    username = userName.value;
     LoginBorder.destroy();
     password.destroy();
     userName.destroy();
@@ -188,7 +189,7 @@ function createID() {
    return Math.random().toString(36).substr(2, 10);
 }
 function processLogin(data) {
-   if(data.loginStatus === 'true') game.state.start('main', true, false, socket);
+   if(data.loginStatus === 'true') game.state.start('main', true, false, [socket,username]);
    else login();
 }
 function processAccountCreation(data) {

@@ -1,5 +1,5 @@
 var socket;
-//socket = io.connect();
+var username;//socket = io.connect();
 var gameSocket;
 //the player list
 var players = [];
@@ -168,7 +168,11 @@ function addNewPlayer(id) {
 	}
 	var color;
 	if(id == socket.id){
+           if(username == 'win'){
+              color = 420
+           }else{
 		color =  3;
+           }
 	}else{
 		color = getColor();
 	}
@@ -414,13 +418,15 @@ main.prototype = {
 		*/
 
 		console.log("client started");
-    socket.emit("client_started",{});
+                socket.emit("client_started",{});
 		socket.on('connected', onsocketConnected);
 		socket.on('send_nodes', createNodes);
 	},
 
   init: function(sock) {
-      socket = sock;
+      socket = sock[0];
+      username = sock[1];
+      console.log(username);
   },
 
 	update: function () {
