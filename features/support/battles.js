@@ -2,24 +2,27 @@ const { Given, When, Then, And } = require('cucumber');
 const assert = require('assert');
 
 Given('I start with an army of size {int}', function (input) {
-  this.addMyArmy(input);
+   this.addMyArmy(input);
 })
 Given('the node I want to go to has a an army of size {int} not owned by me', function (input) {
-  this.addEnemyArmy(input);
+   this.addEnemyArmy(input);
 })
 When('I send my army to that node', function () {
-  this.battle();
+   this.battle();
+   assert.notEqual(this.battle, null);
 })
-Then('my army has {int} troops', function (input) {
-  console.log("Reached");
-  assert.equal(this.myPlayer.armies[0].count, input);
+Then('a battle commences', function () {
+   this.commenceBattle();
 })
-Then('their army has {int} troops', function (input) {
-  assert.equal(this.enemy.armies[0].count, input);
+Then('the enemy army gets destroyed', function () {
+   assert.equal(this.enemy.armies.length, 0);
 })
-Then('the enemy has {int} army remaining', function (input) {
-  assert.equal(this.enemy.armies.length, input);
+Then('Then that node holds my army', function (input) {
+   assert.equal(this.map.nodes[0].army.id, this.myPlayer.armies[0].id);
 })
-Then('I have {int} army remaining', function (input) {
-  assert.equal(this.myPlayer.armies.length, input);
+Then('my army gets destroyed', function (input) {
+   assert.equal(this.myPlayer.armies.length, 0);
+})
+Then('Then that node holds the enemies army', function (input) {
+   assert.equal(this.map.nodes[0].army.id, this.enemy.armies[0].id);
 })
