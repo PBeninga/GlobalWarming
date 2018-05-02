@@ -52,23 +52,23 @@ describe("Test increment all troops:",function(){
       expect(last + 10 == player.armies[0].count);
    });
 });
-
+/*
 describe("Test removing players", function(){
 
    game = new gameObject.Game(null,new io());
 
-   game.addPlayer(0);
+   game.addPlayer(20);
 
    it("test player lookup and remove", function(){
    
       console.log("doing player lookup, should be at index 0");
-      expect(game.playerPool.getPlayer(0).id == 0);
+      expect(game.playerPool.getPlayer(20).id == 20);
 
       console.log("removing player");
-      game.playerPool.removePlayer(0);
+      game.playerPool.removePlayer(20);
    
       console.log("looking up removed player"); 
-      expect(game.playerPool.getPlayer(0) == null);
+      expect(game.playerPool.getPlayer(20) == null);
    });
 
-});
+});*/
