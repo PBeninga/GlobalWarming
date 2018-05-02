@@ -4,21 +4,31 @@ class Army {
     this.owner = owner;
     this.id = -1;
     //this.color = owner.color;
-    if(owner.color ==3){
+    if(owner.color ==3 || owner.color == 420){
        this.color = "0x0000FF";
     }else{
       this.color = "0xFF0000";
     }
     this.x = x;
     this.y = y;
-    this.sprite = game.add.sprite(x, y, 'armies');
-    this.unit = owner.color;
-    // selected units are 3,6,12,15,18,21,432,435,438,441,444,447,450,453,456,459,462,465, 756,762,765,771,774,780
-    this.right = this.sprite.animations.add('right',[this.unit,this.unit +1 , this.unit +2],1);
-    this.down = this.sprite.animations.add('down',[this.unit + 36,this.unit + 37,this.unit + 38],1);
-    this.up = this.sprite.animations.add('up',[this.unit + 72,this.unit + 73,this.unit + 74],1);
-    this.standing = this.sprite.animations.add('standing',[this.unit+36],1);
-    this.castle = this.sprite.animations.add('castle',[30],1);
+    if(owner.color == 420){
+       this.sprite = game.add.sprite(x,y,'win');
+       this.right = this.sprite.animations.add('right',[0,1,2],1);
+       this.down = this.sprite.animations.add('down',[4],1);
+       this.standing = this.sprite.animations.add('standing',[4],1);
+       this.up = this.sprite.animations.add('up',[3],1);
+      this.castle = this.sprite.animations.add('castle',[5],1);
+    }else{
+      this.sprite = game.add.sprite(x, y, 'armies');
+      this.unit = owner.color;
+      // selected units are 3,6,12,15,18,21,432,435,438,441,444,447,450,453,456,459,462,465, 756,762,765,771,774,780
+      this.right = this.sprite.animations.add('right',[this.unit,this.unit +1 , this.unit +2],1);
+      this.down = this.sprite.animations.add('down',[this.unit + 36,this.unit + 37,this.unit + 38],1);
+      this.up = this.sprite.animations.add('up',[this.unit + 72,this.unit + 73,this.unit + 74],1);
+      this.standing = this.sprite.animations.add('standing',[this.unit+36],1)
+      this.castle = this.sprite.animations.add('castle',[30],1);
+    }
+
     this.sprite.anchor.setTo(0.5,0.5);
     this.sprite.scale.setTo(1.75,1.75);
 

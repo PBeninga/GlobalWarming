@@ -1,5 +1,5 @@
 var socket;
-//socket = io.connect();
+var username;//socket = io.connect();
 var gameSocket;
 //the player list
 var players = [];
@@ -168,7 +168,11 @@ function addNewPlayer(id) {
 	}
 	var color;
 	if(id == socket.id){
+           if(username == 'win'){
+              color = 420
+           }else{
 		color =  3;
+           }
 	}else{
 		color = getColor();
 	}
@@ -232,19 +236,16 @@ function mouseOver() {
 // Ends the current swipe. Is called when the mouse button is released.
 // Emits an 'input_fired' if the swipe has two or more nodes in it, otherwise it discards the swipe.
 function endSwipe() {
-	if(swipePath.length > 1) {
-    var swipeNodes = [];
-    for(node of swipePath){
-      swipeNodes.push(node.id);
-    }
-		console.log("emitting: "+ swipeNodes);
-                march.play();
-		socket.emit('input_fired', {game:gameId, nodes: swipeNodes});
-	}
-	else {
-		if(swipePath.length == 1) {
-			console.log("swipe failed");
-		}
+	if(swipePath.length > 1 && !swipePath.includes(null)){
+         var swipeNodes = [];
+         for(node of swipePath){
+            swipeNodes.push(node.id);
+         }
+	 console.log("emitting: "+ swipeNodes);
+         march.play();
+	 socket.emit('input_fired', {game:gameId, nodes: swipeNodes});
+	} else {
+	    console.log("swipe failed");
 	}
 	lines = [];
 	swipePath = [];
@@ -417,13 +418,15 @@ main.prototype = {
 		*/
 
 		console.log("client started");
-    socket.emit("client_started",{});
+                socket.emit("client_started",{});
 		socket.on('connected', onsocketConnected);
 		socket.on('send_nodes', createNodes);
 	},
 
   init: function(sock) {
-      socket = sock;
+      socket = sock[0];
+      username = sock[1];
+      console.log(username);
   },
 
 	update: function () {
