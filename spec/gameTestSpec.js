@@ -16,10 +16,10 @@ describe("Test adding a new player", function(){
 
    it("adding player",function(){
       //console.log("Adding player 0, should return true");
-      expect(game.addPlayer(0)).toBe(true);
+      expect(game.addPlayer(675)).toBe(true);
    
 //      print("Attempting to add player 0 again, should return false");
-      expect(game.addPlayer(0)).toBe(false);
+      expect(game.addPlayer(675)).toBe(false);
 
       //console.log("filling players");
       for(var i = 1; i < game.map.startingCastles.length;i++){
