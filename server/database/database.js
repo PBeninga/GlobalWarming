@@ -16,7 +16,12 @@ var UserSchema = new Schema({
     password: { type: String, required: true },
     stats:      {
        gamesWon:   Number,
-       gamesLost:  Number
+       gamesLost:  Number,
+       castlesWon:  Number,
+       castlesLost:  Number,
+       battesWon:  Number,
+       batlesLost:  Number,
+       totalGameTime: Number
     },
     friends: [{
        name: String,
