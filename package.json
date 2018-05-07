@@ -17,13 +17,15 @@
     "@orange-games/phaser-input": "^2.0.5",
     "bcrypt": "^2.0.1",
     "express": "^4.16.2",
-    "fs": "0.0.1-security",
     "istanbul": "~0.4.5",
     "jasmine-node": "~1.14.5",
     "mongoose": "^5.0.7",
     "p2": "^0.7.1",
     "request": "^2.85.0",
     "socket.io": "^2.0.4"
+  },
+  "engines": {
+    "node": ">=7.0.0"
   },
   "bugs": {
     "url": "https://github.com/PBeninga/GlobalWarming/issues"
