@@ -8,7 +8,12 @@ const fs = require('fs');
 
 // Global Constants
 let tickLength = 50;
-let CONSTANT_TIME_TILL_START = 3000;
+let TIME_TILL_START = 3000;
+
+let STATE_WAITING = 0;
+let STATE_COUNT_DOWN = 1;
+let STATE_RUNNING = 2;
+let STATE_GAME_OVER = 3;
 
 class Game{
     // TODO create a state variable
@@ -30,9 +35,7 @@ class Game{
          this.map.nodes[this.map.castles[i]].army = this.dummyPlayer.addArmy(50, this.map.nodes[this.map.castles[i]]);
       }
 
-      //To be replaced when we explicitly put in matchmaking
-      this.started = false;
-      this.starting = false;
+      this.gameState = STATE_WAITING;
       //Game Variables
       this.maxPlayers = 4;
       this.timeTillStart = 3000;
@@ -48,7 +51,7 @@ class Game{
       if(this.map.nodes[moveNodes[0]].army && //the start node has an army
          this.map.nodes[moveNodes[0]].army.count > 0 && //the start node's army has enough troops
          this.map.nodes[moveNodes[0]].army.player == id && //the start node's army is equal to the sending sockets id
-         this.started){
+         this.gameState == STATE_RUNNING){
             var swipePath = new Array();
             // converts the moveNodes list from nodeIds to x and y variables
             for(var i = 0; i < moveNodes.length; i++) {
@@ -149,17 +152,17 @@ class Game{
             this.time = tickStartTime - (tickStartTime%500);
          }
          // If there are more than 1 player (DummyPlayer doesnt count) and the game isn't started or starting
-         if(this.playerPool.activePlayers.length > 2 && !this.starting && !this.started){
-            this.starting = true;
+         if(this.playerPool.activePlayers.length >2 && this.gameState == STATE_WAITING){
+            this.gameState = STATE_COUNT_DOWN;
             console.log("Game starting.");
             let game = this;
             this.timeGameBeganStarting = new Date().getTime();
             setTimeout(function(){
-               game.started = true;
+               game.gameState = STATE_RUNNING;
                game.gameSocket.emit('startGame');
-            }, CONSTANT_TIME_TILL_START);
+            }, TIME_TILL_START);
          }
-         if(this.started){
+         if(this.gameState == STATE_RUNNING){
             if(troopsToAdd > 0){
                this.incrementTroops(troopsToAdd);
             }
@@ -244,12 +247,12 @@ class Game{
             }
             // Check for end condition (1 Player + DummyPlayer remaining)
             //TODO: Change to check for 2 Players and no Dummy Player
-            if(this.playerPool.activePlayers.length <= 2 && this.started){
+            if(this.playerPool.activePlayers.length <= 2 && this.gameState == STATE_RUNNING){
                this.winner = this.playerPool.activePlayers[1].id;
                this.endGame();
             }
-         } else if(this.starting){
-            this.timeTillStart = CONSTANT_TIME_TILL_START - (new Date().getTime() - this.timeGameBeganStarting);
+         } else if(this.gameState == STATE_COUNT_DOWN){
+            this.timeTillStart = TIME_TILL_START - (new Date().getTime() - this.timeGameBeganStarting);
             this.gameSocket.emit('updateTime',{time:this.timeTillStart});
          }
       }
