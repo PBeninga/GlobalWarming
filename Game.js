@@ -15,6 +15,8 @@ let STATE_COUNT_DOWN = 1;
 let STATE_RUNNING = 2;
 let STATE_GAME_OVER = 3;
 
+let MAX_PLAYERS = 4;
+
 class Game{
 
     
@@ -40,11 +42,8 @@ class Game{
 
       //Game Variables
       this.gameState = STATE_WAITING;
-      this.maxPlayers = 4;
-      this.timeTillStart = 3000;
-      this.time = new Date().getTime();
 
-      this.tickParent(this);
+      this.tickParent();
    }
 
    // TODO: add checking for if the client tries to send an incorrect swipe
@@ -112,7 +111,7 @@ class Game{
                break;
             }
          }
-         if(destination == -1 || this.playerPool.activePlayers.length == this.maxPlayers){
+         if(destination == -1 || this.playerPool.activePlayers.length == MAX_PLAYERS){
             console.log("Could not find a castle.");
             return false;
          }
@@ -123,28 +122,15 @@ class Game{
          return true;
       }
 
-   endGame(){
-       this.gameState = STATE_GAME_OVER;
-       this.removeGame(this.roomid);
-       var winner = null;
-       for(var i = 0; i < this.playerPool.activePlayers.length; i++) {
-          if(this.playerPool.activePlayers[i].id != null) {
-             winner = this.playerPool.activePlayers[i].id;
-          }
-       }
-       console.log()
-       this.gameSocket.emit("endGame",{winner:winner});
-   }
 
  //////////////////////////////////////////////////////////////////////////////////////
  // TICK FUNCTIONS
  //
     
+    
     tickParent(){
 
         var tickStartTime = new Date().getTime();
-        
-        console.log(this.gameState);
         
         if(this.gameState == STATE_WAITING){
             this.waitingState();
@@ -156,21 +142,23 @@ class Game{
 
         if(this.gameState == STATE_RUNNING){
             
-            this.incrementTroops();
+            this.incrementTroops(tickStartTime);
              
-            this.tickChild();
+            this.tickSLOP();
+            
+            this.checkGameOver();
             
         } 
         
+        this.gameSocket.emit('update_armies', {players:this.playerPool.activePlayers});
         this.forceTickRate(tickStartTime); // Wait until min tick-time has passed
 
     }
     
     
-   tickChild(){
+   tickSLOP(){
        
-      this.gameSocket.emit('update_armies', {players:this.playerPool.activePlayers});
-             
+       // PLEASE FOR THE LOVE OF GOD FIX THIS DISGUSTING FOR LOOP      
             // Move all the armies (Done backwards because of splicing within for loop)
             // TODO: Make this not viscerally disgusting
             for(var i = this.movingArmies.length - 1; i >= 0; i--){
@@ -239,6 +227,10 @@ class Game{
                   }
                }
             }
+       
+       
+       
+       
             for(var i = this.battles.length - 1; i >= 0; i--) {
                if(!this.battles[i].tick()) {
                   console.log("Removed a battle");
@@ -249,12 +241,6 @@ class Game{
                if(this.playerPool.activePlayers[i].armies.length == 0) {
                   this.playerPool.removePlayer(this.playerPool.activePlayers[i].id);
                }
-            }
-            // Check for end condition (1 Player + DummyPlayer remaining)
-            //TODO: Change to check for 2 Players and no Dummy Player
-            if(this.playerPool.activePlayers.length <= 2 && this.gameState == STATE_RUNNING){
-               this.winner = this.playerPool.activePlayers[1].id;
-               this.endGame();
             }
       }
     
@@ -273,9 +259,10 @@ class Game{
             let game = this;
             this.gameStartTime = new Date().getTime();
             setTimeout(function(){
+               game.lastTroopIncTime = new Date().getTime();
                game.gameState = STATE_RUNNING;
                game.gameSocket.emit('startGame');
-            }, TIME_TILL_START);
+            }, TIME_TILL_START, game);
         }
     }
     
@@ -283,13 +270,12 @@ class Game{
     // RUNNING STATE TICK FUNCTIONS
     
       // Increments all armies that have the 'castle' buff
-      incrementTroops(){
-          
+      incrementTroops(tickStartTime){
+            //Adds troops based on time not tick
             var troopsToAdd = 0;
-            var tickStartTime = new Date().getTime();
-            if(tickStartTime - this.time >= 500){
-            troopsToAdd = Math.floor((tickStartTime -this.time)/100); //return to 500
-            this.time = tickStartTime - (tickStartTime%500);
+            if(tickStartTime - this.lastTroopIncTime >= 500){
+            troopsToAdd = Math.floor((tickStartTime -this.lastTroopIncTime)/100); //return to 500
+            this.lastTroopIncTime = tickStartTime - (tickStartTime%500);
             }
 
            if(troopsToAdd > 0){
@@ -298,6 +284,25 @@ class Game{
                 this.playerPool.activePlayers[i].incrementArmies(troopsToAdd);
              }
            }
+      }
+    
+    
+      checkGameOver(){
+          // Check for end condition (1 Player + DummyPlayer remaining)
+          //TODO: Change to check for 2 Players and no Dummy Player
+          if(this.playerPool.activePlayers.length <= 2 && this.gameState == STATE_RUNNING){
+               this.winner = this.playerPool.activePlayers[1].id;
+               this.gameState = STATE_GAME_OVER;
+               this.removeGame(this.roomid);
+               var winner = null;
+               for(var i = 0; i < this.playerPool.activePlayers.length; i++) {
+                  if(this.playerPool.activePlayers[i].id != null) {
+                     winner = this.playerPool.activePlayers[i].id;
+                  }
+               }
+               console.log()
+               this.gameSocket.emit("endGame",{winner:winner});
+          }
       }
     
     
