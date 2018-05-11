@@ -16,8 +16,11 @@ let STATE_RUNNING = 2;
 let STATE_GAME_OVER = 3;
 
 class Game{
-    // TODO create a state variable
 
+    
+ ////////////////////////////////////////////////////////////
+ // CONSTRUCTOR
+    
    constructor(removeGame, io){
       let id = "/"+miscFunc.generateID(20)
 	  let gameSocket = io.of(id);
@@ -35,14 +38,12 @@ class Game{
          this.map.nodes[this.map.castles[i]].army = this.dummyPlayer.addArmy(50, this.map.nodes[this.map.castles[i]]);
       }
 
-      this.gameState = STATE_WAITING;
       //Game Variables
+      this.gameState = STATE_WAITING;
       this.maxPlayers = 4;
       this.timeTillStart = 3000;
-      this.timeGameBeganStarting = null;
       this.time = new Date().getTime();
 
-      this.running = true;
       this.tickParent(this);
    }
 
@@ -65,13 +66,6 @@ class Game{
                this.map.nodes[moveNodes[0]].army = null;
             }
             this.movingArmies.push(new movingArmyObject.MovingArmy(movingArmy, swipePath, moveNodes));
-         }
-      }
-
-      // Increments all armies that have the 'castle' buff
-      incrementTroops(num){
-         for(var i = 0; i < this.playerPool.activePlayers.length; i++) {
-            this.playerPool.activePlayers[i].incrementArmies(num);
          }
       }
 
@@ -130,7 +124,7 @@ class Game{
       }
 
    endGame(){
-       this.running = false;
+       this.gameState = STATE_GAME_OVER;
        this.removeGame(this.roomid);
        var winner = null;
        for(var i = 0; i < this.playerPool.activePlayers.length; i++) {
@@ -142,30 +136,41 @@ class Game{
        this.gameSocket.emit("endGame",{winner:winner});
    }
 
-   tickChild(){
-      var troopsToAdd = 0;
-      this.gameSocket.emit('update_armies', {players:this.playerPool.activePlayers});
+ //////////////////////////////////////////////////////////////////////////////////////
+ // TICK FUNCTIONS
+ //
+    
+    tickParent(){
 
-         var tickStartTime = new Date().getTime();
-         if(tickStartTime - this.time >= 500){
-            troopsToAdd = Math.floor((tickStartTime -this.time)/100); //return to 500
-            this.time = tickStartTime - (tickStartTime%500);
-         }
-         // If there are more than 1 player (DummyPlayer doesnt count) and the game isn't started or starting
-         if(this.playerPool.activePlayers.length >2 && this.gameState == STATE_WAITING){
-            this.gameState = STATE_COUNT_DOWN;
-            console.log("Game starting.");
-            let game = this;
-            this.timeGameBeganStarting = new Date().getTime();
-            setTimeout(function(){
-               game.gameState = STATE_RUNNING;
-               game.gameSocket.emit('startGame');
-            }, TIME_TILL_START);
-         }
-         if(this.gameState == STATE_RUNNING){
-            if(troopsToAdd > 0){
-               this.incrementTroops(troopsToAdd);
-            }
+        var tickStartTime = new Date().getTime();
+        
+        console.log(this.gameState);
+        
+        if(this.gameState == STATE_WAITING){
+            this.waitingState();
+        }
+        
+        if(this.gameState == STATE_COUNT_DOWN){
+             this.countDownTimer();
+        }
+
+        if(this.gameState == STATE_RUNNING){
+            
+            this.incrementTroops();
+             
+            this.tickChild();
+            
+        } 
+        
+        this.forceTickRate(tickStartTime); // Wait until min tick-time has passed
+
+    }
+    
+    
+   tickChild(){
+       
+      this.gameSocket.emit('update_armies', {players:this.playerPool.activePlayers});
+             
             // Move all the armies (Done backwards because of splicing within for loop)
             // TODO: Make this not viscerally disgusting
             for(var i = this.movingArmies.length - 1; i >= 0; i--){
@@ -251,46 +256,100 @@ class Game{
                this.winner = this.playerPool.activePlayers[1].id;
                this.endGame();
             }
-         } else if(this.gameState == STATE_COUNT_DOWN){
-            this.timeTillStart = TIME_TILL_START - (new Date().getTime() - this.timeGameBeganStarting);
-            this.gameSocket.emit('updateTime',{time:this.timeTillStart});
-         }
       }
+    
+   
+    /////////////////////////////
+    // WAITING STATE TICK FUNCTIONS
+    
+    waitingState(){
+        
+        // If there are more than 1 player (DummyPlayer doesnt count) and the game isn't started or starting
+        
+        if(this.playerPool.activePlayers.length >2){ 
+        
+            this.gameState = STATE_COUNT_DOWN;
+            console.log("Game starting.");
+            let game = this;
+            this.gameStartTime = new Date().getTime();
+            setTimeout(function(){
+               game.gameState = STATE_RUNNING;
+               game.gameSocket.emit('startGame');
+            }, TIME_TILL_START);
+        }
+    }
+    
+    /////////////////////////////
+    // RUNNING STATE TICK FUNCTIONS
+    
+      // Increments all armies that have the 'castle' buff
+      incrementTroops(){
+          
+            var troopsToAdd = 0;
+            var tickStartTime = new Date().getTime();
+            if(tickStartTime - this.time >= 500){
+            troopsToAdd = Math.floor((tickStartTime -this.time)/100); //return to 500
+            this.time = tickStartTime - (tickStartTime%500);
+            }
 
-    tickParent(game){
+           if(troopsToAdd > 0){
 
-       var startTime = new Date().getTime();
+             for(var i = 0; i < this.playerPool.activePlayers.length; i++) {
+                this.playerPool.activePlayers[i].incrementArmies(troopsToAdd);
+             }
+           }
+      }
+    
+    
+    /////////////////////////////
+    // COUNT DOWN STATE TICK FUNCTIONS
+    
+    countDownTimer(){
+        this.timeTillStart = TIME_TILL_START - (new Date().getTime() -this.gameStartTime);
+        this.gameSocket.emit('updateTime',{time:this.timeTillStart});
+    }
+    
+    
+    /////////////////////////////
+    // GAME OVER STATE TICK FUNCTIONS
 
-       game.tickChild();
 
-       if( game.running ){
-           game.forceTickRate(startTime, game); // Wait until the minimum tick-time has passed
+    /////////////////////////////
+    // GENERAL TICK FUNCTIONS
+
+    forceTickRate(tickStartTime){
+        
+       // If the game is over, do not force another tick
+       if( this.gameState == STATE_GAME_OVER ){ 
+           return;
        }
 
-    }
-
-    forceTickRate(startTime, game){
-
-        var tickTime =  new Date().getTime() - startTime;
+        var tickTime =  new Date().getTime() - tickStartTime;
 
         if(tickTime < 0){
             tickTime = 0;
         }
 
+        var game = this;
+        
        if(tickTime > tickLength){
           console.log("Dropping Frame");
-          setTimeout(game.tickParent,(Math.floor(tickTime/tickLength)+1)*tickLength-tickTime, game);
+          setTimeout(this.tickCaller,(Math.floor(tickTime/tickLength)+1)*tickLength-tickTime, game);
        }else{
-          setTimeout(game.tickParent, tickLength-tickTime, game);
+          setTimeout(this.tickCaller, tickLength-tickTime, game);
        }
 
+    }
+    
+    // This is a callback for setTimeout
+    // so it executes in a different class
+    tickCaller(game){
+       game.tickParent(); 
     }
 
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Tick functions
 
-   module.exports = {
-      Game:Game
-   };
+module.exports = {
+  Game:Game
+};
