@@ -28,7 +28,7 @@ class Game{
 	  let gameSocket = io.of(id);
       this.roomid = id;
       this.gameSocket = gameSocket;
-      this.removeGame = removeGame;
+      this.removeGame = removeGame;  // This is a callback to app.js
 
       //Useful game data
       this.map = new gameMap.MapFactory().getMap(null);
@@ -43,7 +43,7 @@ class Game{
       //Game Variables
       this.gameState = STATE_WAITING;
 
-      this.tickParent();
+      this.tick();
    }
 
    // TODO: add checking for if the client tries to send an incorrect swipe
@@ -128,7 +128,7 @@ class Game{
  //
     
     
-    tickParent(){
+    tick(){
 
         var tickStartTime = new Date().getTime();
         
@@ -147,6 +147,8 @@ class Game{
             this.tickSLOP();
             
             this.checkGameOver();
+            
+            this.garbageCollection();
             
         } 
         
@@ -228,20 +230,6 @@ class Game{
                }
             }
        
-       
-       
-       
-            for(var i = this.battles.length - 1; i >= 0; i--) {
-               if(!this.battles[i].tick()) {
-                  console.log("Removed a battle");
-                  this.battles.splice(i, 1);
-               }
-            }
-            for(var i = 0; i < this.playerPool.activePlayers.length; i++) {
-               if(this.playerPool.activePlayers[i].armies.length == 0) {
-                  this.playerPool.removePlayer(this.playerPool.activePlayers[i].id);
-               }
-            }
       }
     
    
@@ -305,6 +293,25 @@ class Game{
           }
       }
     
+      garbageCollection(){
+          // Removes
+          // Players, Battles ...
+          // From their respective arrays
+          
+            for(var i = this.battles.length - 1; i >= 0; i--) {
+               if(!this.battles[i].tick()) {
+                  console.log("Removed a battle");
+                  this.battles.splice(i, 1);
+               }
+            }
+            for(var i = 0; i < this.playerPool.activePlayers.length; i++) {
+               if(this.playerPool.activePlayers[i].armies.length == 0) {
+                  this.playerPool.removePlayer(this.playerPool.activePlayers[i].id);
+               }
+            }
+          
+      }
+    
     
     /////////////////////////////
     // COUNT DOWN STATE TICK FUNCTIONS
@@ -349,7 +356,7 @@ class Game{
     // This is a callback for setTimeout
     // so it executes in a different class
     tickCaller(game){
-       game.tickParent(); 
+       game.tick(); 
     }
 
 }
