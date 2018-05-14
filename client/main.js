@@ -15,7 +15,7 @@ var lines = [];
 var nodeGroup = null;
 var armyGroup = null;
 
-// selected units are 
+// selected units are
 var colors = [6,12,15,18,21,432,435,438,441,444,447,450,453,456,459,462,465, 756,762,765,771,774,780]
 var colorTaken = [];
 for(color of colors){
@@ -223,7 +223,7 @@ function swipe() {
 // Called when the mouse hovers over the node passed in the parameter.
 // Adds the node to the swipePath if a swipe was initialized.
 function mouseOver() {
-	console.log("Mouse is over node " + this.node.x + ", " + this.node.y);
+	console.log("Mouse is over node " + this.node.id + " at " + this.node.x + ", " + this.node.y);
 	if(swipePath.length != 0) {
 		if(swipePath[swipePath.length-1].pathTo(this.node) != null && swipePath[swipePath.length-1].id != this.node.id) {
 			swipePath.push(this.node);
@@ -367,14 +367,14 @@ function updateArmies(data){
 			// TODO: There is a better way to do this.
 			if(clientNode != null) {
 				var currentClientArmy = currentClientPlayer.getArmyByID(currentArmy.id);
-				clientNode.graphics.events.onInputDown.forget();
+				clientNode.graphics.events.onInputDown.removeAll();
 				clientNode.graphics.events.onInputDown.add(swipe, {army: currentClientArmy});
 				updated[clientNode.id] = true;
 			}
 		}
 		for(var j = 0; j < nodes.length; j++) {
-			if(!updated) {
-				nodes[j].graphics.events.onInputDown.forget();
+			if(!updated[j]) {
+				nodes[j].graphics.events.onInputDown.removeAll();
 			}
 		}
 	}
@@ -397,7 +397,7 @@ main.prototype = {
 		game.world.bringToTop(armyGroup);
         game.world.bringToTop(nodeGroup);
 		game.input.onUp.add(endSwipe);
-                
+
                 march = game.add.audio('march')
 /*
 		leaveButton = game.add.button(game.camera.x + window.innerWidth, game.camera.y + window.innerHeight, 'button1', function() {

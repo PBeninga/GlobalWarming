@@ -1,5 +1,6 @@
 var miscFunc = require('./MiscFunctions.js');
 
+var armySize = 10;
 // *********************************************
 // IMPORTANT - ARMY ONLY HOLDS IDS. DOES NOT HOLD OBJECTS
 // *********************************************
@@ -41,6 +42,13 @@ class Army{
    // TODO: In the future, we should use this function to update buff values
    updateBuff(buff) {
       this.buff = buff;
+   }
+
+   checkCollision(x, y) {
+      if(Math.sqrt(Math.pow((x-this.x),2) + Math.pow(y-this.y,2)) <= armySize) {
+         return true;
+      }
+      return false;
    }
 }
 
