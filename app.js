@@ -89,9 +89,10 @@ function onClientdisconnect(data) {
 
 function onLogin(data){
    var login = new lg.Login(this, this.id);
-   login.onLogin(data.data, processLogin); // ADAM & MAX I'M PASSING YOUR TODO CALLBACK FUNCTION TO ONLOGIN HERE
+   login.onLogin(data.data, processLogin);
 }
 
+// Currently username does nothing, player creation should be done here
 function processLogin(socket, username, status) {
 	socket.emit('login', {'loginStatus' : status});
 }
