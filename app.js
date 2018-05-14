@@ -92,6 +92,10 @@ function onLogin(data){
    login.onLogin(data.data, callback); // ADAM & MAX I'M PASSING YOUR TODO CALLBACK FUNCTION TO ONLOGIN HERE
 }
 
+function processLogin(socket, username, status) {
+	socket.emit('login', {'loginStatus' : status});
+}
+
 function onNewAccount(data){
    var login = new lg.Login(this, this.id);
    login.onNewAccount(data.data);
@@ -127,4 +131,3 @@ function removeGame(gameId){
     console.log("removing game "+ gameId);
     games.delete(gameId);
 }
-
