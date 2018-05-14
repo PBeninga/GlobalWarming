@@ -11,16 +11,11 @@ class Battle {
 	}
 
 	updatePlayers(loser) {
-		console.log("Removing " + loser.id + " from " + loser.player);
-		console.log("Checking " + loser.player + " against " + this.player1.id);
 		if(this.player1.id == loser.player) {
 			this.player1.removeArmy(loser.id);
-			console.log("Removed from player " + this.player1.id);
 		}
-		console.log("Checking " + loser.player + " against " + this.player2.id);
 		if(this.player2.id == loser.player) {
 			this.player2.removeArmy(loser.id);
-			console.log("Removed from player " + this.player2.id);
 		}
 	}
 
