@@ -3,7 +3,7 @@
 
 var gameObject = require('./Game.js');
 var mapObjects = require('./Map.js');
-var lg = require('./server/login.js');
+var lg = require('./server/dbAccess.js');
 
 
 //////////////
@@ -88,13 +88,13 @@ function onClientdisconnect(data) {
 }
 
 function onLogin(data){
-   var login = new lg.Login(this, this.id);
-   login.onLogin(data.data, callback); // ADAM & MAX I'M PASSING YOUR TODO CALLBACK FUNCTION TO ONLOGIN HERE
+   //var login = new lg.Login(this, this.id);
+   lg.onLogin(this, data.data, function(STUFF){console.log("Test callback - username: " + STUFF)}); // ADAM & MAX I'M PASSING YOUR TODO CALLBACK FUNCTION TO ONLOGIN HERE
 }
 
 function onNewAccount(data){
-   var login = new lg.Login(this, this.id);
-   login.onNewAccount(data.data);
+   //var login = new lg.Login(this, this.id);
+   lg.onNewAccount(this, data.data);
 }
 
 function onInputFired(data) {
