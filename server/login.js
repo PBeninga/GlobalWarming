@@ -9,11 +9,15 @@ class Login {
       socketId = id;
    }
 
-//if we pass onlogin a player object or callback, we can set the username inside this onLogin promise.
-   onLogin(data) { 
+//if we pass onlogin a callback, we can set the name of the player inside this onLogin promise.
+// callback creates the player object
+   onLogin(data, callback) { 
       db.compareHash('Player', data).then(function(isMatch) {
-         status = isMatch.toString()
+         status = isMatch.toString() // isMatch is a boolean
          playerSocket.emit('login', {'loginStatus' : status});
+         if (isMatch){
+            callback(data["username"]);
+         }
       });
    }
 
