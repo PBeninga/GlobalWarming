@@ -15,6 +15,25 @@ function createBaseButtons() {
   });
   loginButton = createButton(game, "Login", 'button1', canvas_width/2, canvas_height/2, 1, login);
   createAccountButton = createButton(game, "Create Account", 'button1', canvas_width/2, canvas_height/2 + 100, 1, createAccount);
+  chooseUnitButton = createButton(game, "Choose Unit", 'button1', canvas_width/2, canvas_height/2 + 200, 1, nextUnit);
+}
+
+var army;
+var chosenUnit = 0;
+function makeUnit(unit){
+   temp = game.add.sprite(canvas_width/2+100,canvas_height/2+200,'armies');
+   temp.animations.add('walk',[unit,unit+1,unit+2],1);
+   temp.scale.x = 4;
+   temp.scale.y = 4;
+   temp.animations.play('walk',3,'true');
+   return temp;
+}
+function nextUnit(){
+   army.destroy()
+   chosenUnit += 1;
+   unit = units[chosenUnit];
+   army = makeUnit(unit)
+   console.log(unit);
 }
 
 function destroyBaseButtons() {
@@ -203,7 +222,6 @@ mainmenu.prototype = {
     game.add.plugin(PhaserInput.Plugin);
     console.log("Reached main menu");
     game.stage.backgroundColor = 0xADD8E6;
-
     titleText = game.add.bitmapText((canvas_width/2) - 255, 100, 'carrier_command', 'Global Warming', 32);
 
     var MenuBorder = game.add.graphics();
@@ -218,6 +236,9 @@ mainmenu.prototype = {
 
     // start game
     createBaseButtons();
+    unit = units[chosenUnit];
+    army = makeUnit(unit);
+
     socket.on('login', processLogin);
     socket.on('new_account', processAccountCreation);
   }
