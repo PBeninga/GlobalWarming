@@ -5,7 +5,7 @@ var gameObject = require('./Game.js');
 var miscFunc = require('./MiscFunctions.js');
 var playerObject = require('./Player.js');
 var mapObjects = require('./Map.js');
-var lg = require('./server/login.js');
+var lg = require('./server/dbAccess.js');
 
 
 //////////////
@@ -114,8 +114,8 @@ function processLogin(socket, username, status, playerID) {
 }
 
 function onNewAccount(data){
-   var login = new lg.Login(this, this.id);
-   login.onNewAccount(data.data);
+   //var login = new lg.Login(this, this.id);
+   lg.onNewAccount(this, data.data);
 }
 
 function onInputFired(data) {
