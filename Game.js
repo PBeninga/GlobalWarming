@@ -186,7 +186,7 @@ class Game{
                if(j == i) {
                   continue;
                }
-               if(currentArmy.army.checkCollision(this.movingArmies[j].army)) {
+               if(currentArmy.army.checkCollision(this.movingArmies[j].army.x, this.movingArmies[j].army.y)) {
                   this.battles.push(new battleObject.Battle(
                      currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player),
                      this.movingArmies[j].army, this.playerPool.getPlayer(this.movingArmies[j].army.player),
