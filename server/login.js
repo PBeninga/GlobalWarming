@@ -14,7 +14,7 @@ class Login {
    onLogin(data, callback) {
       db.compareHash('Player', data).then(function(isMatch) {
          var status = isMatch.toString() // isMatch is a boolean
-         callback(playerSocket, data["username"], status);
+         callback(playerSocket, data["username"], status, socketId);
       });
    }
 

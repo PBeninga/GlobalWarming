@@ -390,12 +390,12 @@ function updateArmies(data){
 main.prototype = {
 	create: function () {
 		game.world.setBounds(-canvas_width*20, -canvas_height*20, canvas_width * 40, canvas_height * 40);
-        game.add.image(0, 0, 'background_img');
+      game.add.image(0, 0, 'background_img');
 		game.stage.backgroundColor = 0x68c1d1;
 		nodeGroup = game.add.group();
 		armyGroup = game.add.group();
 		game.world.bringToTop(armyGroup);
-        game.world.bringToTop(nodeGroup);
+      game.world.bringToTop(nodeGroup);
 		game.input.onUp.add(endSwipe);
 
                 march = game.add.audio('march')
@@ -418,7 +418,7 @@ main.prototype = {
 		*/
 
 		console.log("client started");
-                socket.emit("client_started",{});
+      socket.emit("client_started",{});
 		socket.on('connected', onsocketConnected);
 		socket.on('send_nodes', createNodes);
 	},
