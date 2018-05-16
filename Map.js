@@ -1,3 +1,4 @@
+var locationClass = require('./Location.js');
 //we use a factory incase we want to subclass specfic maps to have them do certain things
 class MapFactory{
    constructor(){
@@ -68,12 +69,11 @@ class MapNodeFactory{
       }
    }
 }
-class MapNode{
+class MapNode extends locationClass.Location{
    constructor(x,y,adj,id){
-      this.id = id;
       // Conversion from 100 pixel interval to 48 pixel interval
-      this.x = (x / 100) * 48;
-      this.y = (y / 100) * 48;
+      super((x / 100) * 48, (y / 100) * 48);
+      this.id = id;
       this.adj = adj;
       this.buff = null;
       this.army = null;

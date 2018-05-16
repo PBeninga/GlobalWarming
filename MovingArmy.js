@@ -1,3 +1,4 @@
+var locationObject = require('./Location.js');
 class MovingArmy {
 	constructor(army, swipeList, nodeList) {
 		this.army = army;
@@ -17,16 +18,14 @@ class MovingArmy {
 
 	// Initializes the angle, distance, percent, and movement per tick based on the current startIndex
 	initialize() {
-		var startX = this.swipeList[this.startIndex].x
-		var startY = this.swipeList[this.startIndex].y
-		var endX = this.swipeList[this.startIndex + 1].x
-		var endY = this.swipeList[this.startIndex + 1].y
-		this.angle = Math.atan2((endY-startY), (endX-startX));
-		this.distance = Math.sqrt(Math.pow((endX - startX),2) + Math.pow((endY - startY),2));
+		var start = new locationObject.Location(this.swipeList[this.startIndex].x, this.swipeList[this.startIndex].y);
+		var end = new locationObject.Location(this.swipeList[this.startIndex + 1].x, this.swipeList[this.startIndex + 1].y);
+		this.angle = start.angleTo(end.x, end.y);
+		this.distance = start.distance(end.x, end.y);
 		this.moveX = this.army.movementSpeed * Math.cos(this.angle);
 		this.moveY = this.army.movementSpeed * Math.sin(this.angle);
 
-		this.percent = Math.sqrt(Math.pow((this.army.x - startX),2) + Math.pow((this.army.y - startY),2)) / this.distance;
+		this.percent = start.distance(this.army.x, this.army.y) / this.distance;
 		this.percent *= 100;
 		this.movePercent = (this.army.movementSpeed / this.distance) * 100;
 	}
