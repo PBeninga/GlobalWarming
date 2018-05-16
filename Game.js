@@ -277,8 +277,14 @@ class Game{
 
       for(var i = this.battles.length - 1; i >= 0; i--) {
          if(!this.battles[i].tick()) {
+            var removedBattle = this.battles.splice(i, 1)[0];
+            if(removedBattle.moveArmy == 1) {
+               this.addInput(removedBattle.swipeList1, removedBattle.player1.id)
+            }
+            if(removedBattle.moveArmy == 2) {
+               this.addInput(removedBattle.swipeList2, removedBattle.player2.id)
+            }
             console.log("Removed a battle");
-            this.battles.splice(i, 1);
          }
       }
       for(var i = 0; i < this.playerPool.activePlayers.length; i++) {

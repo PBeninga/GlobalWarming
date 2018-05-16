@@ -1,15 +1,16 @@
 class Battle {
 	// Should be able to handle the players and nodes completely internally.
-	constructor(army1, player1, swipePath1, army2, player2, swipePath2, x, y, node) {
+	constructor(army1, player1, swipeList1, army2, player2, swipeList2, x, y, node) {
 		this.army1 = army1;
 		this.player1 = player1;
-		this.swipePath1 = swipePath1;
+		this.swipeList1 = swipeList1;
 		this.army2 = army2;
 		this.player2 = player2;
-		this.swipePath2 = swipePath2;
+		this.swipeList2 = swipeList2;
 		this.x = x;
 		this.y = y;
 		this.node = node; //Node can be null
+		this.moveArmy = false;
 	}
 
 	updateLoser(loser) {
@@ -67,6 +68,12 @@ class Battle {
 	end(winner, losers) {
 		if(winner != null) {
 			this.updateWinner(winner, losers[0]);
+			if(this.player1.id == winner.player && this.swipePath1 != null) {
+				this.moveArmy = 1;
+			}
+			if(this.player2.id == winner.player && this.swipePath2 != null) {
+				this.moveArmy = 2;
+			}
 		}
 		for(var i = 0; i < losers.length; i++) {
 			this.updateLoser(losers[i]);
