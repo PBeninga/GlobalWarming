@@ -156,6 +156,17 @@ function findGame(id){
 }
 
 function removeGame(gameId){
-    console.log("removing game "+ gameId);
-    games.delete(gameId);
+   console.log("removing game "+ gameId);
+	var currentGame = games.get(gameId);
+	for(var i = 0; i < currentGame.playerPool.activePlayers.length; i++) {
+		if(currentGame.playerPool.activePlayers[i].id != null) {
+			playersToGames.delete(currentGame.playerPool.activePlayers[i].id);
+		}
+	}
+	for(var i = 0; i < currentGame.playerPool.inactivePlayers.length; i++) {
+		if(currentGame.playerPool.inactivePlayers[i].id != null) {
+			playersToGames.delete(currentGame.playerPool.inactivePlayers[i].id);
+		}
+	}
+   games.delete(gameId);
 }

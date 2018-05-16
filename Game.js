@@ -265,7 +265,7 @@ class Game{
                winner = this.playerPool.activePlayers[i].id;
             }
          }
-         console.log()
+         console.log("Game has ended");
          this.gameSocket.emit("endGame",{winner:winner});
       }
    }

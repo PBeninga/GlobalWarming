@@ -21,10 +21,8 @@ var colorTaken = [];
 for(color of colors){
    colorTaken.push(false);
 }
-//var colors = [0xFF0000,	0xFF9F00, 0xF8FF00, 0x7AFF00,0x0000FF,0x8900FF, 0xFF00F6, 0x097B00, 0x980842];
-//var colorTaken = [false, false, false, false, false, false, false, false, false];
 var bannerGFX;
-//var leaveButton;
+var leaveButton;
 
 var march;
 
@@ -399,14 +397,14 @@ main.prototype = {
 		game.input.onUp.add(endSwipe);
 
                 march = game.add.audio('march')
-/*
+
 		leaveButton = game.add.button(game.camera.x + window.innerWidth, game.camera.y + window.innerHeight, 'button1', function() {
 			if(gameSocket != null) {
 				gameSocket.disconnect();
 			}
 			socket.disconnect();
 			removeAll();
-			game.state.start('mainmenu', true, false, socket);
+			game.state.start('mainmenu');
 		}, main, 2, 1, 0);
 		leaveButton.anchor.setTo(0.0, 0.0);
 		leaveButton.text = game.add.text(leaveButton.x, leaveButton.y, "Return to Main Menu", {
@@ -415,7 +413,6 @@ main.prototype = {
 			align: "center"
 		});
 		leaveButton.text.anchor.setTo(0.5, 0.5);
-		*/
 
 		console.log("client started");
       socket.emit("client_started",{});
@@ -451,12 +448,11 @@ main.prototype = {
 		{
 			game.camera.y += 10;
 		}
-/*
+
 		leaveButton.x = game.camera.x + window.innerWidth - leaveButton.width;
 		leaveButton.text.x = game.camera.x + window.innerWidth - (leaveButton.width / 2);
 		leaveButton.y = game.camera.y;
 		leaveButton.text.y = game.camera.y + (leaveButton.height / 2);
-		*/
 		// emit the player input
 	},
 
