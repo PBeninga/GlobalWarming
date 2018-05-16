@@ -26,7 +26,8 @@ class MovingArmy {
 		this.moveX = this.army.movementSpeed * Math.cos(this.angle);
 		this.moveY = this.army.movementSpeed * Math.sin(this.angle);
 
-		this.percent = 0;
+		this.percent = Math.sqrt(Math.pow((this.army.x - startX),2) + Math.pow((this.army.y - startY),2)) / this.distance;
+		this.percent *= 100;
 		this.movePercent = (this.army.movementSpeed / this.distance) * 100;
 	}
 

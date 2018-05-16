@@ -163,8 +163,8 @@ class Game{
                }
                else {
                   this.battles.push(new battleObject.Battle(
-                     currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player),
-                     currentNode.army, this.playerPool.getPlayer(currentNode.army.player),
+                     currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), null,
+                     currentNode.army, this.playerPool.getPlayer(currentNode.army.player), null,
                      currentArmy.army.x, currentArmy.army.y,
                      currentNode
                   ));
@@ -188,8 +188,8 @@ class Game{
                }
                if(currentArmy.army.checkCollision(this.movingArmies[j].army.x, this.movingArmies[j].army.y)) {
                   this.battles.push(new battleObject.Battle(
-                     currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player),
-                     this.movingArmies[j].army, this.playerPool.getPlayer(this.movingArmies[j].army.player),
+                     currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), currentArmy.swipeList.slice(currentArmy.startIndex),
+                     this.movingArmies[j].army, this.playerPool.getPlayer(this.movingArmies[j].army.player), this.movingArmies[j].swipeList.slice(this.movingArmies[j].startIndex),
                      currentArmy.army.x, currentArmy.army.y,
                      null
                   ));
