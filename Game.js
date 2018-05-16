@@ -136,7 +136,8 @@ class Game{
       if(this.gameState == STATE_RUNNING){
 
          this.incrementTroops(tickStartTime);
-         this.tickSLOP();
+         this.moveArmies();
+         this.checkCollisions();
          this.checkGameOver();
          this.garbageCollection();
       }
@@ -145,7 +146,7 @@ class Game{
       this.forceTickRate(tickStartTime); // Wait until min tick-time has passed
    }
 
-   tickSLOP(){
+   moveArmies(){
       // Move all the armies (Done backwards because of splicing within for loop)
       for(var i = this.movingArmies.length - 1; i >= 0; i--){
          var currentArmy = this.movingArmies[i];
@@ -179,33 +180,35 @@ class Game{
                this.map.nodes[finished.nodeList[finished.nodeList.length-1]].army = finished.army;
             }
          }
-         // If the army isn't done moving, check the list of crossing armies to see if they've met yet
-         else {
-            for(var j = 0; j < this.movingArmies.length; j++) {
-               //Not counting the army we're checking
-               if(j == i) {
-                  continue;
+      }
+   }
+
+   checkCollisions() {
+      for(var i = 0; i < this.movingArmies.length; i++) {
+         var currentArmy = this.movingArmies[i];
+         for(var j = 0; j < this.movingArmies.length; j++) {
+            //Not counting the army we're checking
+            if(j == i) {
+               continue;
+            }
+            if(currentArmy.army.checkCollision(this.movingArmies[j].army.x, this.movingArmies[j].army.y)) {
+               this.battles.push(new battleObject.Battle(
+                  currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), currentArmy.swipeList.slice(currentArmy.startIndex),
+                  this.movingArmies[j].army, this.playerPool.getPlayer(this.movingArmies[j].army.player), this.movingArmies[j].swipeList.slice(this.movingArmies[j].startIndex),
+                  currentArmy.army.x, currentArmy.army.y,
+                  null
+               ));
+               this.movingArmies.splice(i,1);
+               this.movingArmies.splice(j,1);
+               // Used to make sure that the for loop doesn't go out of whack
+               if(j < i) {
+                  i--;
                }
-               if(currentArmy.army.checkCollision(this.movingArmies[j].army.x, this.movingArmies[j].army.y)) {
-                  this.battles.push(new battleObject.Battle(
-                     currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), currentArmy.swipeList.slice(currentArmy.startIndex),
-                     this.movingArmies[j].army, this.playerPool.getPlayer(this.movingArmies[j].army.player), this.movingArmies[j].swipeList.slice(this.movingArmies[j].startIndex),
-                     currentArmy.army.x, currentArmy.army.y,
-                     null
-                  ));
-                  this.movingArmies.splice(i,1);
-                  this.movingArmies.splice(j,1);
-                  // Used to make sure that the for loop doesn't go out of whack
-                  if(j < i) {
-                     i--;
-                  }
-                  break;
-               }
+               break;
             }
          }
       }
    }
-
 
    /////////////////////////////
    // WAITING STATE TICK FUNCTIONS
