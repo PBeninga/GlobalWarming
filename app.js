@@ -2,6 +2,8 @@
 // Link other files
 
 var gameObject = require('./Game.js');
+var miscFunc = require('./MiscFunctions.js');
+var playerObject = require('./Player.js');
 var mapObjects = require('./Map.js');
 var lg = require('./server/dbAccess.js');
 
@@ -33,6 +35,7 @@ var io = require('socket.io')(serv,{});
 // Global varibales
 
 var playersToGames = new Map();
+var players = new Array();
 var games = new Map();
 
 
@@ -67,7 +70,12 @@ function onNewClient(){
 function onClientdisconnect(data) {
 
    console.log('disconnect');
-
+	for(var i = 0; i < players.length; i++) {
+		if(players[i].id == this.id) {
+			players.splice(i,1);
+			break;
+		}
+	}
    if(playersToGames.has(this.id)){
        playersToGames.get(this.id).removePlayer(this.id);
        // If the game has no players in it, we remove it.
@@ -88,8 +96,21 @@ function onClientdisconnect(data) {
 }
 
 function onLogin(data){
-   //var login = new lg.Login(this, this.id);
-   lg.onLogin(this, data.data, function(STUFF){console.log("Test callback - username: " + STUFF)}); // ADAM & MAX I'M PASSING YOUR TODO CALLBACK FUNCTION TO ONLOGIN HERE
+   var login = new lg.Login(this, this.id);
+   login.onLogin(data.data, processLogin);
+}
+
+// Currently username does nothing, player creation should be done here
+function processLogin(socket, username, status, playerID) {
+	console.log("Process Login: ");
+	console.log("	playerID: " + socket);
+	console.log("	Socket: " + socket);
+	console.log("	Username: " + username);
+	console.log("	Status: " + status);
+	if(status) {
+		players.push(new playerObject.Player(playerID, username));
+	}
+	socket.emit('login', {'loginStatus' : status});
 }
 
 function onNewAccount(data){
@@ -106,11 +127,22 @@ function onInputFired(data) {
 ///////////////////////////////////////////////////////////////////////////////
 // New Game
 function findGame(id){
+	//Get the player object from the player list
+	var player = null;
+	for(var i = 0; i < players.length; i++) {
+		if(players[i].id == id) {
+			player = players[i];
+		}
+	}
+	if(player == null) {
+		player = new playerObject.Player(id, "Guest" + miscFunc.generateID(10));
+		players.push(player);
+	}
 	gamesIter = games.values();
 	element = gamesIter.next();
 	while(!element.done){
 		game = element.value
-		if(!game.started && game.addPlayer(id)){
+		if(!game.started && game.addPlayer(player)){
 			console.log("returning a game");
 			return game;
 		}
@@ -119,7 +151,7 @@ function findGame(id){
 	//if there are no open games add the player.
 	game  = new gameObject.Game(removeGame, io);
 	games.set(game.roomid,game);  // Add the game to the map with key roomid
-	game.addPlayer(id);
+	game.addPlayer(player);
 	return game;
 }
 
@@ -127,4 +159,3 @@ function removeGame(gameId){
     console.log("removing game "+ gameId);
     games.delete(gameId);
 }
-

@@ -1,6 +1,6 @@
 var miscFunc = require('./MiscFunctions.js');
 
-var armySize = 10;
+var armySize = 30;
 // *********************************************
 // IMPORTANT - ARMY ONLY HOLDS IDS. DOES NOT HOLD OBJECTS
 // *********************************************

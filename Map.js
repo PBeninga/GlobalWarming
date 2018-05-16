@@ -14,7 +14,7 @@ class MapFactory{
       let num = Math.floor(Math.random() * this.mapNames.length)
       let mapString = this.mapNames[Math.floor(Math.random() * this.mapNames.length)];
       //this.map.readMap(mapString);
-      this.map.readMap("fourPlayer");  
+      this.map.readMap("fourPlayer");
     }
     return this.map
   }
@@ -27,6 +27,15 @@ class Map{
       this.buffer = [];
       //this.paths = [];
       //this.makeMap();
+   }
+
+   getStartingCastle() {
+      for(var i = 0; i < this.startingCastles.length; i++){
+         if(this.nodes[this.startingCastles[i]].army.player == null){
+            return this.nodes[this.startingCastles[i]];
+         }
+      }
+      return null;
    }
 
    readMap(mapName){
