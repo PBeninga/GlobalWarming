@@ -181,6 +181,27 @@ class Game{
          }
          // If the army isn't done moving, check the list of crossing armies to see if they've met yet
          else {
+            for(var j = 0; j < this.movingArmies.length; j++) {
+               //Not counting the army we're checking
+               if(j == i) {
+                  continue;
+               }
+               if(currentArmy.army.checkCollision(this.movingArmies[j].army)) {
+                  this.battles.push(new battleObject.Battle(
+                     currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player),
+                     this.movingArmies[j].army, this.playerPool.getPlayer(this.movingArmies[j].army.player),
+                     currentArmy.army.x, currentArmy.army.y,
+                     null
+                  ));
+                  this.movingArmies.splice(i,1);
+                  this.movingArmies.splice(j,1);
+                  // Used to make sure that the for loop doesn't go out of whack
+                  if(j < i) {
+                     i--;
+                  }
+                  break;
+               }
+            }
          }
       }
    }
