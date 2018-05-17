@@ -4,7 +4,7 @@ class Army {
     this.owner = owner;
     this.id = -1;
     //this.color = owner.color;
-    if(owner.color ==3 || owner.color == 420){
+    if(owner.id == socket.id){
        this.color = "0x0000FF";
     }else{
       this.color = "0xFF0000";

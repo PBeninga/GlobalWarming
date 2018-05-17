@@ -10,27 +10,29 @@ var mainmenu = function(game){};
 var username = 'guest';
 
 function createBaseButtons() {
-  startButton = createButton(game, "Game Start", 'button1', canvas_width/2, canvas_height/2 - 100, 1, function() {
+  startButton = createButton(game, "Game Start", 'button1', canvas_width*3/8, canvas_height/2 - 100, 1, function() {
     game.state.start('main', true, false, [socket,username]);
   });
-  loginButton = createButton(game, "Login", 'button1', canvas_width/2, canvas_height/2, 1, login);
-  createAccountButton = createButton(game, "Create Account", 'button1', canvas_width/2, canvas_height/2 + 100, 1, createAccount);
-  chooseUnitButton = createButton(game, "Choose Unit", 'button1', canvas_width/2, canvas_height/2 + 200, 1, nextUnit);
+  loginButton = createButton(game, "Login", 'button1', canvas_width*3/8, canvas_height/2, 1, login);
+  createAccountButton = createButton(game, "Create Account", 'button1', canvas_width*3/8, canvas_height/2 + 100, 1, createAccount);
+  chooseUnitButton = createButton(game, "Change Avatar", 'button1', canvas_width*3/8, canvas_height/2 + 200, 1, nextUnit);
 }
 
 var army;
 var chosenUnit = 0;
 function makeUnit(unit){
-   temp = game.add.sprite(canvas_width/2+100,canvas_height/2+200,'armies');
-   temp.animations.add('walk',[unit,unit+1,unit+2],1);
-   temp.scale.x = 4;
-   temp.scale.y = 4;
-   temp.animations.play('walk',3,'true');
+   temp = game.add.sprite(canvas_width/2+100,canvas_height/2,'armies');
+   temp.animations.add('walk',[unit,unit+1,unit+2],1,true);
+   temp.scale.setTo(1,1);
+   temp.animations.play('walk',3,true);
    return temp;
 }
 function nextUnit(){
    army.destroy()
    chosenUnit += 1;
+   if(chosenUnit >= units.length){
+      chosenUnit = 0;
+   }
    unit = units[chosenUnit];
    army = makeUnit(unit)
    console.log(unit);
