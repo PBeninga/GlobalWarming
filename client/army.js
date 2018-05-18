@@ -22,7 +22,7 @@ class Army {
       this.sprite = game.add.sprite(x, y, 'armies');
       this.unit = owner.color;
       // selected units are 3,6,12,15,18,21,432,435,438,441,444,447,450,453,456,459,462,465, 756,762,765,771,774,780
-      this.right = this.sprite.animations.add('right',[this.unit,this.unit +1 , this.unit +2],1);
+      this.right = this.sprite.animations.add('right',[this.unit,this.unit + 1, this.unit + 2],1);
       this.down = this.sprite.animations.add('down',[this.unit + 36,this.unit + 37,this.unit + 38],1);
       this.up = this.sprite.animations.add('up',[this.unit + 72,this.unit + 73,this.unit + 74],1);
       this.standing = this.sprite.animations.add('standing',[this.unit+36],1)
@@ -86,6 +86,7 @@ class Army {
     }
     if(clientNode != null){
        if(clientNode.castle){
+         this.sprite.scale.setTo(10,10);
          this.sprite.animations.play('castle',1,false);
        }else{
          this.sprite.animations.play('standing',1,false);

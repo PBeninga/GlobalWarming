@@ -5,7 +5,7 @@ var preloader = {
     // Load all assets.
     game.load.audio('march', 'client/assets/march.mp3');
     game.load.spritesheet('win', 'client/assets/win.png', 16, 16);
-    game.load.spritesheet('armies', 'client/assets/armies.png', 16, 16);
+    game.load.spritesheet('armies', 'client/assets/armies.png', 16, 16, -1, 0, 1);
     game.load.image('castle_img', 'client/assets/castle.png');
     game.load.image('node_img', 'client/assets/node.png');
     game.load.image('button1', 'client/assets/blue_button00.png');
