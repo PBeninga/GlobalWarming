@@ -15,15 +15,15 @@ function createBaseButtons() {
   });
   loginButton = createButton(game, "Login", 'button1', canvas_width*3/8, canvas_height/2, 1, login);
   createAccountButton = createButton(game, "Create Account", 'button1', canvas_width*3/8, canvas_height/2 + 100, 1, createAccount);
-  chooseUnitButton = createButton(game, "Change Avatar", 'button1', canvas_width*3/8, canvas_height/2 + 200, 1, nextUnit);
+  chooseUnitButton = createButton(game, "Change Avatar", 'button1', canvas_width/2+ 100, canvas_height/2 + 100, 1, nextUnit);
 }
 
 var army;
 var chosenUnit = 0;
 function makeUnit(unit){
-   temp = game.add.sprite(canvas_width/2+100,canvas_height/2,'armies');
-   temp.animations.add('walk',[unit,unit+1,unit+2],1,true);
-   temp.scale.setTo(1,1);
+   temp = game.add.sprite(canvas_width/2,canvas_height/2-100,'armies');
+   temp.animations.add('walk',[unit,unit+1,unit+2],true);
+   temp.scale.setTo(10,10);
    temp.animations.play('walk',3,true);
    return temp;
 }
