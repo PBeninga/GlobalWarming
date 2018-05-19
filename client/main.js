@@ -16,13 +16,11 @@ var nodeGroup = null;
 var armyGroup = null;
 
 // selected units are
-var colors = [6,12,15,18,21,432,435,438,441,444,447,450,453,456,459,462,465, 756,762,765,771,774,780]
-var colorTaken = [];
-for(color of colors){
-   colorTaken.push(false);
+var units = [6,12,15,18,21,432,435,438,441,444,447,450,453,456,459,462,465,756,762,765,771,774,780]
+var unitTaken = [];
+for(unit of units){
+   unitTaken.push(false);
 }
-//var colors = [0xFF0000,	0xFF9F00, 0xF8FF00, 0x7AFF00,0x0000FF,0x8900FF, 0xFF00F6, 0x097B00, 0x980842];
-//var colorTaken = [false, false, false, false, false, false, false, false, false];
 var bannerGFX;
 //var leaveButton;
 
@@ -142,14 +140,14 @@ function onRemovePlayer (data) {
 	}
 }
 
-// Removes the player from the players list and opens their color up for reassignment
+// Removes the player from the players list and opens their unit up for reassignment
 function removePlayer(id) {
 	if(!id) {
 		return false;
 	}
 	for(var i = 0; i < players.length; i++) {
 		if(players[i].id == id) {
-			clearColor(players[i].color);
+			clearUnit(players[i].unit);
 			players.splice(i, 1);
 			return true;
 		}
@@ -157,54 +155,54 @@ function removePlayer(id) {
 	return false;
 }
 
-// Adds a new player to the player list with the given id. Also gets a color from getColor.
+// Adds a new player to the player list with the given id. Also gets a unit from getUnit.
 function addNewPlayer(id) {
-	if(id == null) {
-		return DummyPlayer;
-	}
-	var newPlayer = findplayerbyid(id);
-	if(newPlayer.id != DummyPlayer.id) {
-		return newPlayer;
-	}
-	var color;
-	if(id == socket.id){
-           if(username == 'win'){
-              color = 420
-           }else{
-		color =  3;
-           }
-	}else{
-		color = getColor();
-	}
-	let player = new Player(id, color);
-	players.push(player);
-	return player;
+   if(id == null) {
+	return DummyPlayer;
+   }
+   var newPlayer = findplayerbyid(id);
+   if(newPlayer.id != DummyPlayer.id) {
+      return newPlayer;
+   }
+   var unit;
+   if(id == socket.id){   
+      if(username == 'win'){
+         unit = 420
+      }else{
+	 unit =  units[chosenUnit];    // WHERE SELECTED UNIT WILL GO
+         unitTaken[chosenUnit] = true
+      }
+   }else{
+      unit = getUnit();
+   }
+   let player = new Player(id, unit);
+   players.push(player);
+   return player;
 }
 
-// Called when a player exits. Allows their color to be used again.
-function clearColor(color) {
-	for(var i = 0; i < colors.length; i++) {
-		if(color == colors[i]) {
-			colorTaken[i] = false;
+// Called when a player exits. Allows their unit to be used again.
+function clearUnit(unit) {
+	for(var i = 0; i < units.length; i++) {
+		if(unit == units[i]) {
+			unitTaken[i] = false;
 		}
 	}
 }
 
-// Returns a color from the colors list, so long as it isn't taken.
-// If all colors are taken, it will return a black color.
-function getColor() {
-	var index = Math.floor(Math.random() * colors.length);
-	var loopBreaker = 0;
-	// Will iterate through all colours in the list. If none are available, you're gonna be black
-	while(colorTaken[index]) {
-		index++;
-		loopBreaker++;
-		if(loopBreaker > colors.length) {
-			return 0x000000;
-		}
-	}
-	colorTaken[index] = true;
-	return colors[index];
+// Returns a unit from the units list, so long as it isn't taken.
+// TODO: Loop through colors
+function getUnit() {
+   if(unitTaken.includes(false)){
+      console.log("To many players, assigning already used unit.");
+      return units[Math.floor(Math.random() * units.length)];
+   }
+   
+   var index = Math.floor(Math.random() * units.length);
+   while(unitTaken[index]) {
+      index++;
+   }
+   unitTaken[index] = true;
+   return units[index];
 }
 
 // Called when a user clicks on a node.

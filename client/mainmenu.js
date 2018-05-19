@@ -10,11 +10,32 @@ var mainmenu = function(game){};
 var username = 'guest';
 
 function createBaseButtons() {
-  startButton = createButton(game, "Game Start", 'button1', canvas_width/2, canvas_height/2 - 100, 1, function() {
+  startButton = createButton(game, "Game Start", 'button1', canvas_width*3/8, canvas_height/2 - 100, 1, function() {
     game.state.start('main', true, false, [socket,username]);
   });
-  loginButton = createButton(game, "Login", 'button1', canvas_width/2, canvas_height/2, 1, login);
-  createAccountButton = createButton(game, "Create Account", 'button1', canvas_width/2, canvas_height/2 + 100, 1, createAccount);
+  loginButton = createButton(game, "Login", 'button1', canvas_width*3/8, canvas_height/2, 1, login);
+  createAccountButton = createButton(game, "Create Account", 'button1', canvas_width*3/8, canvas_height/2 + 100, 1, createAccount);
+  chooseUnitButton = createButton(game, "Change Avatar", 'button1', canvas_width/2+ 100, canvas_height/2 + 100, 1, nextUnit);
+}
+
+var army;
+var chosenUnit = 0;
+function makeUnit(unit){
+   temp = game.add.sprite(canvas_width/2,canvas_height/2-100,'armies');
+   temp.animations.add('walk',[unit,unit+1,unit+2],true);
+   temp.scale.setTo(10,10);
+   temp.animations.play('walk',3,true);
+   return temp;
+}
+function nextUnit(){
+   army.destroy()
+   chosenUnit += 1;
+   if(chosenUnit >= units.length){
+      chosenUnit = 0;
+   }
+   unit = units[chosenUnit];
+   army = makeUnit(unit)
+   console.log(unit);
 }
 
 function destroyBaseButtons() {
@@ -203,7 +224,6 @@ mainmenu.prototype = {
     game.add.plugin(PhaserInput.Plugin);
     console.log("Reached main menu");
     game.stage.backgroundColor = 0xADD8E6;
-
     titleText = game.add.bitmapText((canvas_width/2) - 255, 100, 'carrier_command', 'Global Warming', 32);
 
     var MenuBorder = game.add.graphics();
@@ -218,6 +238,9 @@ mainmenu.prototype = {
 
     // start game
     createBaseButtons();
+    unit = units[chosenUnit];
+    army = makeUnit(unit);
+
     socket.on('login', processLogin);
     socket.on('new_account', processAccountCreation);
   }
