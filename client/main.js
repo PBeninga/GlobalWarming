@@ -418,15 +418,9 @@ main.prototype = {
 		armyGroup = game.add.group();
 		game.world.bringToTop(armyGroup);
       game.world.bringToTop(nodeGroup);
-<<<<<<< HEAD
-		game.input.onUp.add(endSwipe);       
+		game.input.onUp.add(endSwipe);
                 battle_music = game.add.audio('battle_music',.7,true);
                 march = game.add.audio('march');
-=======
-		game.input.onUp.add(endSwipe);
-
-/*
->>>>>>> parent of 00a7544... Added leavebutton
 		leaveButton = game.add.button(game.camera.x + window.innerWidth, game.camera.y + window.innerHeight, 'button1', function() {
 			if(gameSocket != null) {
 				gameSocket.disconnect();
