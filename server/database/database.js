@@ -16,7 +16,12 @@ var UserSchema = new Schema({
     password: { type: String, required: true },
     stats:      {
        gamesWon:   Number,
-       gamesLost:  Number
+       gamesLost:  Number,
+       castlesWon:  Number,
+       castlesLost:  Number,
+       battesWon:  Number,
+       batlesLost:  Number,
+       totalGameTime: Number 
     },
     friends: [{
        name: String,
@@ -155,8 +160,8 @@ class Database{
 
    insertMany(modelName, documents) {
       return new Promise((resolve,reject)=>{
-         for(i in documents) {
-            this.insertOne(modelName, documents[i]);
+         for (doc in documents) {
+            this.insertOne(modelName, doc);
          }
       });
    }

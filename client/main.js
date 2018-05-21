@@ -22,7 +22,7 @@ for(unit of units){
    unitTaken.push(false);
 }
 var bannerGFX;
-//var leaveButton;
+var leaveButton;
 
 var main = function(game){
 };
@@ -388,12 +388,12 @@ function updateArmies(data){
 main.prototype = {
 	create: function () {
 		game.world.setBounds(-canvas_width*20, -canvas_height*20, canvas_width * 40, canvas_height * 40);
-        game.add.image(0, 0, 'background_img');
+      game.add.image(0, 0, 'background_img');
 		game.stage.backgroundColor = 0x68c1d1;
 		nodeGroup = game.add.group();
 		armyGroup = game.add.group();
 		game.world.bringToTop(armyGroup);
-        game.world.bringToTop(nodeGroup);
+      game.world.bringToTop(nodeGroup);
 		game.input.onUp.add(endSwipe);
                 
 /*
@@ -403,7 +403,7 @@ main.prototype = {
 			}
 			socket.disconnect();
 			removeAll();
-			game.state.start('mainmenu', true, false, socket);
+			game.state.start('mainmenu');
 		}, main, 2, 1, 0);
 		leaveButton.anchor.setTo(0.0, 0.0);
 		leaveButton.text = game.add.text(leaveButton.x, leaveButton.y, "Return to Main Menu", {
@@ -412,10 +412,9 @@ main.prototype = {
 			align: "center"
 		});
 		leaveButton.text.anchor.setTo(0.5, 0.5);
-		*/
-
+*/
 		console.log("client started");
-                socket.emit("client_started",{});
+      socket.emit("client_started",{});
 		socket.on('connected', onsocketConnected);
 		socket.on('send_nodes', createNodes);
 	},
@@ -453,7 +452,7 @@ main.prototype = {
 		leaveButton.text.x = game.camera.x + window.innerWidth - (leaveButton.width / 2);
 		leaveButton.y = game.camera.y;
 		leaveButton.text.y = game.camera.y + (leaveButton.height / 2);
-		*/
+*/
 		// emit the player input
 	},
 

@@ -1,16 +1,19 @@
 class Battle {
 	// Should be able to handle the players and nodes completely internally.
-	constructor(army1, player1, army2, player2, x, y, node) {
+	constructor(army1, player1, swipeList1, army2, player2, swipeList2, x, y, node) {
 		this.army1 = army1;
 		this.player1 = player1;
+		this.swipeList1 = swipeList1;
 		this.army2 = army2;
 		this.player2 = player2;
+		this.swipeList2 = swipeList2;
 		this.x = x;
 		this.y = y;
 		this.node = node; //Node can be null
+		this.moveArmy = 0;
 	}
 
-	updatePlayers(loser) {
+	updateLoser(loser) {
 		if(this.player1.id == loser.player) {
 			this.player1.removeArmy(loser.id);
 		}
@@ -42,22 +45,39 @@ class Battle {
 	tick() {
 		this.attack();
 		if(this.army1.count <= 0 || this.army2.count <= 0) {
+			var losers = new Array();
 			// If both armies get destroyed
 			if(this.army1.count <= 0 && this.army2.count <= 0) {
-				this.updatePlayers(this.army1);
-				this.updatePlayers(this.army2);
+				losers.push(this.army1);
+				losers.push(this.army2);
+				this.end(null, losers);
 			}
 			if(this.army1.count <= 0) {
-				this.updateWinner(this.army2, this.army1);
-				this.updatePlayers(this.army1);
+				losers.push(this.army1);
+				this.end(this.army2, losers);
 			}
 			if(this.army2.count <= 0) {
-				this.updateWinner(this.army1, this.army2);
-				this.updatePlayers(this.army2);
+				losers.push(this.army2);
+				this.end(this.army1, losers);
 			}
 			return false;
 		}
 		return true;
+	}
+
+	end(winner, losers) {
+		if(winner != null) {
+			this.updateWinner(winner, losers[0]);
+			if(this.player1.id == winner.player && this.swipeList1 != null) {
+				this.moveArmy = 1;
+			}
+			if(this.player2.id == winner.player && this.swipeList2 != null) {
+				this.moveArmy = 2;
+			}
+		}
+		for(var i = 0; i < losers.length; i++) {
+			this.updateLoser(losers[i]);
+		}
 	}
 }
 

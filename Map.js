@@ -1,3 +1,4 @@
+var locationClass = require('./Location.js');
 //we use a factory incase we want to subclass specfic maps to have them do certain things
 class MapFactory{
    constructor(){
@@ -11,12 +12,12 @@ class MapFactory{
       this.map.readMap(specifier);
     }
     else{
-      let num = Math.floor(Math.random() * this.mapNames.length)
+      let num = Math.floor(Math.random() * this.mapNames.length);
       let mapString = this.mapNames[Math.floor(Math.random() * this.mapNames.length)];
       //this.map.readMap(mapString);
-      this.map.readMap("fourPlayer");  
+      this.map.readMap("twoByTwo");
     }
-    return this.map
+    return this.map;
   }
 }
 class Map{
@@ -27,6 +28,15 @@ class Map{
       this.buffer = [];
       //this.paths = [];
       //this.makeMap();
+   }
+
+   getStartingCastle() {
+      for(var i = 0; i < this.startingCastles.length; i++){
+         if(this.nodes[this.startingCastles[i]].army.player == null){
+            return this.nodes[this.startingCastles[i]];
+         }
+      }
+      return null;
    }
 
    readMap(mapName){
@@ -47,7 +57,15 @@ class Map{
          }
          this.nodes[i] = nodeFactory.getNode(type, tNode.x, tNode.y, tNode.adj, i);
       }
+   }
 
+   nodeToXY(moveNodes) {
+      var swipePath = new Array();
+      // converts the moveNodes list from nodeIds to x and y variables
+      for(var i = 0; i < moveNodes.length; i++) {
+         swipePath.push({x:this.nodes[moveNodes[i]].x, y:this.nodes[moveNodes[i]].y});
+      }
+      return swipePath;
    }
 }
 class MapNodeFactory{
@@ -59,12 +77,11 @@ class MapNodeFactory{
       }
    }
 }
-class MapNode{
+class MapNode extends locationClass.Location{
    constructor(x,y,adj,id){
-      this.id = id;
       // Conversion from 100 pixel interval to 48 pixel interval
-      this.x = (x / 100) * 48;
-      this.y = (y / 100) * 48;
+      super((x / 100) * 48, (y / 100) * 48);
+      this.id = id;
       this.adj = adj;
       this.buff = null;
       this.army = null;

@@ -1,16 +1,16 @@
 var miscFunc = require('./MiscFunctions.js');
+var locationClass = require('./Location.js');
 
-var armySize = 10;
+var armySize = 30;
 // *********************************************
 // IMPORTANT - ARMY ONLY HOLDS IDS. DOES NOT HOLD OBJECTS
 // *********************************************
-class Army{
+class Army extends locationClass.Location{
    constructor(player,count,node,x,y,buff) {
+      super(x, y);
       this.id = miscFunc.generateID(20);
       this.player = player.id;
       this.node = node;
-      this.x = x;
-      this.y = y;
       this.count = count;
       this.buff = buff;
 
@@ -45,7 +45,7 @@ class Army{
    }
 
    checkCollision(x, y) {
-      if(Math.sqrt(Math.pow((x-this.x),2) + Math.pow(y-this.y,2)) <= armySize) {
+      if(this.distance(x, y) <= armySize) {
          return true;
       }
       return false;

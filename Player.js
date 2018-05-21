@@ -24,22 +24,21 @@ class PlayerPool{
       return false;
    }
 
-   addPlayer(id) {
+   addPlayer(player) {
       for(var i = 0; i < this.activePlayers.length; i++) {
-         if(this.activePlayers[i].id == id) {
-            return null;
+         if(this.activePlayers[i].id == player.id) {
+            return this.activePlayers[i];
          }
       }
       for(var i = 0; i < this.inactivePlayers.length; i++) {
-         if(this.inactivePlayers[i].id == id) {
+         if(this.inactivePlayers[i].id == player.id) {
             var addedPlayer = this.inactivePlayers.splice(i, 1);
             this.activePlayers.push(addedPlayer);
             return addedPlayer;
          }
       }
-      var newPlayer = new Player(id);
-      this.activePlayers.push(newPlayer);
-      return newPlayer;
+      this.activePlayers.push(player);
+      return player;
    }
 
    getPlayer(id) {
@@ -64,9 +63,9 @@ class PlayerPool{
 }
 
 class Player{
-   constructor(id){
+   constructor(id, name){
       this.id = id;
-      this.name = null;
+      this.name = name;
       this.armies = [];
    }
 
@@ -82,15 +81,13 @@ class Player{
    }
 
    removeArmy(id) {
-      console.log("Called Remove Army");
       for(var i = 0; i < this.armies.length; i++){
          if(this.armies[i].id == id){
-            console.log("Removed " + id);
-            var removedArmy = this.armies.splice(i, 1);
+            console.log("Removed army with id " + id);
+            var removedArmy = this.armies.splice(i, 1)[0];
             return removedArmy;
          }
       }
-      console.log("Failed!");
       return null;
    }
 
@@ -121,6 +118,7 @@ class Player{
    }
 
    addArmy(count, node) {
+      console.log("Adding Army");
       var newArmy = new armyObject.Army(this, count, node.id, node.x, node.y, node.buff);
       this.armies.push(newArmy);
       return newArmy;
