@@ -400,6 +400,7 @@ main.prototype = {
 				gameSocket.disconnect();
 			}
 			socket.disconnect();
+			battle_music.pause();
 			game.state.start('mainmenu', true, false, socket);
 		}, main, 2, 1, 0);
 		leaveButton.anchor.setTo(0.0, 0.0);
