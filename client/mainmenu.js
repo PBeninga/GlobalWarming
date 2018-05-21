@@ -1,12 +1,13 @@
 var socket;
-var playerID;
+var playerID = createID();
 var playerSocket;
-var menuFlag;
+var menuFlag = 0;
 var titleText;
 var startButton;
 var loginButton;
 var createAccountButton;
 var mainmenu = function(game){};
+<<<<<<< HEAD
 var username;
 var menu_music;
 
@@ -15,6 +16,9 @@ function initializeValues() {
    playerID = createID();
    menuFlag = 0;
 }
+=======
+var username = 'guest';
+>>>>>>> parent of 00a7544... Added leavebutton
 
 function createBaseButtons() {
   startButton = createButton(game, "Game Start", 'button1', canvas_width*3/8, canvas_height/2 - 100, 1, function() {
@@ -227,8 +231,11 @@ function processAccountCreation(data) {
 
 mainmenu.prototype = {
  create: function(game) {
+<<<<<<< HEAD
     initializeValues();
     menu_music = game.add.audio('menu_music',.7,true);
+=======
+>>>>>>> parent of 00a7544... Added leavebutton
     socket = io.connect();
     game.add.plugin(PhaserInput.Plugin);
     console.log("Reached main menu");

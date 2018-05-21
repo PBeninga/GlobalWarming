@@ -2,21 +2,25 @@ var socket;
 var username;//socket = io.connect();
 var gameSocket;
 //the player list
-var players;
-var ClientPlayer;
-var DummyPlayer;
+var players = [];
+var ClientPlayer = null;
+var DummyPlayer = new Player(null, 0x000000);
+players.push(DummyPlayer);
 
-var nodes;
-var swipePath;
+var nodes = [];
+var swipePath = [];
 var gameId;
-var lines;
+var lines = [];
 // Used for image heirarchy in phaser
-var nodeGroup;
-var armyGroup;
+var nodeGroup = null;
+var armyGroup = null;
 
 // selected units are
-var units;
-var unitTaken;
+var units = [6,12,15,18,21,432,435,438,441,444,447,450,453,456,459,462,465,756,762,765,771,774,780]
+var unitTaken = [];
+for(unit of units){
+   unitTaken.push(false);
+}
 var bannerGFX;
 var bannerBox;
 var leaveButton;
@@ -26,6 +30,42 @@ var battle_music;
 
 var main = function(game){
 };
+
+// ONLY CALL IF YOU WANT TO DESTROY ALL OBJECTS IN MAIN
+function removeAll() {
+	if(bannerGFX != null)
+		bannerGFX.destroy();
+
+	// Removes all lines? Is this even necessary?
+	lines = [];
+	// Removes all Nodes and Paths
+	for(var i = 0; i < nodes.length; i++) {
+		for(var j = 0; j < nodes[i].paths.length; j++) {
+			if(nodes[i].paths[j].graphics != null) {
+				nodes[i].paths[j].graphics.destroy();
+			}
+		}
+		if(nodes[i].graphics != null) {
+			nodes[i].graphics.destroy();
+		}
+	}
+	// Removes all players and armies
+	if(players != null) {
+		for(var i = 0; i < players.length; i++) {
+			for(var j = 0; j < players[i].armies.length; j++) {
+				players[i].armies[j].destroyGraphics();
+			}
+		}
+	}
+	/*
+	if(leaveButton != null)
+		leaveButton.destroy();
+		*/
+	players = [];
+	ClientPlayer = null;
+	DummyPlayer = new Player(-1, 0x000000);
+	players.push(DummyPlayer);
+}
 
 function onsocketConnected (data) {
 	console.log("connected to server");
@@ -369,26 +409,8 @@ function updateArmies(data){
 	}
 }
 
-function initializeValues() {
-   players = [];
-   ClientPlayer = null;
-   DummyPlayer = new Player(null, 0x000000);
-   players.push(DummyPlayer);
-   nodes = [];
-   swipePath = [];
-   lines = [];
-   nodeGroup = null;
-   armyGroup = null;
-   units = [6,12,15,18,21,432,435,438,441,444,447,450,453,456,459,462,465,756,762,765,771,774,780]
-   unitTaken = [];
-   for(unit of units){
-      unitTaken.push(false);
-   }
-}
-
 main.prototype = {
 	create: function () {
-      initializeValues();
 		game.world.setBounds(-canvas_width*20, -canvas_height*20, canvas_width * 40, canvas_height * 40);
       game.add.image(0, 0, 'background_img');
 		game.stage.backgroundColor = 0x68c1d1;
@@ -396,15 +418,22 @@ main.prototype = {
 		armyGroup = game.add.group();
 		game.world.bringToTop(armyGroup);
       game.world.bringToTop(nodeGroup);
+<<<<<<< HEAD
 		game.input.onUp.add(endSwipe);       
                 battle_music = game.add.audio('battle_music',.7,true);
                 march = game.add.audio('march');
+=======
+		game.input.onUp.add(endSwipe);
+
+/*
+>>>>>>> parent of 00a7544... Added leavebutton
 		leaveButton = game.add.button(game.camera.x + window.innerWidth, game.camera.y + window.innerHeight, 'button1', function() {
 			if(gameSocket != null) {
 				gameSocket.disconnect();
 			}
 			socket.disconnect();
-			game.state.start('mainmenu', true, false, socket);
+			removeAll();
+			game.state.start('mainmenu');
 		}, main, 2, 1, 0);
 		leaveButton.anchor.setTo(0.0, 0.0);
 		leaveButton.text = game.add.text(leaveButton.x, leaveButton.y, "Return to Main Menu", {
@@ -413,6 +442,7 @@ main.prototype = {
 			align: "center"
 		});
 		leaveButton.text.anchor.setTo(0.5, 0.5);
+*/
 		console.log("client started");
       socket.emit("client_started",{});
 		socket.on('connected', onsocketConnected);
@@ -447,12 +477,12 @@ main.prototype = {
 		{
 			game.camera.y += 10;
 		}
-
+/*
 		leaveButton.x = game.camera.x + window.innerWidth - leaveButton.width;
 		leaveButton.text.x = game.camera.x + window.innerWidth - (leaveButton.width / 2);
 		leaveButton.y = game.camera.y;
 		leaveButton.text.y = game.camera.y + (leaveButton.height / 2);
-
+*/
 		// emit the player input
 	},
 
