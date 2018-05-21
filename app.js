@@ -120,7 +120,9 @@ function onNewAccount(data){
 
 function onInputFired(data) {
 	currentGame = games.get(data.game);
-	currentGame.addInput(data.nodes, this.id);
+	if(!(currentGame === undefined)){
+		currentGame.addInput(data.nodes, this.id);
+	}
 }
 
 
