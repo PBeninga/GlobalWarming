@@ -117,8 +117,7 @@ function processLogin(username, status, playerID, socket) {
 }
 
 function onNewAccount(data){
-   var login = new lg.Login(this, this.id);
-   login.onNewAccount(data.data);
+   lg.onNewAccount(this, data.data);
 }
 
 function onInputFired(data) {
