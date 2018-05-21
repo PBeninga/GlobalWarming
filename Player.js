@@ -1,4 +1,5 @@
 var armyObject = require('./Army.js');
+var db = require('./server/dbAccess.js');
 
 class PlayerPool{
    constructor() {
