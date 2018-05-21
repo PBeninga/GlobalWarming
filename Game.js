@@ -163,6 +163,7 @@ class Game{
                   this.movingArmies.splice(i,1);
                }
                else {
+                  console.log("Battle At Node");
                   this.battles.push(new battleObject.Battle(
                      currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), null,
                      currentNode.army, this.playerPool.getPlayer(currentNode.army.player), null,
@@ -193,13 +194,19 @@ class Game{
             }
             if(currentArmy.army.checkCollision(this.movingArmies[j].army.x, this.movingArmies[j].army.y)) {
                this.battles.push(new battleObject.Battle(
-                  currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), currentArmy.swipeList.slice(currentArmy.startIndex),
-                  this.movingArmies[j].army, this.playerPool.getPlayer(this.movingArmies[j].army.player), this.movingArmies[j].swipeList.slice(this.movingArmies[j].startIndex),
+                  currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), currentArmy.nodeList.slice(currentArmy.startIndex),
+                  this.movingArmies[j].army, this.playerPool.getPlayer(this.movingArmies[j].army.player), this.movingArmies[j].nodeList.slice(this.movingArmies[j].startIndex),
                   currentArmy.army.x, currentArmy.army.y,
                   null
                ));
-               this.movingArmies.splice(i,1);
-               this.movingArmies.splice(j,1);
+               if(i < j) {
+                  this.movingArmies.splice(j,1);
+                  this.movingArmies.splice(i,1);
+               }
+               else {
+                  this.movingArmies.splice(i,1);
+                  this.movingArmies.splice(j,1);
+               }
                // Used to make sure that the for loop doesn't go out of whack
                if(j < i) {
                   i--;
@@ -276,7 +283,7 @@ class Game{
       // From their respective arrays
 
       for(var i = this.battles.length - 1; i >= 0; i--) {
-         if(!this.battles[i].tick()) {
+         if(!(this.battles[i].tick())) {
             var removedBattle = this.battles.splice(i, 1)[0];
             if(removedBattle.moveArmy == 1) {
                this.addInput(removedBattle.swipeList1, removedBattle.player1.id)

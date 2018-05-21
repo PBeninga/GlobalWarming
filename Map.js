@@ -12,12 +12,12 @@ class MapFactory{
       this.map.readMap(specifier);
     }
     else{
-      let num = Math.floor(Math.random() * this.mapNames.length)
+      let num = Math.floor(Math.random() * this.mapNames.length);
       let mapString = this.mapNames[Math.floor(Math.random() * this.mapNames.length)];
       //this.map.readMap(mapString);
       this.map.readMap("fourPlayer");
     }
-    return this.map
+    return this.map;
   }
 }
 class Map{

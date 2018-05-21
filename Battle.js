@@ -10,7 +10,7 @@ class Battle {
 		this.x = x;
 		this.y = y;
 		this.node = node; //Node can be null
-		this.moveArmy = false;
+		this.moveArmy = 0;
 	}
 
 	updateLoser(loser) {
@@ -68,10 +68,10 @@ class Battle {
 	end(winner, losers) {
 		if(winner != null) {
 			this.updateWinner(winner, losers[0]);
-			if(this.player1.id == winner.player && this.swipePath1 != null) {
+			if(this.player1.id == winner.player && this.swipeList1 != null) {
 				this.moveArmy = 1;
 			}
-			if(this.player2.id == winner.player && this.swipePath2 != null) {
+			if(this.player2.id == winner.player && this.swipeList2 != null) {
 				this.moveArmy = 2;
 			}
 		}
