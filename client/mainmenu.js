@@ -1,13 +1,19 @@
 var socket;
-var playerID = createID();
+var playerID;
 var playerSocket;
-var menuFlag = 0;
+var menuFlag;
 var titleText;
 var startButton;
 var loginButton;
 var createAccountButton;
 var mainmenu = function(game){};
-var username = 'guest';
+var username;
+
+function initializeValues() {
+   username = 'guest';
+   playerID = createID();
+   menuFlag = 0;
+}
 
 function createBaseButtons() {
   startButton = createButton(game, "Game Start", 'button1', canvas_width*3/8, canvas_height/2 - 100, 1, function() {
@@ -228,6 +234,7 @@ function processAccountCreation(data) {
 
 mainmenu.prototype = {
  create: function(game) {
+    initializeValues();
     socket = io.connect();
     game.add.plugin(PhaserInput.Plugin);
     console.log("Reached main menu");
