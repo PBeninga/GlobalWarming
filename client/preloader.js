@@ -3,6 +3,8 @@ var preloader = {
     // Add a loading label
 
     // Load all assets.
+    game.load.audio('menu_music', 'client/assets/menu_music.mp3');
+    game.load.audio('battle_music', 'client/assets/battle_music.mp3');
     game.load.audio('march', 'client/assets/march.mp3');
     game.load.spritesheet('win', 'client/assets/win.png', 16, 16);
     game.load.spritesheet('armies', 'client/assets/armies.png', 16, 16, -1, 0, 1);

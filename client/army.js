@@ -19,8 +19,8 @@ class Army {
        this.up = this.sprite.animations.add('up',[3],1);
       this.castle = this.sprite.animations.add('castle',[5],1);
     }else{
-      this.sprite = game.add.sprite(x, y, 'armies');
       this.unit = owner.color;
+      this.sprite = game.add.sprite(x, y, 'armies',this.unit);
       // selected units are 3,6,12,15,18,21,432,435,438,441,444,447,450,453,456,459,462,465, 756,762,765,771,774,780
       this.right = this.sprite.animations.add('right',[this.unit,this.unit + 1, this.unit + 2],1);
       this.down = this.sprite.animations.add('down',[this.unit + 36,this.unit + 37,this.unit + 38],1);
@@ -43,7 +43,7 @@ class Army {
       fill: this.color,
       align: "right"
     });
-    this.countGraphics.anchor.setTo(1.5, 1.5);
+    this.countGraphics.anchor.setTo(1.5, -1.25);
   }
 
   // Destroys all graphics associated with this object
@@ -86,7 +86,7 @@ class Army {
     }
     if(clientNode != null){
        if(clientNode.castle){
-         this.sprite.scale.setTo(10,10);
+         this.graphics.scale.setTo(2,1.5);
          this.sprite.animations.play('castle',1,false);
        }else{
          this.sprite.animations.play('standing',1,false);

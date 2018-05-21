@@ -8,6 +8,7 @@ var loginButton;
 var createAccountButton;
 var mainmenu = function(game){};
 var username = 'guest';
+var menu_music;
 
 function createBaseButtons() {
   startButton = createButton(game, "Game Start", 'button1', canvas_width*3/8, canvas_height/2 - 100, 1, function() {
@@ -220,6 +221,7 @@ function processAccountCreation(data) {
 
 mainmenu.prototype = {
  create: function(game) {
+    menu_music = game.add.audio('menu_music',.7,true);
     socket = io.connect();
     game.add.plugin(PhaserInput.Plugin);
     console.log("Reached main menu");
@@ -237,10 +239,15 @@ mainmenu.prototype = {
 
 
     // start game
-    createBaseButtons();
-    unit = units[chosenUnit];
-    army = makeUnit(unit);
 
+    enterButton = createButton(game, "Enter Game", 'button1', canvas_width/2, canvas_height/2, 1, function() {
+       createBaseButtons();
+       unit = units[chosenUnit];
+       army = makeUnit(unit);
+       menu_music.play();
+       enterButton.text.destroy();
+       enterButton.destroy();
+    });
     socket.on('login', processLogin);
     socket.on('new_account', processAccountCreation);
   }
