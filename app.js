@@ -144,7 +144,7 @@ function findGame(id){
 	element = gamesIter.next();
 	while(!element.done){
 		game = element.value
-		if(!game.started && game.addPlayer(player)){
+		if(!(game.gameState > 1) && game.addPlayer(player)){
 			console.log("returning a game");
 			return game;
 		}
