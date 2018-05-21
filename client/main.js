@@ -25,6 +25,7 @@ var bannerGFX;
 //var leaveButton;
 
 var march;
+var battle_music;
 
 var main = function(game){
 };
@@ -71,7 +72,6 @@ function onsocketConnected (data) {
 	gameId = data.game
 	console.log(gameId);
 	gameSocket = io(gameId);
-
 	gameSocket.on('update_armies', updateArmies);
 	gameSocket.on('remove_player', onRemovePlayer);
 	gameSocket.on('endGame',endGame);
@@ -94,6 +94,7 @@ function onStart(){
 			fill: "#FFFFFF",
 			align: "center"
 		  });
+                battle_music.play();
 		setTimeout(function(){bannerGFX.destroy();}, 5000);
 }
 function onUpdateTime(data){
@@ -173,6 +174,8 @@ function addNewPlayer(id) {
          unitTaken[chosenUnit] = true
       }
    }else{
+
+      menu_music.stop();
       unit = getUnit();
    }
    let player = new Player(id, unit);
@@ -395,8 +398,9 @@ main.prototype = {
 		game.world.bringToTop(armyGroup);
         game.world.bringToTop(nodeGroup);
 		game.input.onUp.add(endSwipe);
-
-                march = game.add.audio('march')
+                
+                battle_music = game.add.audio('battle_music',.7,true);
+                march = game.add.audio('march');
 /*
 		leaveButton = game.add.button(game.camera.x + window.innerWidth, game.camera.y + window.innerHeight, 'button1', function() {
 			if(gameSocket != null) {
