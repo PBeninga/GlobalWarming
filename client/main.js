@@ -24,6 +24,9 @@ for(unit of units){
 var bannerGFX;
 var leaveButton;
 
+var march;
+var battle_music;
+
 var main = function(game){
 };
 
@@ -172,7 +175,7 @@ function addNewPlayer(id) {
       }
    }else{
 
-      menu_music.pause();
+      menu_music.stop();
       unit = getUnit();
    }
    let player = new Player(id, unit);
@@ -240,8 +243,8 @@ function endSwipe() {
             swipeNodes.push(node.id);
          }
 	 console.log("emitting: "+ swipeNodes);
-	 march.play();
-         socket.emit('input_fired', {game:gameId, nodes: swipeNodes});
+         march.play();
+	 socket.emit('input_fired', {game:gameId, nodes: swipeNodes});
 	} else {
 	    console.log("swipe failed");
 	}
@@ -396,6 +399,8 @@ main.prototype = {
       game.world.bringToTop(nodeGroup);
 		game.input.onUp.add(endSwipe);
                 
+                battle_music = game.add.audio('battle_music',.7,true);
+                march = game.add.audio('march');
 /*
 		leaveButton = game.add.button(game.camera.x + window.innerWidth, game.camera.y + window.innerHeight, 'button1', function() {
 			if(gameSocket != null) {
