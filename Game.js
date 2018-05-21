@@ -182,8 +182,8 @@ class Game{
       for(var i = 0; i < this.movingArmies.length; i++) {
          var currentArmy = this.movingArmies[i];
          for(var j = 0; j < this.movingArmies.length; j++) {
-            //Not counting the army we're checking or armies owned by the player
-            if(j == i || this.movingArmies[j].army.player == currentArmy.player) {
+            //Not counting the army we're checking
+            if(j == i) {
                continue;
             }
             if(currentArmy.army.checkCollision(this.movingArmies[j].army.x, this.movingArmies[j].army.y)) {

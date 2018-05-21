@@ -1,3 +1,12 @@
+
+function getSound(sound,volume,loop) {		
+		var tempSound = document.createElement("audio");
+		tempSound.setAttribute("src", sound);
+		tempSound.volume = volume;
+		tempSound.loop = loop;
+                return tempSound;
+}
+
 var boot = {
 
   create: function() {
@@ -20,3 +29,4 @@ var boot = {
       game.state.start('preloader');
   }
 }
+

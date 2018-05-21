@@ -117,7 +117,8 @@ function processLogin(username, status, playerID, socket) {
 }
 
 function onNewAccount(data){
-   lg.onNewAccount(this, data.data);
+   var login = new lg.Login(this, this.id);
+   login.onNewAccount(data.data);
 }
 
 function onInputFired(data) {
@@ -144,7 +145,7 @@ function findGame(id){
 	element = gamesIter.next();
 	while(!element.done){
 		game = element.value
-		if(!(game.gameState > 1) && game.addPlayer(player)){
+		if(!game.started && game.addPlayer(player)){
 			console.log("returning a game");
 			return game;
 		}
