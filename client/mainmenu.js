@@ -8,10 +8,10 @@ var loginButton;
 var createAccountButton;
 var mainmenu = function(game){};
 var username = 'guest';
-var menu_music;
 
 function createBaseButtons() {
   startButton = createButton(game, "Game Start", 'button1', canvas_width*3/8, canvas_height/2 - 100, 1, function() {
+    boop.play();
     game.state.start('main', true, false, [socket,username]);
   });
   loginButton = createButton(game, "Login", 'button1', canvas_width*3/8, canvas_height/2, 1, login);
@@ -29,6 +29,7 @@ function makeUnit(unit){
    return temp;
 }
 function nextUnit(){
+   boop.play();
    army.destroy()
    chosenUnit += 1;
    if(chosenUnit >= units.length){
@@ -60,6 +61,7 @@ function createButton(game, string, ident, x, y, scale, callback) {
 }
 
 function createAccount() {
+   boop.play();
    if(menuFlag == 1) return;
    menuFlag = 1;
    destroyBaseButtons();
@@ -106,6 +108,7 @@ function createAccount() {
 
    var login;
    var cancel = createButton(game, "Cancel", 'button1', maxLeft + 250, maxTop + 350, 1, function() {
+      boop.play();
       AccountBorder.destroy();
       password.destroy();
       userName.destroy();
@@ -119,6 +122,7 @@ function createAccount() {
 
 
    login = createButton(game, "Make Account", 'button1', maxLeft + 250, maxTop + 280, 1, function() {
+      boop.play();
       AccountBorder.destroy();
       password.destroy();
       userName.destroy();
@@ -134,6 +138,7 @@ function createAccount() {
 }
 
 function login() {
+   boop.play();
    if(menuFlag == 1) return;
    menuFlag = 1;
    destroyBaseButtons();
@@ -180,6 +185,7 @@ function login() {
 
   var login;
   var cancel = createButton(game, "Cancel", 'button1', maxLeft + 250, maxTop + 350, 1, function() {
+    boop.play();
     LoginBorder.destroy();
     password.destroy();
     userName.destroy();
@@ -193,6 +199,7 @@ function login() {
 
 
   login = createButton(game, "Login", 'button1', maxLeft + 250, maxTop + 280, 1, function() {
+    boop.play();
     username = userName.value;
     LoginBorder.destroy();
     password.destroy();
@@ -221,7 +228,6 @@ function processAccountCreation(data) {
 
 mainmenu.prototype = {
  create: function(game) {
-    menu_music = game.add.audio('menu_music',.7,true);
     socket = io.connect();
     game.add.plugin(PhaserInput.Plugin);
     console.log("Reached main menu");
@@ -237,10 +243,8 @@ mainmenu.prototype = {
     // centering
     MenuBorder.drawRect((canvas_width/2)-(backWidth/2), (canvas_height/2)-(backHeight/2), backWidth, backHeight);
 
-
-    // start game
-
-    enterButton = createButton(game, "Enter Game", 'button1', canvas_width/2, canvas_height/2, 1, function() {
+    enterButton = createButton(game, "Start", 'button1', canvas_width/2, canvas_height/2, 1, function() {
+       boop.play();
        createBaseButtons();
        unit = units[chosenUnit];
        army = makeUnit(unit);
@@ -248,6 +252,7 @@ mainmenu.prototype = {
        enterButton.text.destroy();
        enterButton.destroy();
     });
+    // start game
     socket.on('login', processLogin);
     socket.on('new_account', processAccountCreation);
   }
