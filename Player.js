@@ -83,8 +83,8 @@ class Player{
    removeArmy(id) {
       for(var i = 0; i < this.armies.length; i++){
          if(this.armies[i].id == id){
-            console.log("Removed " + id);
-            var removedArmy = this.armies.splice(i, 1);
+            console.log("Removed army with id " + id);
+            var removedArmy = this.armies.splice(i, 1)[0];
             return removedArmy;
          }
       }
@@ -118,6 +118,7 @@ class Player{
    }
 
    addArmy(count, node) {
+      console.log("Adding Army");
       var newArmy = new armyObject.Army(this, count, node.id, node.x, node.y, node.buff);
       this.armies.push(newArmy);
       return newArmy;

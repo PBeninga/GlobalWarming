@@ -51,12 +51,6 @@ class Game{
          this.map.nodes[moveNodes[0]].army.count > 0 && //the start node's army has enough troops
          this.map.nodes[moveNodes[0]].army.player == id && //the start node's army is equal to the sending sockets id
          this.gameState == STATE_RUNNING){
-
-         var swipePath = new Array();
-         // converts the moveNodes list from nodeIds to x and y variables
-         for(var i = 0; i < moveNodes.length; i++) {
-            swipePath.push({x:this.map.nodes[moveNodes[i]].x, y:this.map.nodes[moveNodes[i]].y});
-         }
          // Gets the army to be moved, and removes it from its node if necessary
          var player = this.playerPool.getPlayer(id);
          var currentPlayerArmyListLength = player.armies.length;
@@ -64,7 +58,7 @@ class Game{
          if(currentPlayerArmyListLength == player.armies.length) {
             this.map.nodes[moveNodes[0]].army = null;
          }
-         this.movingArmies.push(new movingArmyObject.MovingArmy(movingArmy, swipePath, moveNodes));
+         this.movingArmies.push(new movingArmyObject.MovingArmy(movingArmy, this.map.nodeToXY(moveNodes), moveNodes));
       }
    }
 
@@ -286,10 +280,10 @@ class Game{
          if(!(this.battles[i].tick())) {
             var removedBattle = this.battles.splice(i, 1)[0];
             if(removedBattle.moveArmy == 1) {
-               this.addInput(removedBattle.swipeList1, removedBattle.player1.id)
+               this.movingArmies.push(new movingArmyObject.MovingArmy(removedBattle.army1, this.map.nodeToXY(removedBattle.swipeList1), removedBattle.swipeList1));
             }
             if(removedBattle.moveArmy == 2) {
-               this.addInput(removedBattle.swipeList2, removedBattle.player2.id)
+               this.movingArmies.push(new movingArmyObject.MovingArmy(removedBattle.army2, this.map.nodeToXY(removedBattle.swipeList2), removedBattle.swipeList2));
             }
             console.log("Removed a battle");
          }

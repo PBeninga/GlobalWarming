@@ -15,7 +15,7 @@ class MapFactory{
       let num = Math.floor(Math.random() * this.mapNames.length);
       let mapString = this.mapNames[Math.floor(Math.random() * this.mapNames.length)];
       //this.map.readMap(mapString);
-      this.map.readMap("fourPlayer");
+      this.map.readMap("twoByTwo");
     }
     return this.map;
   }
@@ -57,7 +57,15 @@ class Map{
          }
          this.nodes[i] = nodeFactory.getNode(type, tNode.x, tNode.y, tNode.adj, i);
       }
+   }
 
+   nodeToXY(moveNodes) {
+      var swipePath = new Array();
+      // converts the moveNodes list from nodeIds to x and y variables
+      for(var i = 0; i < moveNodes.length; i++) {
+         swipePath.push({x:this.nodes[moveNodes[i]].x, y:this.nodes[moveNodes[i]].y});
+      }
+      return swipePath;
    }
 }
 class MapNodeFactory{
