@@ -128,7 +128,7 @@ class Game{
       }
 
       if(this.gameState == STATE_RUNNING){
-
+         this.gameSocket.emit('players', {players:this.playerPool.activePlayers});
          this.incrementTroops(tickStartTime);
          this.moveArmies();
          this.checkCollisions();
@@ -183,7 +183,7 @@ class Game{
          var currentArmy = this.movingArmies[i];
          for(var j = 0; j < this.movingArmies.length; j++) {
             //Not counting the army we're checking
-            if(j == i) {
+            if(this.movingArmies[j].army.player == currentArmy.army.player) {
                continue;
             }
             if(currentArmy.army.checkCollision(this.movingArmies[j].army.x, this.movingArmies[j].army.y)) {

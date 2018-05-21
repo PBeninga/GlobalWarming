@@ -1,11 +1,16 @@
+var menu_music;
+var march;
+var battle_music;
+
 var preloader = {
   preload: function() {
     // Add a loading label
 
     // Load all assets.
-    game.load.audio('menu_music', 'client/assets/menu_music.mp3');
-    game.load.audio('battle_music', 'client/assets/battle_music.mp3');
-    game.load.audio('march', 'client/assets/march.mp3');
+    boop = getSound('/client/assets/boop.mp3',.9,false);
+    menu_music = getSound('/client/assets/menu_music.mp3',.6,true);
+    battle_music = getSound('/client/assets/battle_music.mp3',.5,true);
+    march = getSound('/client/assets/march.mp3',1,false);
     game.load.spritesheet('win', 'client/assets/win.png', 16, 16);
     game.load.spritesheet('armies', 'client/assets/armies.png', 16, 16, -1, 0, 1);
     game.load.image('castle_img', 'client/assets/castle.png');
