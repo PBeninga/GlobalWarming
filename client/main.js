@@ -137,7 +137,7 @@ function removePlayer(id) {
 // Adds a new player to the player list with the given id. Also gets a unit from getUnit.
 function addNewPlayer(id) {
    if(id == null) {
-	return DummyPlayer;
+		return DummyPlayer;
    }
    var newPlayer = findplayerbyid(id);
    if(newPlayer.id != DummyPlayer.id) {
@@ -147,12 +147,11 @@ function addNewPlayer(id) {
    if(id == socket.id){
       if(username == 'win'){
          unit = 420
-      }else{
-	 unit =  units[chosenUnit];    // WHERE SELECTED UNIT WILL GO
+      } else{
+			unit = units[chosenUnit];    // WHERE SELECTED UNIT WILL GO
          unitTaken[chosenUnit] = true
       }
-   }else{
-
+   } else{
       menu_music.pause();
       unit = getUnit();
    }
@@ -216,15 +215,15 @@ function mouseOver() {
 // Emits an 'input_fired' if the swipe has two or more nodes in it, otherwise it discards the swipe.
 function endSwipe() {
 	if(swipePath.length > 1 && !swipePath.includes(null)){
-         var swipeNodes = [];
-         for(node of swipePath){
-            swipeNodes.push(node.id);
-         }
-	 console.log("emitting: "+ swipeNodes);
-	 march.play();
-         socket.emit('input_fired', {game:gameId, nodes: swipeNodes});
+      var swipeNodes = [];
+      for(node of swipePath){
+         swipeNodes.push(node.id);
+      }
+	console.log("emitting: "+ swipeNodes);
+	march.play();
+      socket.emit('input_fired', {game:gameId, nodes: swipeNodes});
 	} else {
-	    console.log("swipe failed");
+		console.log("swipe failed");
 	}
 	lines = [];
 	swipePath = [];
@@ -273,18 +272,18 @@ function findnodebyloc (x, y) {
 
 // Called when the map is originated. Creates all the nodes with the data from the server.
 function createNodes(data) {
-        console.log(data);
+	console.log(data);
 	for (var i = 0; i < data.nodes.length; i++) {
 		// Creates a node from the data given and sets the callbacks for the node.
 		node_data = data.nodes[i];
-                var castle = false;
+      var castle = false;
 		if(node_data.buff == 'castle'){
-                  castle = true;
-                }
-                let newNode = new MapNode(node_data.id, node_data.x, node_data.y,castle);
-	        nodeGroup.add(newNode.graphics);
-	        newNode.graphics.inputEnabled = true;
-	        newNode.graphics.events.onInputOver.add(mouseOver, {node: newNode});
+         castle = true;
+      }
+      let newNode = new MapNode(node_data.id, node_data.x, node_data.y,castle);
+		nodeGroup.add(newNode.graphics);
+		newNode.graphics.inputEnabled = true;
+		newNode.graphics.events.onInputOver.add(mouseOver, {node: newNode});
 		// Pushes the node into the node buffer and displays it.
 		nodes.push(newNode);
 	}
@@ -318,7 +317,7 @@ function createNodes(data) {
 		font: "70px Arial",
 		fill: "#FFFFFF",
 		align: "center"
-		});
+	});
 }
 
 // Called every tick
