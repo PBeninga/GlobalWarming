@@ -22,6 +22,7 @@ for(unit of units){
    unitTaken.push(false);
 }
 var bannerGFX;
+var bannerBox;
 var leaveButton;
 
 var main = function(game){
@@ -70,6 +71,7 @@ function onsocketConnected (data) {
 	console.log(gameId);
 	gameSocket = io(gameId);
 	gameSocket.on('update_armies', updateArmies);
+   gameSocket.on('players', displayPlayers);
 	gameSocket.on('remove_player', onRemovePlayer);
 	gameSocket.on('endGame',endGame);
 	gameSocket.on('newPlayer', onNewPlayer);
@@ -130,6 +132,25 @@ function displayWin(){
 		align: "center"
 	  });
 }
+
+function displayPlayers(players) {
+   bannerGFX.destroy();
+   playerString = "";
+   plays = players.players;
+   for(var i = 1; i < plays.length; i++) {
+      name = plays[i]['name'];
+      if(!name) {
+         name = 'guest';
+      }
+      playerString = playerString.concat(plays[i]['name'], '\n');
+   }
+   console.log(playerString);
+   bannerGFX = game.add.text(game.camera.x, game.camera.y, playerString, {
+      font: "28px Arial",
+      fill: "#FFFFFF",
+      align: "left"
+   });
+}
 // When the server notifies us of client disconnection, we find the disconnected
 // enemy and remove from our game
 function onRemovePlayer (data) {
@@ -163,7 +184,7 @@ function addNewPlayer(id) {
       return newPlayer;
    }
    var unit;
-   if(id == socket.id){   
+   if(id == socket.id){
       if(username == 'win'){
          unit = 420
       }else{
@@ -196,7 +217,7 @@ function getUnit() {
       console.log("To many players, assigning already used unit.");
       return units[Math.floor(Math.random() * units.length)];
    }
-   
+
    var index = Math.floor(Math.random() * units.length);
    while(unitTaken[index]) {
       index++;
@@ -395,7 +416,7 @@ main.prototype = {
 		game.world.bringToTop(armyGroup);
       game.world.bringToTop(nodeGroup);
 		game.input.onUp.add(endSwipe);
-                
+
 /*
 		leaveButton = game.add.button(game.camera.x + window.innerWidth, game.camera.y + window.innerHeight, 'button1', function() {
 			if(gameSocket != null) {
