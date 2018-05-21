@@ -1,7 +1,0 @@
-class Tick {
-	constructor() {
-	}
-	tick() {
-		
-	}
-}
