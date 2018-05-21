@@ -96,20 +96,23 @@ function onClientdisconnect(data) {
 }
 
 function onLogin(data){
-   var login = new lg.Login(this, this.id);
-   login.onLogin(data.data, processLogin);
+   lg.onLogin(this, data.data, processLogin);
 }
 
 // Currently username does nothing, player creation should be done here
-function processLogin(socket, username, status, playerID) {
+function processLogin(username, status, playerID, socket) {
 	console.log("Process Login: ");
-	console.log("	playerID: " + socket);
-	console.log("	Socket: " + socket);
 	console.log("	Username: " + username);
 	console.log("	Status: " + status);
-	if(status) {
-		players.push(new playerObject.Player(playerID, username));
-	}
+        for(var i = 0; i < players.length; i++) {
+            if(username == players[i].name) {
+               console.log(username);
+               console.log(players[i].name);
+               socket.emit('login', {'loginStatus' : false});
+               return;
+            }
+        }
+        players.push(new playerObject.Player(playerID, username));
 	socket.emit('login', {'loginStatus' : status});
 }
 

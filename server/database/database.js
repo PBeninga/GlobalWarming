@@ -109,7 +109,7 @@ class Database{
           console.log('Enter valid model name');
           return
         }
-
+        console.log(query);
         model.findOne({"username": query["username"]}, function(err, docs) {
           if(err) reject(err);
           if (docs == null){

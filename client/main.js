@@ -24,6 +24,7 @@ for(color of colors){
 //var colors = [0xFF0000,	0xFF9F00, 0xF8FF00, 0x7AFF00,0x0000FF,0x8900FF, 0xFF00F6, 0x097B00, 0x980842];
 //var colorTaken = [false, false, false, false, false, false, false, false, false];
 var bannerGFX;
+var bannerBox;
 //var leaveButton;
 
 var march;
@@ -75,6 +76,7 @@ function onsocketConnected (data) {
 	gameSocket = io(gameId);
 
 	gameSocket.on('update_armies', updateArmies);
+        gameSocket.on('players', displayPlayers);
 	gameSocket.on('remove_player', onRemovePlayer);
 	gameSocket.on('endGame',endGame);
 	gameSocket.on('newPlayer', onNewPlayer);
@@ -134,6 +136,25 @@ function displayWin(){
 		align: "center"
 	  });
 }
+
+function displayPlayers(players) {
+   bannerGFX.destroy();
+   playerString = "";
+   plays = players.players;
+   for(var i = 1; i < plays.length; i++) {
+      name = plays[i]['name'];
+      if(!name) {
+         name = 'guest';
+      }
+      playerString = playerString.concat(plays[i]['name'], '\n');
+   }
+   console.log(playerString);
+   bannerGFX = game.add.text(game.camera.x, game.camera.y, playerString, {
+         font: "28px Arial",
+         fill: "#FFFFFF",
+         align: "left"
+   });
+   }
 // When the server notifies us of client disconnection, we find the disconnected
 // enemy and remove from our game
 function onRemovePlayer (data) {

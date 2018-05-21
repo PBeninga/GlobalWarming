@@ -6,9 +6,9 @@ var db = new database.Database();
 function onLogin(playerSocket, data, callback) { 
    db.compareHash('Player', data).then(function(isMatch) {
       status = isMatch.toString() // isMatch is a boolean
-      playerSocket.emit('login', {'loginStatus' : status});
+      //playerSocket.emit('login', {'loginStatus' : status});
       if (isMatch){
-         callback(data["username"]);
+         callback(data["username"], status, playerSocket.id, playerSocket);
       }
    });
 }
