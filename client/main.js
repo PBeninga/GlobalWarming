@@ -18,6 +18,7 @@ var armyGroup;
 var units;
 var unitTaken;
 var bannerGFX;
+var bannerGFXMarker;
 var bannerBox;
 var leaveButton;
 
@@ -47,25 +48,28 @@ function onsocketConnected (data) {
 	// send the server our initial position and tell it we are connected
 }
 function onStart(){
-		bannerGFX.destroy();
-		bannerGFX= game.add.text(game.camera.x,game.camera.y, "Fight!",{
-			font: "70px Arial",
-			fill: "#FFFFFF",
-			align: "center"
-		  });
-                battle_music.play();
-		setTimeout(function(){bannerGFX.destroy();}, 5000);
+	bannerGFX.destroy();
+	bannerGFX = game.add.text(game.camera.x,game.camera.y, "Fight!",{
+		font: "70px Arial",
+		fill: "#FFFFFF",
+		align: "center"
+	});
+	bannerGFXMarker = 'Fight';
+   battle_music.play();
+	setTimeout(function(){bannerGFX.destroy();bannerGFX = null;bannerGFXMarker = null}, 5000);
 }
+
 function onUpdateTime(data){
-		if(bannerGFX){
-			bannerGFX.destroy();
-		}
-		let text = "Game starting in: " + data.time/1000;
-		bannerGFX = game.add.text(game.camera.x,game.camera.y, text,{
-			font: "70px Arial",
-			fill: "#FFFFFF",
-			align: "center"
-		  });
+	if(bannerGFX){
+		bannerGFX.destroy();
+	}
+	let text = "Game starting in: " + data.time/1000;
+	bannerGFX = game.add.text(game.camera.x,game.camera.y, text,{
+		font: "70px Arial",
+		fill: "#FFFFFF",
+		align: "center"
+	});
+	bannerGFXMarker = 'Time';
 }
 
 function endGame(data){
@@ -82,7 +86,8 @@ function displayLoss(){
 		font: "70px Arial",
 		fill: "#FFFFFF",
 		align: "center"
-	  });
+	});
+	bannerGFXMarker = 'Loss';
 }
 function displayWin(){
 	bannerGFX.destroy();
@@ -90,11 +95,14 @@ function displayWin(){
 		font: "70px Arial",
 		fill: "#FFFFFF",
 		align: "center"
-	  });
+	});
+	bannerGFXMarker = 'Win';
 }
 
 function displayPlayers(players) {
-   bannerGFX.destroy();
+	if(bannerGFXMarker != null) {
+		return;
+	}
    playerString = "";
    plays = players.players;
    for(var i = 1; i < plays.length; i++) {
@@ -105,6 +113,12 @@ function displayPlayers(players) {
       playerString = playerString.concat(plays[i]['name'], '\n');
    }
    console.log(playerString);
+	if(bannerGFX != null && playerString == bannerGFX.text) {
+		return;
+	}
+	if(bannerGFX != null) {
+		bannerGFX.destroy();
+	}
    bannerGFX = game.add.text(game.camera.x, game.camera.y, playerString, {
       font: "28px Arial",
       fill: "#FFFFFF",
@@ -318,6 +332,7 @@ function createNodes(data) {
 		fill: "#FFFFFF",
 		align: "center"
 	});
+	bannerGFXMarker = 'Waiting';
 }
 
 // Called every tick
@@ -449,6 +464,10 @@ main.prototype = {
 		leaveButton.y = game.camera.y;
 		leaveButton.text.y = game.camera.y + (leaveButton.height / 2);
 
+		if(bannerGFX != null) {
+			bannerGFX.x = game.camera.x;
+			bannerGFX.y = game.camera.y;
+		}
 		// emit the player input
 	},
 
