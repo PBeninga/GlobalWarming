@@ -135,6 +135,7 @@ class Game{
 
       if(this.gameState == STATE_RUNNING){
 
+         this.gameSocket.emit('players', {players:this.playerPool.activePlayers});
          this.incrementTroops(tickStartTime);
          this.tickSLOP();
          this.checkGameOver();
