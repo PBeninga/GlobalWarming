@@ -6,14 +6,13 @@ class MapNode {
     this.castle = castle;
     this.paths = [];
     if(castle){
-      this.graphics = game.add.image(x, y, 'castle_img');
-    }else{
-      this.graphics = game.add.image(x, y, 'node_img');
+      this.graphics = game.add.image(this.x, this.y-5, 'castle_img');
+    }else {
+      this.graphics = game.add.image(this.x, this.y-5, 'node_img');
     }
     this.graphics.anchor.setTo(0.5,0.5);
-    this.graphics.height = 35;
-    this.graphics.width = 35;
-    //this.graphics.scale.setTo(0.5, 0.5);
+    this.graphics.height = 55;
+    this.graphics.width = 55;
   }
 
   display() {
