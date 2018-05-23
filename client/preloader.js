@@ -11,8 +11,10 @@ var preloader = {
     menu_music = getSound('/client/assets/menu_music.mp3',.6,true);
     battle_music = getSound('/client/assets/battle_music.mp3',.5,true);
     march = getSound('/client/assets/march.mp3',1,false);
+    battle_sound = getSound('/client/assets/battle_sound.mp3',.5,false);
     game.load.spritesheet('win', 'client/assets/win.png', 16, 16);
     game.load.spritesheet('armies', 'client/assets/armies.png', 16, 16, -1, 0, 1);
+    game.load.spritesheet('battle', 'client/assets/battle.png', 128, 128);
     game.load.image('castle_img', 'client/assets/castle.png');
     game.load.image('node_img', 'client/assets/node.png');
     game.load.image('button1', 'client/assets/blue_button00.png');
