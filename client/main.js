@@ -38,6 +38,8 @@ function onsocketConnected (data) {
 	gameSocket.on('newPlayer', onNewPlayer);
 	gameSocket.on('updateTime', onUpdateTime);
 	gameSocket.on('startGame',onStart);
+        gameSocket.on('battle_start',startBattle);
+        gameSocket.on('battle_end',endBattle);
 
 	ClientPlayer = addNewPlayer(this.id);
 	for(var i = 0; i < data.players.length; i++) {
@@ -379,6 +381,18 @@ function updateArmies(data){
 		players[j].updateArmies(); // Does nothing
 	}
 }
+
+function startBattle(data) {
+   battle_sound.play();
+   console.log('battle');
+   console.log('battle at x:' + data.x + ' y:' + data.y);
+}
+
+function endBattle(data) {
+   console.log('battleend');
+   console.log('battle at x:' + data.x + ' y:' + data.y);
+}
+
 
 function initializeValues() {
    players = [];
