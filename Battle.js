@@ -2,9 +2,11 @@ class Battle {
 	// Should be able to handle the players and nodes completely internally.
 	constructor(army1, player1, swipeList1, army2, player2, swipeList2, x, y, node) {
 		this.army1 = army1;
+		this.army1Attack = this.army1.attackModifier * this.army1.count * 0.05;
 		this.player1 = player1;
 		this.swipeList1 = swipeList1;
 		this.army2 = army2;
+		this.army2Attack = this.army2.attackModifier * this.army2.count * 0.05;
 		this.player2 = player2;
 		this.swipeList2 = swipeList2;
 		this.x = x;
@@ -35,8 +37,6 @@ class Battle {
 	}
 
 	attack() {
-		var army1Attack = this.army1.attackModifier * this.army1.count * 0.1;
-		var army2Attack = this.army2.attackModifier * this.army2.count * 0.1;
 		this.army1.count -= army2Attack;
 		this.army2.count -= army1Attack;
 	}
