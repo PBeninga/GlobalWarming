@@ -3,6 +3,7 @@ var username;//socket = io.connect();
 var gameSocket;
 //the player list
 var players;
+var battles = [];
 var ClientPlayer;
 var DummyPlayer;
 
@@ -384,13 +385,26 @@ function updateArmies(data){
 
 function startBattle(data) {
    battle_sound.play();
-   console.log('battle');
-   console.log('battle at x:' + data.x + ' y:' + data.y);
+   battles.push(new Battle(data.x,data.y)); //what happens when more people join a battle?
+   console.log('battle starting at x:' + data.x + ' y:' + data.y);
+}
+
+function removeBattle(x,y) {
+   for(battle of battles){
+      if(battle.x == x && battle.y == y){
+         battle.end();
+         battles.splice(battles.indexOf(battle),1);
+         return true;
+      }
+   }
+   return false;
 }
 
 function endBattle(data) {
-   console.log('battleend');
-   console.log('battle at x:' + data.x + ' y:' + data.y);
+   console.log('battle ending at x:' + data.x + ' y:' + data.y);
+   if(!removeBattle(data.x,data.y)){
+      console.log('ERROR: Attempting to remove battle that does not exist!');
+   }
 }
 
 
