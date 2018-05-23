@@ -40,7 +40,7 @@ function onsocketConnected (data) {
 	gameSocket.on('updateTime', onUpdateTime);
 	gameSocket.on('startGame',onStart);
         gameSocket.on('battle_start',startBattle);
-        gameSocket.on('battle_end',endBattle);
+        gameSocket.on('battle_end',removeBattle);
 
 	ClientPlayer = addNewPlayer(this.id);
 	for(var i = 0; i < data.players.length; i++) {
@@ -289,7 +289,6 @@ function findnodebyloc (x, y) {
 
 // Called when the map is originated. Creates all the nodes with the data from the server.
 function createNodes(data) {
-	console.log(data);
 	for (var i = 0; i < data.nodes.length; i++) {
 		// Creates a node from the data given and sets the callbacks for the node.
 		node_data = data.nodes[i];
@@ -384,27 +383,19 @@ function updateArmies(data){
 }
 
 function startBattle(data) {
-   battle_sound.play();
-   battles.push(new Battle(data.x,data.y)); //what happens when more people join a battle?
-   console.log('battle starting at x:' + data.x + ' y:' + data.y);
+   battles.push(new Battle(data.battle));
+   console.log('battle starting at x:' + data.battle.x + ' y:' + data.battle.y);
 }
 
-function removeBattle(x,y) {
+function removeBattle(data) {
    for(battle of battles){
-      if(battle.x == x && battle.y == y){
+      if(battle.x == data.x && battle.y == data.y){
          battle.end();
          battles.splice(battles.indexOf(battle),1);
          return true;
       }
    }
    return false;
-}
-
-function endBattle(data) {
-   console.log('battle ending at x:' + data.x + ' y:' + data.y);
-   if(!removeBattle(data.x,data.y)){
-      console.log('ERROR: Attempting to remove battle that does not exist!');
-   }
 }
 
 

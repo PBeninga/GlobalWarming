@@ -164,7 +164,7 @@ class Game{
                      currentArmy.army.x, currentArmy.army.y,
                      currentNode
                   ));
-                  this.gameSocket.emit('battle_start',{x:currentNode.army.x,y:currentNode.army.y});
+                  this.gameSocket.emit('battle_start',{battle:this.battles[this.battles.length-1]});
                   console.log("Removed Army");
                   this.movingArmies.splice(i,1);
                }
@@ -188,13 +188,13 @@ class Game{
                continue;
             }
             if(currentArmy.army.checkCollision(this.movingArmies[j].army.x, this.movingArmies[j].army.y)) {
-               this.gameSocket.emit('battle_start',{x:currentArmy.army.x,y:currentArmy.army.y});
                this.battles.push(new battleObject.Battle(
                   currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), currentArmy.nodeList.slice(currentArmy.startIndex),
                   this.movingArmies[j].army, this.playerPool.getPlayer(this.movingArmies[j].army.player), this.movingArmies[j].nodeList.slice(this.movingArmies[j].startIndex),
                   currentArmy.army.x, currentArmy.army.y,
                   null
                ));
+               this.gameSocket.emit('battle_start',{battle:this.battles[this.battles.length-1]});
                if(i < j) {
                   this.movingArmies.splice(j,1);
                   this.movingArmies.splice(i,1);
