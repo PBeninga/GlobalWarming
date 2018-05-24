@@ -6,7 +6,7 @@ var titleText;
 var startButton;
 var loginButton;
 var createAccountButton;
-var mainmenu = function(game){};
+var MainMenu = function(game){};
 var username;
 
 function initializeValues() {
@@ -16,54 +16,34 @@ function initializeValues() {
 }
 
 function createBaseButtons() {
-  startButton = createButton(game, "Game Start", 'button1', canvas_width*3/8, canvas_height/2 - 100, 1, function() {
+  startButton = createButton(game, "Game Start", 'button1', canvas_width*3/8, canvas_height/2 - 100, 1, MainMenu, function() {
     boop.play();
-    game.state.start('main', true, false, [socket,username]);
+    game.state.start('Main', true, false, [socket,username]);
   });
-  loginButton = createButton(game, "Login", 'button1', canvas_width*3/8, canvas_height/2, 1, login);
-  createAccountButton = createButton(game, "Create Account", 'button1', canvas_width*3/8, canvas_height/2 + 100, 1, createAccount);
-  chooseUnitButton = createButton(game, "Change Avatar", 'button1', canvas_width/2+ 100, canvas_height/2 + 100, 1, nextUnit);
+  loginButton = createButton(game, "Login", 'button1', canvas_width*3/8, canvas_height/2, 1, MainMenu, login);
+  createAccountButton = createButton(game, "Create Account", 'button1', canvas_width*3/8, canvas_height/2 + 100, 1, MainMenu, createAccount);
+  chooseUnitButton = createButton(game, "Change Avatar", 'button1', canvas_width/2+ 100, canvas_height/2 + 100, 1, MainMenu, nextUnit);
 }
 
 var army;
 var chosenUnit = 0;
-function makeUnit(unit){
-   temp = game.add.sprite(canvas_width/2,canvas_height/2-100,'armies');
-   temp.animations.add('walk',[unit,unit+1,unit+2],true);
-   temp.scale.setTo(10,10);
-   temp.animations.play('walk',3,true);
-   return temp;
-}
 function nextUnit(){
    boop.play();
-   army.destroy()
+   if(army){
+      army.destroy()
+   }
    chosenUnit += 1;
    if(chosenUnit >= units.length){
       chosenUnit = 0;
    }
    unit = units[chosenUnit];
-   army = makeUnit(unit)
-   console.log(unit);
+   army = makeUnit(unit,canvas_width/2,canvas_height/2-100,10,10);
 }
 
 function destroyBaseButtons() {
   startButton.destroy();
   loginButton.destroy();
   createAccountButton.destroy();
-}
-
-function createButton(game, string, ident, x, y, scale, callback) {
-  var tempButton = game.add.button(x, y, ident, callback, mainmenu, 2, 1, 0);
-  tempButton.scale.set(scale,scale);
-  tempButton.anchor.setTo(0.5, 0.5);
-  tempButton.text = game.add.text(tempButton.x, tempButton.y, string, {
-    font: "14px Arial",
-    fill: "#fff",
-    align: "center"
-  });
-  tempButton.text.anchor.setTo(0.5, 0.5);
-
-  return tempButton;
 }
 
 function createAccount() {
@@ -113,7 +93,7 @@ function createAccount() {
    var password = game.add.inputField(inputLeft, inputTop, inputDataTwo);
 
    var login;
-   var cancel = createButton(game, "Cancel", 'button1', maxLeft + 250, maxTop + 350, 1, function() {
+   var cancel = createButton(game, "Cancel", 'button1', maxLeft + 250, maxTop + 350, 1, MainMenu, function() {
       boop.play();
       AccountBorder.destroy();
       password.destroy();
@@ -127,7 +107,7 @@ function createAccount() {
    });
 
 
-   login = createButton(game, "Make Account", 'button1', maxLeft + 250, maxTop + 280, 1, function() {
+   login = createButton(game, "Make Account", 'button1', maxLeft + 250, maxTop + 280, 1, MainMenu, function() {
       boop.play();
       AccountBorder.destroy();
       password.destroy();
@@ -190,7 +170,7 @@ function login() {
   var password = game.add.inputField(inputLeft, inputTop, inputDataTwo);
 
   var login;
-  var cancel = createButton(game, "Cancel", 'button1', maxLeft + 250, maxTop + 350, 1, function() {
+  var cancel = createButton(game, "Cancel", 'button1', maxLeft + 250, maxTop + 350, 1, MainMenu, function() {
     boop.play();
     LoginBorder.destroy();
     password.destroy();
@@ -204,7 +184,7 @@ function login() {
   });
 
 
-  login = createButton(game, "Login", 'button1', maxLeft + 250, maxTop + 280, 1, function() {
+  login = createButton(game, "Login", 'button1', maxLeft + 250, maxTop + 280, 1, MainMenu, function() {
     boop.play();
     username = userName.value;
     LoginBorder.destroy();
@@ -224,7 +204,7 @@ function createID() {
    return Math.random().toString(36).substr(2, 10);
 }
 function processLogin(data) {
-   if(data.loginStatus === 'true') game.state.start('main', true, false, [socket,username]);
+   if(data.loginStatus === 'true') game.state.start('Main', true, false, [socket,username]);
    else login();
 }
 function processAccountCreation(data) {
@@ -232,7 +212,7 @@ function processAccountCreation(data) {
    if(data.accountExists === 'true') createAccount();
 }
 
-mainmenu.prototype = {
+MainMenu.prototype = {
  create: function(game) {
     initializeValues();
     socket = io.connect();
@@ -250,11 +230,10 @@ mainmenu.prototype = {
     // centering
     MenuBorder.drawRect((canvas_width/2)-(backWidth/2), (canvas_height/2)-(backHeight/2), backWidth, backHeight);
 
-    enterButton = createButton(game, "Start", 'button1', canvas_width/2, canvas_height/2, 1, function() {
+    enterButton = createButton(game, "Start", 'button1', canvas_width/2, canvas_height/2, 1, MainMenu, function() {
        boop.play();
        createBaseButtons();
-       unit = units[chosenUnit];
-       army = makeUnit(unit);
+       nextUnit();
        menu_music.play();
        enterButton.text.destroy();
        enterButton.destroy();

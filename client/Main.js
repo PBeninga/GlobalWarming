@@ -23,7 +23,7 @@ var bannerGFXMarker;
 var bannerBox;
 var leaveButton;
 
-var main = function(game){
+var Main = function(game){
 };
 
 function onsocketConnected (data) {
@@ -416,7 +416,7 @@ function initializeValues() {
    }
 }
 
-main.prototype = {
+Main.prototype = {
 	create: function () {
       initializeValues();
 		game.world.setBounds(-canvas_width*20, -canvas_height*20, canvas_width * 40, canvas_height * 40);
@@ -427,24 +427,27 @@ main.prototype = {
 		game.world.bringToTop(armyGroup);
       game.world.bringToTop(nodeGroup);
 		game.input.onUp.add(endSwipe);
-
-		leaveButton = game.add.button(game.camera.x + window.innerWidth, game.camera.y + window.innerHeight, 'button1', function() {
-			if(gameSocket != null) {
-				gameSocket.disconnect();
-			}
-			socket.disconnect();
-			battle_music.pause();
-			game.state.start('mainmenu', true, false, socket);
-		}, main, 2, 1, 0);
-		leaveButton.anchor.setTo(0.0, 0.0);
-		leaveButton.text = game.add.text(leaveButton.x, leaveButton.y, "Return to Main Menu", {
-			font: "14px Arial",
-			fill: "#fff",
-			align: "center"
-		});
-		leaveButton.text.anchor.setTo(0.5, 0.5);
+                leaveButton = createButton(
+                      game,
+                      'Return To Main Menu', 
+                      'button1', 
+                      game.camera.x + window.innerWidth,
+                      game.camera.y + window.innerHeight,
+                      1,
+                      Main,
+                      function(){
+                         if(gameSocket != null) {
+                            gameSocket.disconnect();
+                         }
+                         socket.disconnect();
+                         battle_music.pause();
+                         game.state.start('MainMenu', true, false, socket);
+                      },
+                      0
+                );
+                leaveButton.text.anchor.setTo(0.5, 0.5);
 		console.log("client started");
-      socket.emit("client_started",{});
+                socket.emit("client_started",{});
 		socket.on('connected', onsocketConnected);
 		socket.on('send_nodes', createNodes);
 	},

@@ -1,8 +1,9 @@
 var menu_music;
 var march;
 var battle_music;
+var boop;
 
-var preloader = {
+var Preloader = {
   preload: function() {
     // Add a loading label
 
@@ -28,6 +29,6 @@ var preloader = {
 
   create: function() {
     console.log("Reached preloader");
-    game.state.start('mainmenu')
+    game.state.start('MainMenu')
   }
 }
