@@ -17,6 +17,21 @@ function changeVolume(audios, vol){
    }
 }
 
+//Loops through volume and updates button text to new volume 
+var master_vol = .5;
+function volumeUpdate(){
+   console.log(i);
+   if(master_vol > .9){
+      master_vol=0;
+   }else{
+      i+= .1;
+   }
+   master_vol = Math.round(i*10)/10;
+   changeVolume(sounds,i);
+   volumeButton.text.text = i;
+   boop.play();
+}
+
 //Produces a simple sprite based off given unit index
 function makeUnit(unit, x, y, scale_x, scale_y){
    temp = game.add.sprite(x,y,'armies');
