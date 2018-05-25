@@ -113,7 +113,7 @@ function processLogin(username, status, playerID, socket) {
 		}
 	}
 	players.push(new playerObject.Player(playerID, username));
-	socket.emit('login', {'loginStatus' : status});
+	//socket.emit('login', {'loginStatus' : status});
 }
 
 function onNewAccount(data){

@@ -26,9 +26,8 @@ function login() {
 }
 
 function loginHandler(data) {
-   console.log('loginhandling');
    if(data.loginStatus === 'true'){ enterGame();}
-   else {alert(data);}
+   else {alert(data.error);}
 }
 
 function createAccount(){
