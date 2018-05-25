@@ -23,6 +23,9 @@ var bannerGFXMarker;
 var bannerBox;
 var leaveButton;
 
+function TRASHCODE() {
+players = [];
+battles = [];
 ClientPlayer = null;
 DummyPlayer = new Player(null, 0x000000);
 players.push(DummyPlayer);
@@ -35,7 +38,7 @@ unitTaken = [];
 for(unit of units){
    unitTaken.push(false);
 }
-
+}
 
 
 var Main = function(game){
@@ -414,11 +417,12 @@ function removeBattle(data) {
 }
 
 Main.prototype = {
-   create: function () {   
+   create: function () {
+      TRASHCODE();
       game.world.setBounds(-canvas_width*20, -canvas_height*20, canvas_width * 40, canvas_height * 40);
       game.add.image(0, 0, 'background_img');
       game.stage.backgroundColor = 0x68c1d1;
-      volumeButton = createButton(game, i, 'tiny_button', game.camera.x+100, game.camera.y+canvas_height-100, 1, Main, volumeUpdate);
+      volumeButton = createButton(game, master_vol, 'tiny_button', game.camera.x+100, game.camera.y+canvas_height-100, 1, Main, volumeUpdate);
       nodeGroup = game.add.group();
       armyGroup = game.add.group();
       game.world.bringToTop(armyGroup);
@@ -437,6 +441,7 @@ Main.prototype = {
                gameSocket.disconnect();
             }
             socket.disconnect();
+            socket = null;
             battle_music.pause();
             game.state.start('MainMenu', true, false, socket);
          },
