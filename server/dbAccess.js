@@ -6,10 +6,8 @@ var db = new database.Database();
 function onLogin(playerSocket, data, callback) {
    db.compareHash('Player', data).then(function(lgStatus) {
       status = lgStatus['isMatch'].toString() // isMatch is a boolean
-      playerSocket.emit('login', {'loginStatus' : status, 'error': lgStatus['message']});
-      if (lgStatus['isMatch']){
-         callback(data["username"], status, playerSocket.id, playerSocket);
-      }
+      message = lgStatus['message'] // refers to an error
+      callback(data["username"], status, message, playerSocket.id, playerSocket);
    });
 }
 
