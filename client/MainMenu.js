@@ -36,7 +36,7 @@ MainMenu.prototype = {
       
       chooseUnitButton = createButton(game, "Change Avatar", 'button1', canvas_width/2, canvas_height/2 + 110, 1, MainMenu, nextUnit);
 
-      volumeButton = createButton(game, '.5', 'tiny_button', 100, canvas_height-100, 1, MainMenu, volumeUpdate);
+      volumeButton = createButton(game, '0.5', 'tiny_button', 100, canvas_height-100, 1, MainMenu, volumeUpdate);
       //initializes chosen unit graphic
       nextUnit();
 
