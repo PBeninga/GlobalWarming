@@ -20,15 +20,14 @@ function changeVolume(audios, vol){
 //Loops through volume and updates button text to new volume 
 var master_vol = .5;
 function volumeUpdate(){
-   console.log(i);
    if(master_vol > .9){
       master_vol=0;
    }else{
-      i+= .1;
+      master_vol+= .1;
    }
-   master_vol = Math.round(i*10)/10;
-   changeVolume(sounds,i);
-   volumeButton.text.text = i;
+   master_vol = Math.round(master_vol*10)/10;
+   changeVolume(sounds,master_vol);
+   volumeButton.text.text = master_vol
    boop.play();
 }
 

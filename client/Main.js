@@ -504,7 +504,8 @@ Main.prototype = {
 		if(lines.length > 0) {
 			lines[lines.length-1].end = new Phaser.Point(game.input.mousePointer.x +game.camera.x, game.input.mousePointer.y+game.camera.y);
 			for(var i = 0; i < lines.length; i++) {
-				game.debug.geom(lines[i], 0x000000);
+                           lines[i].width = 200;
+				game.debug.geom(lines[i], '#0000ff');
 			}
 		}
 	}
