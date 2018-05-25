@@ -96,24 +96,19 @@ function onClientdisconnect(data) {
 }
 
 function onLogin(data){
+   for(var i = 0; i < players.length; i++) {
+      if(data.data.username == players[i].name) {
+         this.emit('login', {'loginStatus' : false, 'error': 'Cannot login'});
+         return
+      }
+   }
    lg.onLogin(this, data.data, processLogin);
 }
 
 // Currently username does nothing, player creation should be done here
-function processLogin(username, status, playerID, socket) {
-	console.log("Process Login: ");
-	console.log("	Username: " + username);
-	console.log("	Status: " + status);
-	for(var i = 0; i < players.length; i++) {
-		if(username == players[i].name) {
-			console.log(username);
-			console.log(players[i].name);
-			socket.emit('login', {'loginStatus' : false});
-			return;
-		}
-	}
-	players.push(new playerObject.Player(playerID, username));
-	socket.emit('login', {'loginStatus' : status});
+function processLogin(username, status, message, playerID, socket) {
+   if(status) players.push(new playerObject.Player(playerID, username));
+   socket.emit('login', {'loginStatus' : status, 'error': message});
 }
 
 function onNewAccount(data){
