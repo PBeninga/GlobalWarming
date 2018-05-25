@@ -21,7 +21,7 @@ function login() {
    username = usernameInput.value;
    socket.emit(
       "login", // Send following 'data' as data (in login.js) -> doc (in database.js)
-      {'playerID': playerID, 'data' : {'username': usernameInput.value, 'password' : passwordInput.value}}
+      {'data' : {'username': usernameInput.value, 'password' : passwordInput.value}}
    );
 }
 
@@ -35,30 +35,13 @@ function createAccount(){
    boop.play();
    socket.emit(
       "new_account", // Send following 'data' as data (in login.js) -> doc (in database.js)
-      {'playerID': playerID, 'data' : {'username': usernameInput.value, 'password' : passwordInput.value}}
+      {'data' : {'username': usernameInput.value, 'password' : passwordInput.value}}
    );
 }
 
 function createAccountHandler(data){
    if(data.accountExists === 'true') {alert('Account Exists');}
    else {enterGame();}
-}
-
-function getInputField(name,type,x,y,width){
-   var width = canvas_width*3/5;
-   inputData = {
-      font: '18px Arial',
-      fill: '#212121',
-      fontWeight: 'bold',
-      width: width,
-      padding: 8,
-      borderWidth: 1,
-      borderColor: '#000',
-      borderRadius: 6,
-      placeHolder: name,
-      type: type
-   };
-   return game.add.inputField(x-width/2, y, inputData);
 }
 
 Login.prototype = {

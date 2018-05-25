@@ -2,17 +2,28 @@ var menu_music;
 var march;
 var battle_music;
 var boop;
-
+var sounds = [];
 var Preloader = {
   preload: function() {
-    // Add a loading label
+    //loads all sounds
+    var boop_vol = 1;
+    var menu_music_vol = .7;
+    var battle_sound_vol = .9;
+    var march_vol = 1;
+    var battle_music_vol = .7;
 
-    // Load all assets.
-    boop = getSound('/client/assets/boop.mp3',.9,false);
-    menu_music = getSound('/client/assets/menu_music.mp3',.6,true);
-    battle_music = getSound('/client/assets/battle_music.mp3',.5,true);
-    march = getSound('/client/assets/march.mp3',1,false);
-    battle_sound = getSound('/client/assets/battle_sound.mp3',.5,false);
+    boop = getSound('/client/assets/boop.mp3',boop_vol,false);
+    sounds.push([boop,boop_vol]);
+    menu_music = getSound('/client/assets/menu_music.mp3',menu_music_vol,true);
+    sounds.push([menu_music,menu_music_vol]);
+    battle_music = getSound('/client/assets/battle_music.mp3',battle_music_vol,true);
+    sounds.push([battle_music,battle_music_vol]);
+    march = getSound('/client/assets/march.mp3',march_vol,false);
+    sounds.push([march,march_vol]);
+    battle_sound = getSound('/client/assets/battle_sound.mp3',battle_sound_vol,false);
+    sounds.push([battle_sound,battle_sound_vol]);
+
+    //loads all graphics
     game.load.spritesheet('win', 'client/assets/win.png', 16, 16);
     game.load.spritesheet('armies', 'client/assets/armies.png', 16, 16, -1, 0, 1);
     game.load.spritesheet('battle', 'client/assets/battle.png', 128, 128);
