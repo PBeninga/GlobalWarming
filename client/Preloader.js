@@ -3,6 +3,9 @@ var march;
 var battle_music;
 var boop;
 var sounds = [];
+//List of every sprite in sheet that we want accessible
+units = [6,12,15,18,21,432,435,438,441,444,447,450,453,456,459,462,465,756,762,765,771,774,780]
+
 var Preloader = {
   preload: function() {
     //loads all sounds
@@ -12,6 +15,7 @@ var Preloader = {
     var march_vol = 1;
     var battle_music_vol = .7;
 
+    //saves each sound into a list of sounds paired with volume(for ratio)
     boop = getSound('/client/assets/boop.mp3',boop_vol,false);
     sounds.push([boop,boop_vol]);
     menu_music = getSound('/client/assets/menu_music.mp3',menu_music_vol,true);
@@ -29,6 +33,7 @@ var Preloader = {
     game.load.spritesheet('battle', 'client/assets/battle.png', 128, 128);
     game.load.image('castle_img', 'client/assets/castle.png');
     game.load.image('node_img', 'client/assets/node.png');
+    game.load.image('tiny_button', 'client/assets/tiny_button.png');
     game.load.image('button1', 'client/assets/blue_button00.png');
     game.load.image('button2', 'client/assets/blue_button01.png');
     game.load.image('button3', 'client/assets/blue_button02.png');

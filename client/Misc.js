@@ -1,11 +1,15 @@
-function getSound(sound,volume,loop) {		
+//Produces a sound object from audio file
+function getSound(file,volume,loop) {		
 		var tempSound = document.createElement("audio");
-		tempSound.setAttribute("src", sound);
+		tempSound.setAttribute("src", file);
 		tempSound.volume = volume;
 		tempSound.loop = loop;
                 return tempSound;
 }
 
+//Changes the volume of each audio object(audio[0])
+//based off ratio given in audio[1]
+//Audios is initialized in PreLoader
 function changeVolume(audios, vol){
    boop.play();
    for(audio of audios) {
@@ -13,6 +17,7 @@ function changeVolume(audios, vol){
    }
 }
 
+//Produces a simple sprite based off given unit index
 function makeUnit(unit, x, y, scale_x, scale_y){
    temp = game.add.sprite(x,y,'armies');
    temp.animations.add('walk',[unit,unit+1,unit+2],true);

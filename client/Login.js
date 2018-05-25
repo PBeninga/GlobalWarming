@@ -1,26 +1,21 @@
 var socket;
 var playerSocket;
-var username = 'ERROR';
-var password;
 var Login = function(game){};
 
 function enterGame(){
-   //Destroy all stuffs
-   //
+   //So far this function is unneccesary, expected a use for it
    game.state.start('MainMenu');
 }
 
 function guest() {
    boop.play();
-   username = 'idk';
    enterGame();
 }
 
 function login() {
    boop.play();
-   username = usernameInput.value;
    socket.emit(
-      "login", // Send following 'data' as data (in login.js) -> doc (in database.js)
+      "login",
       {'data' : {'username': usernameInput.value, 'password' : passwordInput.value}}
    );
 }
@@ -33,7 +28,7 @@ function loginHandler(data) {
 function createAccount(){
    boop.play();
    socket.emit(
-      "new_account", // Send following 'data' as data (in login.js) -> doc (in database.js)
+      "new_account",
       {'data' : {'username': usernameInput.value, 'password' : passwordInput.value}}
    );
 }
