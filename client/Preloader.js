@@ -29,6 +29,6 @@ var Preloader = {
 
   create: function() {
     console.log("Reached preloader");
-    game.state.start('MainMenu')
+    game.state.start('Login')
   }
 }

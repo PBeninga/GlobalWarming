@@ -22,6 +22,7 @@ function onNewAccount(playerSocket, data){
       else{
          console.log("New Account Created");
          db.insertOne('Player', data);
+         playerSocket.emit('new_account', {'accountExists' : 'false'});
       }
    });
 }
