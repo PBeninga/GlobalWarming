@@ -93,8 +93,8 @@ class Database{
             return
          }
          model.findOne(query, function(err, docs) {
-            if(err) reject(err);
-            resolve(docs);
+            if(err != null) resolve(err);
+            else resolve(docs);
          });
       });
    }
@@ -113,13 +113,19 @@ class Database{
         model.findOne({"username": query["username"]}, function(err, docs) {
           if(err) reject(err);
           if (docs == null){
-            console.log("Username not found");
-            return (false);
+            var message = 'Username not found';
+            console.log(message);
+            resolve({'isMatch': false, 'message': message});
+            return
           }
           docs.comparePassword(query['password'], function(err, isMatch) {
             if (err) throw err;
-            console.log("Hashed passwords match: ", isMatch);
-            resolve(isMatch);
+            var message;
+            if (isMatch) message = 'Passwords match';
+            else message = 'Passwords do not match';
+            console.log(message);
+            resolve({'isMatch': isMatch, 'message': message});
+            return
           });
         });
         

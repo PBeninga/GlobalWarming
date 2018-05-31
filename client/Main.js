@@ -2,7 +2,7 @@ var socket;
 var username;//socket = io.connect();
 var gameSocket;
 //the player list
-var players;
+var players = [];
 var battles = [];
 var ClientPlayer;
 var DummyPlayer;
@@ -23,7 +23,25 @@ var bannerGFXMarker;
 var bannerBox;
 var leaveButton;
 
-var main = function(game){
+function TRASHCODE() {
+players = [];
+battles = [];
+ClientPlayer = null;
+DummyPlayer = new Player(null, 0x000000);
+players.push(DummyPlayer);
+nodes = [];
+swipePath = [];
+lines = [];
+nodeGroup = null;
+armyGroup = null;
+unitTaken = [];
+for(unit of units){
+   unitTaken.push(false);
+}
+}
+
+
+var Main = function(game){
 };
 
 function onsocketConnected (data) {
@@ -40,7 +58,7 @@ function onsocketConnected (data) {
 	gameSocket.on('updateTime', onUpdateTime);
 	gameSocket.on('startGame',onStart);
         gameSocket.on('battle_start',startBattle);
-        gameSocket.on('battle_end',endBattle);
+        gameSocket.on('battle_end',removeBattle);
 
 	ClientPlayer = addNewPlayer(this.id);
 	for(var i = 0; i < data.players.length; i++) {
@@ -289,7 +307,6 @@ function findnodebyloc (x, y) {
 
 // Called when the map is originated. Creates all the nodes with the data from the server.
 function createNodes(data) {
-	console.log(data);
 	for (var i = 0; i < data.nodes.length; i++) {
 		// Creates a node from the data given and sets the callbacks for the node.
 		node_data = data.nodes[i];
@@ -384,14 +401,13 @@ function updateArmies(data){
 }
 
 function startBattle(data) {
-   battle_sound.play();
-   battles.push(new Battle(data.x,data.y)); //what happens when more people join a battle?
-   console.log('battle starting at x:' + data.x + ' y:' + data.y);
+   battles.push(new Battle(data.battle));
+   console.log('battle starting at x:' + data.battle.x + ' y:' + data.battle.y);
 }
 
-function removeBattle(x,y) {
+function removeBattle(data) {
    for(battle of battles){
-      if(battle.x == x && battle.y == y){
+      if(battle.x == data.x && battle.y == data.y){
          battle.end();
          battles.splice(battles.indexOf(battle),1);
          return true;
@@ -400,63 +416,43 @@ function removeBattle(x,y) {
    return false;
 }
 
-function endBattle(data) {
-   console.log('battle ending at x:' + data.x + ' y:' + data.y);
-   if(!removeBattle(data.x,data.y)){
-      console.log('ERROR: Attempting to remove battle that does not exist!');
-   }
-}
-
-
-function initializeValues() {
-   players = [];
-   ClientPlayer = null;
-   DummyPlayer = new Player(null, 0x000000);
-   players.push(DummyPlayer);
-   nodes = [];
-   swipePath = [];
-   lines = [];
-   nodeGroup = null;
-   armyGroup = null;
-   units = [6,12,15,18,21,432,435,438,441,444,447,450,453,456,459,462,465,756,762,765,771,774,780]
-   unitTaken = [];
-   for(unit of units){
-      unitTaken.push(false);
-   }
-}
-
-main.prototype = {
-	create: function () {
-      initializeValues();
-		game.world.setBounds(-canvas_width*20, -canvas_height*20, canvas_width * 40, canvas_height * 40);
+Main.prototype = {
+   create: function () {
+      TRASHCODE();
+      game.world.setBounds(-canvas_width*20, -canvas_height*20, canvas_width * 40, canvas_height * 40);
       game.add.image(0, 0, 'background_img');
-		game.stage.backgroundColor = 0x68c1d1;
-		nodeGroup = game.add.group();
-		armyGroup = game.add.group();
-		game.world.bringToTop(armyGroup);
+      game.stage.backgroundColor = 0x68c1d1;
+      volumeButton = createButton(game, master_vol, 'tiny_button', game.camera.x+100, game.camera.y+canvas_height-100, 1, Main, volumeUpdate);
+      nodeGroup = game.add.group();
+      armyGroup = game.add.group();
+      game.world.bringToTop(armyGroup);
       game.world.bringToTop(nodeGroup);
-		game.input.onUp.add(endSwipe);
-
-		leaveButton = game.add.button(game.camera.x + window.innerWidth, game.camera.y + window.innerHeight, 'button1', function() {
-			if(gameSocket != null) {
-				gameSocket.disconnect();
-			}
-			socket.disconnect();
-			battle_music.pause();
-			game.state.start('mainmenu', true, false, socket);
-		}, main, 2, 1, 0);
-		leaveButton.anchor.setTo(0.0, 0.0);
-		leaveButton.text = game.add.text(leaveButton.x, leaveButton.y, "Return to Main Menu", {
-			font: "14px Arial",
-			fill: "#fff",
-			align: "center"
-		});
-		leaveButton.text.anchor.setTo(0.5, 0.5);
-		console.log("client started");
+      game.input.onUp.add(endSwipe);
+      leaveButton = createButton(
+         game,
+         'Return To Main Menu', 
+         'button1', 
+         game.camera.x + window.innerWidth,
+         game.camera.y + window.innerHeight,
+         1,
+         Main,
+         function(){
+            if(gameSocket != null) {
+               gameSocket.disconnect();
+            }
+            socket.disconnect();
+            socket = null;
+            battle_music.pause();
+            game.state.start('MainMenu', true, false, socket);
+         },
+         0
+      );
+      leaveButton.text.anchor.setTo(0.5, 0.5);
+      console.log("client started");
       socket.emit("client_started",{});
-		socket.on('connected', onsocketConnected);
-		socket.on('send_nodes', createNodes);
-	},
+      socket.on('connected', onsocketConnected);
+      socket.on('send_nodes', createNodes);
+   },
 
   init: function(sock) {
       socket = sock[0];
@@ -496,14 +492,20 @@ main.prototype = {
 			bannerGFX.x = game.camera.x;
 			bannerGFX.y = game.camera.y;
 		}
-		// emit the player input
+                if(volumeButton != null){
+                   volumeButton.x = game.camera.x + 100;
+                   volumeButton.text.x = game.camera.x + 100;
+                   volumeButton.y = game.camera.y + canvas_height - 100;
+                   volumeButton.text.y = game.camera.y + canvas_height - 100;
+                }
 	},
 
 	render: function () {
 		if(lines.length > 0) {
 			lines[lines.length-1].end = new Phaser.Point(game.input.mousePointer.x +game.camera.x, game.input.mousePointer.y+game.camera.y);
 			for(var i = 0; i < lines.length; i++) {
-				game.debug.geom(lines[i], 0x000000);
+                           lines[i].width = 200;
+				game.debug.geom(lines[i], '#0000ff');
 			}
 		}
 	}
