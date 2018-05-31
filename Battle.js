@@ -37,8 +37,8 @@ class Battle {
 	}
 
 	attack() {
-		this.army1.count -= army2Attack;
-		this.army2.count -= army1Attack;
+		this.army1.count -= army2Attack + (Math.random() * (army2Attack * 0.1));
+		this.army2.count -= army1Attack + (Math.random() * (army2Attack * 0.1));
 	}
 
 	// Returns true if the battle is ongoing, and false if it has finished

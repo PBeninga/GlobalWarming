@@ -24,20 +24,20 @@ var bannerBox;
 var leaveButton;
 
 function TRASHCODE() {
-players = [];
-battles = [];
-ClientPlayer = null;
-DummyPlayer = new Player(null, 0x000000);
-players.push(DummyPlayer);
-nodes = [];
-swipePath = [];
-lines = [];
-nodeGroup = null;
-armyGroup = null;
-unitTaken = [];
-for(unit of units){
-   unitTaken.push(false);
-}
+   players = [];
+   battles = [];
+   ClientPlayer = null;
+   DummyPlayer = new Player(null, 0x000000);
+   players.push(DummyPlayer);
+   nodes = [];
+   swipePath = [];
+   lines = [];
+   nodeGroup = null;
+   armyGroup = null;
+   unitTaken = [];
+   for(unit of units){
+      unitTaken.push(false);
+   }
 }
 
 
@@ -57,8 +57,8 @@ function onsocketConnected (data) {
 	gameSocket.on('newPlayer', onNewPlayer);
 	gameSocket.on('updateTime', onUpdateTime);
 	gameSocket.on('startGame',onStart);
-        gameSocket.on('battle_start',startBattle);
-        gameSocket.on('battle_end',removeBattle);
+   gameSocket.on('battle_start',startBattle);
+   gameSocket.on('battle_end',removeBattle);
 
 	ClientPlayer = addNewPlayer(this.id);
 	for(var i = 0; i < data.players.length; i++) {
@@ -430,8 +430,8 @@ Main.prototype = {
       game.input.onUp.add(endSwipe);
       leaveButton = createButton(
          game,
-         'Return To Main Menu', 
-         'button1', 
+         'Return To Main Menu',
+         'button1',
          game.camera.x + window.innerWidth,
          game.camera.y + window.innerHeight,
          1,
