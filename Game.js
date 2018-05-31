@@ -62,10 +62,6 @@ class Game{
       }
    }
 
-   onPlayerDisconnect(){
-      this.removePlayer(this.id);
-   }
-
    removePlayer(id){
       if(!this.playerPool.containsActive(id)){
          console.log("Attempting to remove player that doesn't exist.");

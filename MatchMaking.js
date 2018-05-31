@@ -15,35 +15,26 @@ class MatchMaking {
       this.lobbySocket = lobbySocket;
       this.removeLobby = removeLobby;  // This is a callback to app.js
 
-		this.players = [];
+		this.playerPool = new playerObject.PlayerPool(); // used for compatibility
 	}
 
-	onPlayerDisconnect(){
-      this.removePlayer(this.id);
-   }
-
    removePlayer(id){
-		for(var i = 0; i < this.players.length; i++) {
-			if(players[i].id == player.id) {
-				console.log('Player ' + id + ' successfully removed');
-				players.splice(i, 1);
-			}
-		}
+		this.playerPool.removePlayer(id);
    }
 
 	//return true on player succesfully added
 	addPlayer(player){
-		if(this.players.length >= MAX_PLAYERS){
+		if(this.playerPool.activePlayers.length >= MAX_PLAYERS){
 			console.log("This lobby is full.");
 		}
-		for(var i = 0; i < this.players.length; i++) {
-			if(players[i].id == player.id) {
-				console.log("Attempting to add player that already exists.");
-			}
-		}
-		this.players.push(player);
-		if(this.players.length == MAX_PLAYERS) {
+		this.playerPool.addPlayer(player);
+		if(this.playerPool.activePlayers.length == MAX_PLAYERS) {
 			this.start();
 		}
+	}
+
+	start() {
+		this.removeLobby(this.roomid, this.playerPool);
+		this.gameSocket.emit("startGame",{});
 	}
 }
