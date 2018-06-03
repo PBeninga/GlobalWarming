@@ -28,18 +28,18 @@ MainMenu.prototype = {
       console.log("Reached main menu");
       game.stage.backgroundColor = 0xADD8E6;
       titleText = game.add.bitmapText((canvas_width/2) - 255, 100, 'carrier_command', 'Global Warming', 32);
-      
+
       startButton = createButton(game, "Game Start", 'button1', canvas_width/2, canvas_height/2 - 100, 1, MainMenu, function() {
          boop.play();
-         game.state.start('Main', true, false, [socket,username]);
+         game.state.start('MatchMaking', true, false, [socket,username]);
       });
-      
+
       chooseUnitButton = createButton(game, "Change Avatar", 'button1', canvas_width/2, canvas_height/2 + 110, 1, MainMenu, nextUnit);
 
       volumeButton = createButton(game, '0.5', 'tiny_button', 100, canvas_height-100, 1, MainMenu, volumeUpdate);
       //initializes chosen unit graphic
       nextUnit();
 
-      menu_music.play(); 
+      menu_music.play();
    }
 }
