@@ -5,7 +5,7 @@ var gameObject = require('./Game.js');
 var miscFunc = require('./MiscFunctions.js');
 var playerObject = require('./Player.js');
 var mapObjects = require('./Map.js');
-var lg = require('./server/login.js');
+var lg = require('./server/dbAccess.js');
 
 
 //////////////
@@ -96,26 +96,23 @@ function onClientdisconnect(data) {
 }
 
 function onLogin(data){
-   var login = new lg.Login(this, this.id);
-   login.onLogin(data.data, processLogin);
+   for(var i = 0; i < players.length; i++) {
+      if(data.data.username == players[i].name) {
+         this.emit('login', {'loginStatus' : false, 'error': 'Cannot login'});
+         return
+      }
+   }
+   lg.onLogin(this, data.data, processLogin);
 }
 
 // Currently username does nothing, player creation should be done here
-function processLogin(socket, username, status, playerID) {
-	console.log("Process Login: ");
-	console.log("	playerID: " + socket);
-	console.log("	Socket: " + socket);
-	console.log("	Username: " + username);
-	console.log("	Status: " + status);
-	if(status) {
-		players.push(new playerObject.Player(playerID, username));
-	}
-	socket.emit('login', {'loginStatus' : status});
+function processLogin(username, status, message, playerID, socket) {
+   if(status) players.push(new playerObject.Player(playerID, username));
+   socket.emit('login', {'loginStatus' : status, 'error': message});
 }
 
 function onNewAccount(data){
-   var login = new lg.Login(this, this.id);
-   login.onNewAccount(data.data);
+   lg.onNewAccount(this, data.data);
 }
 
 function onInputFired(data) {

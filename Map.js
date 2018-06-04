@@ -42,10 +42,8 @@ class Map{
    readMap(mapName){
       const fs = require("fs");
       var buffer = JSON.parse(fs.readFileSync("./maps/"+mapName+".txt", "utf-8"));
-      console.log(buffer);
       this.castles = buffer.castles;
       this.startingCastles = buffer.startingCastles;
-      console.log(this.startingCastles)
       let nodeFactory = new MapNodeFactory();
       var type = "Intersection";
       for(var i=0; i<buffer.nodes.length; i++){

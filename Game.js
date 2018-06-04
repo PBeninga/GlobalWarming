@@ -31,6 +31,8 @@ class Game{
       this.removeGame = removeGame;  // This is a callback to app.js
 
       //Useful game data
+      this.center = [500 + Math.floor(Math.random() * 1000),500 + Math.floor(Math.random() * 1000)];
+      this.radius = 2000;
       this.map = new gameMap.MapFactory().getMap(null);
       this.playerPool = new playerObject.PlayerPool();
       this.dummyPlayer = this.playerPool.addPlayer(new playerObject.Player(null, null));
@@ -128,7 +130,11 @@ class Game{
       }
 
       if(this.gameState == STATE_RUNNING){
-
+         this.radius -= .5;
+         if(this.radius < 5){
+            this.radius = 5
+         }
+         this.gameSocket.emit('players', {players:this.playerPool.activePlayers});
          this.incrementTroops(tickStartTime);
          this.moveArmies();
          this.checkCollisions();
@@ -137,6 +143,7 @@ class Game{
       }
 
       this.gameSocket.emit('update_armies', {players:this.playerPool.activePlayers});
+      this.gameSocket.emit('update_circle', {x:this.center[0],y:this.center[1],r:this.radius});
       this.forceTickRate(tickStartTime); // Wait until min tick-time has passed
    }
 
@@ -149,8 +156,13 @@ class Game{
             var currentNode = this.map.nodes[currentArmy.nodeList[currentArmy.startIndex+1]]; // The ending node of the MovingArmy
             // if the node is occupied, initialize a battle and remove the MovingArmy from the list
             if(currentNode.army != null) {
+               var currentBattle = this.getBattle(currentNode.army);
+               if(currentBattle != null) {
+                  currentBattle.addArmy(currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), null);
+                  this.movingArmies.splice(i,1);
+               }
                // If the current Node's army is the players, don't start a battle.
-               if(currentArmy.army.player == currentNode.army.player) {
+               else if(currentArmy.army.player == currentNode.army.player) {
                   currentNode.army.count += currentArmy.army.count;
                   this.playerPool.getPlayer(currentArmy.army.player).removeArmy(currentArmy.army.id);
                   console.log("Removed Army");
@@ -158,12 +170,11 @@ class Game{
                }
                else {
                   console.log("Battle At Node");
-                  this.battles.push(new battleObject.Battle(
-                     currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), null,
-                     currentNode.army, this.playerPool.getPlayer(currentNode.army.player), null,
-                     currentArmy.army.x, currentArmy.army.y,
-                     currentNode
-                  ));
+                  var newBattle = new battleObject.Battle(currentArmy.army.x, currentArmy.army.y, currentNode);
+                  newBattle.addArmy(currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), null);
+                  newBattle.addArmy(currentNode.army, this.playerPool.getPlayer(currentNode.army.player), null);
+                  this.battles.push(newBattle);
+                  this.gameSocket.emit('battle_start',{battle:this.battles[this.battles.length-1]});
                   console.log("Removed Army");
                   this.movingArmies.splice(i,1);
                }
@@ -178,21 +189,31 @@ class Game{
       }
    }
 
+   getBattle(army) {
+      for(var i = 0; i < this.battles.length; i++) {
+         for(var j = 0; j < this.battles.armies.length; j++) {
+            if(this.battles[i].armies[j].id == army.id) {
+               return this.battles[i];
+            }
+         }
+      }
+      return null;
+   }
+
    checkCollisions() {
       for(var i = 0; i < this.movingArmies.length; i++) {
          var currentArmy = this.movingArmies[i];
          for(var j = 0; j < this.movingArmies.length; j++) {
             //Not counting the army we're checking
-            if(j == i) {
+            if(this.movingArmies[j].army.player == currentArmy.army.player) {
                continue;
             }
             if(currentArmy.army.checkCollision(this.movingArmies[j].army.x, this.movingArmies[j].army.y)) {
-               this.battles.push(new battleObject.Battle(
-                  currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), currentArmy.nodeList.slice(currentArmy.startIndex),
-                  this.movingArmies[j].army, this.playerPool.getPlayer(this.movingArmies[j].army.player), this.movingArmies[j].nodeList.slice(this.movingArmies[j].startIndex),
-                  currentArmy.army.x, currentArmy.army.y,
-                  null
-               ));
+               var newBattle = new battleObject.Battle(currentArmy.army.x, currentArmy.army.y,null);
+               newBattle.addArmy(currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), currentArmy.nodeList.slice(currentArmy.startIndex));
+               newBattle.addArmy(this.movingArmies[j].army, this.playerPool.getPlayer(this.movingArmies[j].army.player), this.movingArmies[j].nodeList.slice(this.movingArmies[j].startIndex));
+               this.battles.push(newBattle);
+               this.gameSocket.emit('battle_start',{battle:this.battles[this.battles.length-1]});
                if(i < j) {
                   this.movingArmies.splice(j,1);
                   this.movingArmies.splice(i,1);
@@ -205,6 +226,13 @@ class Game{
                if(j < i) {
                   i--;
                }
+               break;
+            }
+         }
+         for(var j = 0; j < this.battles.length; j++) {
+            if(currentArmy.army.checkCollision(this.battles[j].x, this.battles[j].y)) {
+               this.battles[j].addArmy(currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), currentArmy.nodeList.slice(currentArmy.startIndex));
+               this.movingArmies.splice(i,1);
                break;
             }
          }
@@ -247,7 +275,7 @@ class Game{
       if(troopsToAdd > 0){
 
          for(var i = 0; i < this.playerPool.activePlayers.length; i++) {
-            this.playerPool.activePlayers[i].incrementArmies(troopsToAdd);
+            this.playerPool.activePlayers[i].incrementArmies(troopsToAdd, this.center, this.radius);
          }
       }
    }
@@ -255,9 +283,10 @@ class Game{
 
    checkGameOver(){
       // Check for end condition (1 Player + DummyPlayer remaining)
-      //TODO: Change to check for 2 Players and no Dummy Player
+      if(this.playerPool.activePlayers.length == 2 && !this.playerPool.containsActive(null)){
+         return;
+      }
       if(this.playerPool.activePlayers.length <= 2 && this.gameState == STATE_RUNNING){
-         this.winner = this.playerPool.activePlayers[1].id;
          this.gameState = STATE_GAME_OVER;
          this.removeGame(this.roomid);
          var winner = null;
@@ -285,6 +314,7 @@ class Game{
             if(removedBattle.moveArmy == 2) {
                this.movingArmies.push(new movingArmyObject.MovingArmy(removedBattle.army2, this.map.nodeToXY(removedBattle.swipeList2), removedBattle.swipeList2));
             }
+            this.gameSocket.emit("battle_end",{x:removedBattle.x,y:removedBattle.y});
             console.log("Removed a battle");
          }
       }
