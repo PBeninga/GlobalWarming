@@ -31,6 +31,8 @@ class Game{
       this.removeGame = removeGame;  // This is a callback to app.js
 
       //Useful game data
+      this.center = [500 + Math.floor(Math.random() * 1000),500 + Math.floor(Math.random() * 1000)];
+      this.radius = 2000;
       this.map = new gameMap.MapFactory().getMap(null);
       this.playerPool = new playerObject.PlayerPool();
       this.dummyPlayer = this.playerPool.addPlayer(new playerObject.Player(null, null));
@@ -128,6 +130,10 @@ class Game{
       }
 
       if(this.gameState == STATE_RUNNING){
+         this.radius -= .5;
+         if(this.radius < 5){
+            this.radius = 5
+         }
          this.gameSocket.emit('players', {players:this.playerPool.activePlayers});
          this.incrementTroops(tickStartTime);
          this.moveArmies();
@@ -137,6 +143,7 @@ class Game{
       }
 
       this.gameSocket.emit('update_armies', {players:this.playerPool.activePlayers});
+      this.gameSocket.emit('update_circle', {x:this.center[0],y:this.center[1],r:this.radius});
       this.forceTickRate(tickStartTime); // Wait until min tick-time has passed
    }
 
@@ -249,7 +256,7 @@ class Game{
       if(troopsToAdd > 0){
 
          for(var i = 0; i < this.playerPool.activePlayers.length; i++) {
-            this.playerPool.activePlayers[i].incrementArmies(troopsToAdd);
+            this.playerPool.activePlayers[i].incrementArmies(troopsToAdd, this.center, this.radius);
          }
       }
    }

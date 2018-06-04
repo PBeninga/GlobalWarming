@@ -69,12 +69,15 @@ class Player{
       this.armies = [];
    }
 
-   incrementArmies(toAdd) {
-      if(this.id == null) {
-         return;
-      }
-      for(var i = 0; i < this.armies.length; i++) {
-         if(this.armies[i].node != null && this.armies[i].buff != null) {
+   incrementArmies(toAdd,center,radius) {
+      for(var i = this.armies.length-1; i >= 0; i--) {
+         var distance_sqrd = (this.armies[i].x - center[0])**2 + (this.armies[i].y - center[1])**2;
+         if(distance_sqrd > radius**2 && this.armies[i].count > 0 ){
+            this.armies[i].count -= toAdd;
+            if(this.armies[i].count <= 0){
+               this.armies.splice(i,1);
+            }
+         } else if(this.id != null && this.armies[i].node != null && this.armies[i].buff != null) {
             this.armies[i].count += toAdd;
          }
       }

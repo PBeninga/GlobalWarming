@@ -22,6 +22,7 @@ var bannerGFX;
 var bannerGFXMarker;
 var bannerBox;
 var leaveButton;
+var circle;
 
 function TRASHCODE() {
 players = [];
@@ -51,7 +52,8 @@ function onsocketConnected (data) {
 	console.log(gameId);
 	gameSocket = io(gameId);
 	gameSocket.on('update_armies', updateArmies);
-   gameSocket.on('players', displayPlayers);
+	gameSocket.on('update_circle', updateCircle);
+        gameSocket.on('players', displayPlayers);
 	gameSocket.on('remove_player', onRemovePlayer);
 	gameSocket.on('endGame',endGame);
 	gameSocket.on('newPlayer', onNewPlayer);
@@ -67,6 +69,13 @@ function onsocketConnected (data) {
 		}
 	}
 	// send the server our initial position and tell it we are connected
+}
+
+function updateCircle(data){
+   width = 2000
+   circle.clear();
+   circle.lineStyle(width, 0x6b346a,.5);
+   circle.drawCircle(data.x,data.y,data.r*2+width);
 }
 function onStart(){
 	bannerGFX.destroy();
@@ -183,7 +192,7 @@ function addNewPlayer(id) {
       if(username == 'win'){
          unit = 420
       } else{
-			unit = units[chosenUnit];    // WHERE SELECTED UNIT WILL GO
+	 unit = units[chosenUnit];    // WHERE SELECTED UNIT WILL GO
          unitTaken[chosenUnit] = true
       }
    } else{
@@ -207,7 +216,7 @@ function clearUnit(unit) {
 // Returns a unit from the units list, so long as it isn't taken.
 // TODO: Loop through colors
 function getUnit() {
-   if(unitTaken.includes(false)){
+   if(!unitTaken.includes(false)){
       console.log("To many players, assigning already used unit.");
       return units[Math.floor(Math.random() * units.length)];
    }
@@ -428,6 +437,7 @@ Main.prototype = {
       game.world.bringToTop(armyGroup);
       game.world.bringToTop(nodeGroup);
       game.input.onUp.add(endSwipe);
+      circle = game.add.graphics(0,0);
       leaveButton = createButton(
          game,
          'Return To Main Menu', 
