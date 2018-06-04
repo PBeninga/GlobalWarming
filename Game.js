@@ -156,8 +156,13 @@ class Game{
             var currentNode = this.map.nodes[currentArmy.nodeList[currentArmy.startIndex+1]]; // The ending node of the MovingArmy
             // if the node is occupied, initialize a battle and remove the MovingArmy from the list
             if(currentNode.army != null) {
+               var currentBattle = this.getBattle(currentNode.army);
+               if(currentBattle != null) {
+                  currentBattle.addArmy(currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), null);
+                  this.movingArmies.splice(i,1);
+               }
                // If the current Node's army is the players, don't start a battle.
-               if(currentArmy.army.player == currentNode.army.player) {
+               else if(currentArmy.army.player == currentNode.army.player) {
                   currentNode.army.count += currentArmy.army.count;
                   this.playerPool.getPlayer(currentArmy.army.player).removeArmy(currentArmy.army.id);
                   console.log("Removed Army");
@@ -165,12 +170,10 @@ class Game{
                }
                else {
                   console.log("Battle At Node");
-                  this.battles.push(new battleObject.Battle(
-                     currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), null,
-                     currentNode.army, this.playerPool.getPlayer(currentNode.army.player), null,
-                     currentArmy.army.x, currentArmy.army.y,
-                     currentNode
-                  ));
+                  var newBattle = new battleObject.Battle(currentArmy.army.x, currentArmy.army.y, currentNode);
+                  newBattle.addArmy(currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), null);
+                  newBattle.addArmy(currentNode.army, this.playerPool.getPlayer(currentNode.army.player), null);
+                  this.battles.push(newBattle);
                   this.gameSocket.emit('battle_start',{battle:this.battles[this.battles.length-1]});
                   console.log("Removed Army");
                   this.movingArmies.splice(i,1);
@@ -186,6 +189,17 @@ class Game{
       }
    }
 
+   getBattle(army) {
+      for(var i = 0; i < this.battles.length; i++) {
+         for(var j = 0; j < this.battles.armies.length; j++) {
+            if(this.battles[i].armies[j].id == army.id) {
+               return this.battles[i];
+            }
+         }
+      }
+      return null;
+   }
+
    checkCollisions() {
       for(var i = 0; i < this.movingArmies.length; i++) {
          var currentArmy = this.movingArmies[i];
@@ -195,12 +209,10 @@ class Game{
                continue;
             }
             if(currentArmy.army.checkCollision(this.movingArmies[j].army.x, this.movingArmies[j].army.y)) {
-               this.battles.push(new battleObject.Battle(
-                  currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), currentArmy.nodeList.slice(currentArmy.startIndex),
-                  this.movingArmies[j].army, this.playerPool.getPlayer(this.movingArmies[j].army.player), this.movingArmies[j].nodeList.slice(this.movingArmies[j].startIndex),
-                  currentArmy.army.x, currentArmy.army.y,
-                  null
-               ));
+               var newBattle = new battleObject.Battle(currentArmy.army.x, currentArmy.army.y,null);
+               newBattle.addArmy(currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), currentArmy.nodeList.slice(currentArmy.startIndex));
+               newBattle.addArmy(this.movingArmies[j].army, this.playerPool.getPlayer(this.movingArmies[j].army.player), this.movingArmies[j].nodeList.slice(this.movingArmies[j].startIndex));
+               this.battles.push(newBattle);
                this.gameSocket.emit('battle_start',{battle:this.battles[this.battles.length-1]});
                if(i < j) {
                   this.movingArmies.splice(j,1);
@@ -214,6 +226,13 @@ class Game{
                if(j < i) {
                   i--;
                }
+               break;
+            }
+         }
+         for(var j = 0; j < this.battles.length; j++) {
+            if(currentArmy.army.checkCollision(this.battles[j].x, this.battles[j].y)) {
+               this.battles[j].addArmy(currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), currentArmy.nodeList.slice(currentArmy.startIndex));
+               this.movingArmies.splice(i,1);
                break;
             }
          }
