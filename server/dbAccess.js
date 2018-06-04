@@ -19,7 +19,6 @@ function onNewAccount(playerSocket, data){
          playerSocket.emit('new_account', {'accountExists' : 'true'});
          return
       }
-         playerSocket.emit('new_account', {'accountExists' : 'false'});
       console.log("New Account Created");
       db.insertOne('Player', data).then(function() {
          playerSocket.emit('new_account', {'accountExists' : 'false'});
