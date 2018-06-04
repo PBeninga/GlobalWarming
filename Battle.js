@@ -27,12 +27,12 @@ class Battle {
 		}
 		this.armies.push(army);
 		this.armyAttacks.push(army.attackModifier * army.count * 0.05);
-		this.players.push(player);
+		this.players.push(Player);
 		this.swipeLists.push(swipeList);
 	}
 
-	updateLoser(index) {
-		this.players[i].removeArmy(loser.id);
+	updateLoser(i) {
+		this.players[i].removeArmy(this.armies[i].id);
 		this.players.splice(i, 1);
 		this.swipeLists.splice(i, 1);
 		this.armies.splice(i, 1);
@@ -66,7 +66,7 @@ class Battle {
 		this.attack();
 		for(var i = 0; i < this.armies.length; i++) {
 			if(this.armies[i].count <= 0) {
-				updateLoser(i);
+				this.updateLoser(i);
 			}
 		}
 		if(this.players.length <= 1) {

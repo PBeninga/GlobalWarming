@@ -149,7 +149,7 @@ class Game{
             var currentNode = this.map.nodes[currentArmy.nodeList[currentArmy.startIndex+1]]; // The ending node of the MovingArmy
             // if the node is occupied, initialize a battle and remove the MovingArmy from the list
             if(currentNode.army != null) {
-               var currentBattle = getBattle(currentNode.army);
+               var currentBattle = this.getBattle(currentNode.army);
                if(currentBattle != null) {
                   currentBattle.addArmy(currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), null);
                   this.movingArmies.splice(i,1);
@@ -163,7 +163,7 @@ class Game{
                }
                else {
                   console.log("Battle At Node");
-                  var newBattles = new battleObject.Battle(currentArmy.army.x, currentArmy.army.y, currentNode));
+                  var newBattle = new battleObject.Battle(currentArmy.army.x, currentArmy.army.y, currentNode);
                   newBattle.addArmy(currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), null);
                   newBattle.addArmy(currentNode.army, this.playerPool.getPlayer(currentNode.army.player), null);
                   this.battles.push(newBattle);
@@ -224,7 +224,7 @@ class Game{
          }
          for(var j = 0; j < this.battles.length; j++) {
             if(currentArmy.army.checkCollision(this.battles[j].x, this.battles[j].y)) {
-               battles[j].addArmy(currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), currentArmy.nodeList.slice(currentArmy.startIndex));
+               this.battles[j].addArmy(currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), currentArmy.nodeList.slice(currentArmy.startIndex));
                this.movingArmies.splice(i,1);
                break;
             }
