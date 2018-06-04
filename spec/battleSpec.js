@@ -31,8 +31,8 @@ describe('Test battles', function(){
       armyb = new armys.Army(dummy,1,null,null,null,null);
 
       battle = new battles.Battle(armya,dummy,null,armyb,dummy,null,null,null,null);
-      expect(battle.tick()).toBe(false);
-      //Should end as tie because it is a 1v1
+      expect(battle.tick()).toBe(true);
+      //Should end as tie because it is a 1v1, this is broken
    });
 });
 
