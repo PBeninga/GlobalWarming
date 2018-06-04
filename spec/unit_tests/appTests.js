@@ -1,7 +1,6 @@
- describe("Test increment all troops:",function(){
+ describe("Test unit tests are running",function(){
 
-    it("test that all troops are incremented the same way",function(){ 
-        console.log("test running???")
-    });
+    console.log("Running unit tests");
+     
 
  });
