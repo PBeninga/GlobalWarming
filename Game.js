@@ -264,9 +264,10 @@ class Game{
 
    checkGameOver(){
       // Check for end condition (1 Player + DummyPlayer remaining)
-      //TODO: Change to check for 2 Players and no Dummy Player
+      if(this.playerPool.activePlayers.length == 2 && !this.playerPool.containsActive(null)){
+         return;
+      }
       if(this.playerPool.activePlayers.length <= 2 && this.gameState == STATE_RUNNING){
-         this.winner = this.playerPool.activePlayers[1].id;
          this.gameState = STATE_GAME_OVER;
          this.removeGame(this.roomid);
          var winner = null;
