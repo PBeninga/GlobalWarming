@@ -2,12 +2,12 @@
 
     console.log("Running unit tests");
      
- )};
+ });
      
 describe('testy', function(){
 
    it("checkkigttyy", function(){ 
-   )};
+   });
 
 
- )};
+});
