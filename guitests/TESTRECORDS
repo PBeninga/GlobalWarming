@@ -1,0 +1,16 @@
+LOGIN
+To begin with, we checked if logins worked. We tried to login with a username and password
+not stored in our database, "jrjiow" and "rfwweq". That resulted in a message appearing saying
+user not found. Empty strings resulted in the same message appearing. We then created an account
+called "Bro" with the password of "Bro". This lead the client to start the game.
+
+CREATE ACCOUNT
+We began with creating an account with a username that already exists. This lead to our game
+displaying a message that the account already exists.
+
+ARMY DISPLAY
+This was a simple test to see if the
+
+SOUNDS
+
+SWIPES

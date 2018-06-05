@@ -1,3 +1,8 @@
+var socket;
+var username;
+var startButton;
+var titleText;
+
 var MatchMaking = function(game){};
 
 
@@ -15,5 +20,10 @@ MatchMaking.prototype = {
          boop.play();
          game.state.start('Main', true, false, [socket,username]);
       });
+   },
+
+   init: function(sock) {
+      socket = sock[0];
+      username = sock[1];
    }
 }
