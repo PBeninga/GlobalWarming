@@ -130,7 +130,7 @@ class Game{
       }
 
       if(this.gameState == STATE_RUNNING){
-         this.radius -= .5;
+         this.radius -= 2.5;
          if(this.radius < 5){
             this.radius = 5
          }
@@ -307,7 +307,7 @@ class Game{
 
    garbageCollection(){
       // Removes
-      // Players, Battles ...
+      // Armies, Players, Battles ...
       // From their respective arrays
 
       for(var i = this.battles.length - 1; i >= 0; i--) {
@@ -323,6 +323,13 @@ class Game{
       for(var i = 0; i < this.playerPool.activePlayers.length; i++) {
          if(this.playerPool.activePlayers[i].armies.length == 0) {
             this.playerPool.removePlayer(this.playerPool.activePlayers[i].id);
+         }
+      }
+
+      for(var i = 0; i < this.map.nodes.length; i++){
+         if(this.map.nodes[i].army && this.map.nodes[i].army.count == 0){
+            this.playerPool.getPlayer(this.map.nodes[i].army.player).removeArmy(this.map.nodes[i].army.id);
+            this.map.nodes[i].army = null;
          }
       }
 
