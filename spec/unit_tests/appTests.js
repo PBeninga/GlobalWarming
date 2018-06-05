@@ -1,13 +1,15 @@
- describe("Test unit tests are running",function(){
+var web_app = require("../../app.js");
 
-    console.log("Running unit tests");
-     
- )};
-     
-describe('testy', function(){
+describe('Finding game tests', function(){
 
-   it("checkkigttyy", function(){ 
-   )};
+   console.log("Running app.js tests");
+ 
+   it("Checks find game", function(){ 
+   
+      expect( (web_app.games.size == 0) ).toBe(true);
+      web_app.findGame(000);
+      
+   });
 
 
- )};
+ });

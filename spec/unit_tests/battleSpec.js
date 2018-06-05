@@ -1,9 +1,11 @@
-var armys = require("../Army.js");
-var battles = require("../Battle.js");
-var player = require("../Player.js");
+var armys = require("../../Army.js");
+var battles = require("../../Battle.js");
+var player = require("../../Player.js");
 
 
 describe('Test battles', function(){
+    
+   console.log("Running battle unit Tests");
 
    it("Checking that battle ends", function(){ 
       dummya = new player.Player('ya','ya'); 
