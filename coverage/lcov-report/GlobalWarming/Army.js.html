@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for GlobalWarming/Army.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">GlobalWarming/</a> Army.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">51.85% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>14/27</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/6</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">50% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>2/4</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">51.85% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>14/27</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line medium'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">var miscFunc = require('./MiscFunctions.js');
+var locationClass = require('./Location.js');
+&nbsp;
+var armySize = 30;
+// *********************************************
+// IMPORTANT - ARMY ONLY HOLDS IDS. DOES NOT HOLD OBJECTS
+// *********************************************
+class Army extends locationClass.Location{
+   constructor(player,count,node,x,y,buff) {
+      super(x, y);
+      this.id = miscFunc.generateID(20);
+      this.player = player.id;
+      this.node = node;
+      this.count = count;
+      this.buff = buff;
+&nbsp;
+      this.movementSpeed = 6.0;
+      this.attackModifier = 1.0;
+      this.defenseModifier = 1.0;
+   }
+&nbsp;
+   // returns the loser, so it can be removed from it's node and it's players list
+   battle<span class="fstat-no" title="function not covered" >(army) {</span>
+     //if end node contains your army, just combine armies
+<span class="cstat-no" title="statement not covered" >     if(this.player == army.player){</span>
+<span class="cstat-no" title="statement not covered" >       this.count += army.count;</span>
+<span class="cstat-no" title="statement not covered" >       return army;</span>
+     }else{ //battle
+       //if enemy army is greater, decrease enemy army by your attacking army count
+<span class="cstat-no" title="statement not covered" >       if(army.count &gt;= this.count){</span>
+<span class="cstat-no" title="statement not covered" >         army.count -= this.count;</span>
+<span class="cstat-no" title="statement not covered" >         return this;</span>
+       //otherwise, conquer the node with your remaning troops.
+       }else{
+<span class="cstat-no" title="statement not covered" >         this.count -= army.count;</span>
+<span class="cstat-no" title="statement not covered" >         this.buff = army.buff;</span>
+<span class="cstat-no" title="statement not covered" >         this.node = army.node;</span>
+<span class="cstat-no" title="statement not covered" >         return army;</span>
+       }
+     }
+   }
+   // TODO: In the future, we should use this function to update buff values
+   updateBuff(buff) {
+      this.buff = buff;
+   }
+&nbsp;
+   checkCollision<span class="fstat-no" title="function not covered" >(x, y) {</span>
+<span class="cstat-no" title="statement not covered" >      if(this.distance(x, y) &lt;= armySize) {</span>
+<span class="cstat-no" title="statement not covered" >         return true;</span>
+      }
+<span class="cstat-no" title="statement not covered" >      return false;</span>
+   }
+}
+&nbsp;
+module.exports = {
+    Army:Army
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Jun 04 2018 16:52:21 GMT-0700 (DST)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

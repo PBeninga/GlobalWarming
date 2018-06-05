@@ -1,3 +1,15 @@
+
+describe("Database constructor", function() {
+  it("checks if we can connect to the database", function() {
+
+    var database = require('./database/database.js');
+	var db = new database.Database();
+
+    expect(db).toEqual(db);
+  });
+});
+
+
 /*describe("Database", function() {
    var database = require('../server/database/database.js');
    var db;
