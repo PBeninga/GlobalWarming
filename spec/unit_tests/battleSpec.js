@@ -1,6 +1,6 @@
-var armys = require("../Army.js");
-var battles = require("../Battle.js");
-var player = require("../Player.js");
+var armys = require("../../Army.js");
+var battles = require("../../Battle.js");
+var player = require("../../Player.js");
 
 
 describe('Test battles', function(){
