@@ -15,13 +15,12 @@ class Battle {
 		for(var i = 0; i < this.players.length; i++) {
 			if(Player.id == this.players[i].id) {
 				this.armies[i].count += army.count;
-				if(this.swipeLists[i] == null) {
-					this.swipeLists[i] = swipeList;
-				}
 				if(this.armies[i].buff == null) {
 					this.armies[i].updateBuff(army.buff);
 				}
 				this.armyAttacks[i] = this.armies[i].attackModifier * this.armies[i].count * 0.05;
+				console.log("Removing unneccesary army");
+				Player.removeArmy(army.id);
 				return;
 			}
 		}
@@ -32,6 +31,7 @@ class Battle {
 	}
 
 	updateLoser(i) {
+		console.log("REMOVED");
 		this.players[i].removeArmy(this.armies[i].id);
 		this.players.splice(i, 1);
 		this.swipeLists.splice(i, 1);
@@ -42,6 +42,7 @@ class Battle {
 	// Updates the winner with the spoils of the loser
 	updateWinner(winner) {
 		if(this.node != null) {
+			console.log("Placing winner " + winner.id + " onto node " + this.node.id);
 			this.node.army = winner;
 			if(this.node.buff != null) {
 				winner.updateBuff(this.node.buff);
