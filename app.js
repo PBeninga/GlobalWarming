@@ -57,6 +57,7 @@ socket.on('input_fired', onInputFired);
 // Socket callbacks
 
 function onNewClient(){
+  console.log("testing onNewClient");
     game = findGame(this.id);
     this.join(game.roomid)
     io.of(game.roomid).emit('newPlayer',{id:this.id, starting:game.starting});
@@ -169,3 +170,10 @@ function removeGame(gameId){
 	}
    games.delete(gameId);
 }
+
+module.exports = {
+   findGame:findGame,
+   onNewClient:onNewClient,
+   games:games,
+   removeGame:removeGame
+};
