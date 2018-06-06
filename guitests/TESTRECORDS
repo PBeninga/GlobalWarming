@@ -1,30 +1,48 @@
-LOGIN
-To begin with, we checked if logins worked. We tried to login with a username and password
-not stored in our database, "jrjiow" and "rfwweq". That resulted in a message appearing saying
-user not found. Empty strings resulted in the same message appearing. We then created an account
-called "Bro" with the password of "Bro". This lead the client to start the game.
+LOGIN FUNTIONALITY  
+(PASS) - Test for incorrect login:
+Try to login with a username and password not stored in our database, "jrjiow" and "rfwweq". 
+This should result in a message appearing reporting that the user is not found. 
 
-CREATE ACCOUNT
-We began with creating an account with a username that already exists. This lead to our game
-displaying a message that the account already exists. We then attempted to create an account
-that does not exist. This leads to the successful creation of the account, which his signified by
-the start of the game. We then exited the game and attempted to log back in with this newly created
-account. The login was successful.
+(PASS) - Test for empty string:
+Try to login with a empty strings.
+This should result in a message appearing reporting that the user is not found.
+
+(PASS) - Test for creating valid account:
+Create an account called "Bro" with the password of "Bro". 
+This should lead the client to start the game.
+
+
+ACCOUNT CREATION
+(PASS) - Test for creating existing account
+Create an account with a username that already exists. 
+This should lead to our game displaying a message that the account already exists. 
+
+(PASS) - Test creating an account that does not exist
+Attempt to create an account that does not exist. 
+This should lead to the successful creation of the account, which is signified by the start of the game. 
+After then exiting the game and attempting to log back in with this newly created account, the login should be successful.
+
 
 ARMY DISPLAY
-This was a simple test to see if the army display would cycle and be used correctly. The army display,
-when clicked on, successfully cycles through the available sprites. When the game starts, the sprite
-chosen remains as your sprite for all members of that game.
+(PASS) - Test to see if the army display would cycle and be used correctly.
+The army display, when clicked on, should successfully cycles through the available sprites. 
+When the game starts, the chosen sprite should remain as your sprite for all members of that game.
 
 
 SOUNDS
-We checked to make sure that the sound changes between the main menu and the game, that buttons boop when
-pressed, that battles properly sound out, that marching successfully sounds, and that the sound can be
-increased and decreased. All of these tests worked as expected.
+(PASS) - Test sounds
+The sound should change between the main menu and the game, buttons should "boop" when pressed,
+battles should properly sound out, marching successfully sounds, and the sounds should be able to be
+increased and decreased.
+
 
 SWIPES
-We attempted to create several incorrect swipes in different ways. We attempted to swipe an army that was not
-ours, we attempted to swipe an army onto a path it shouldn't have been able to go down, we attempted to swipe
-armies into esoteric paths(from a node to another node back to the original node, and so on and so forth),
-we attempted to swipe an army, then not complete the swipe. All tests performed as expected. These are the main
-interactions the player can make, so we tested them thoroughly to be sure that they work properly.
+(PASS) -  Test invalid swipes
+When trying to swipe an army that is not the users, or onto a path it be able to access, it should not move the army.
+
+(PASS) - Test valid swipes
+Complex army swipes creating esoteric paths (from a node to another node back to the original node, and so on and so forth), 
+should navigate as directed.
+
+(PASS) - Test incomplete swipe
+Try to swipe an army, then not complete the swipe. This should not initiate movement.
