@@ -11,8 +11,8 @@ describe('Test moving armies', function(){
 
    it("Checking that moving army initializes properly", function(){
 		var dummy = new playerObject.Player('ya','ya');
-		var nodea = new mapObject.MapNode(0, 0, {1}, 0);
-		var nodeb = new mapObject.MapNode(100, 0, {0}, 1);
+		var nodea = new mapObject.MapNode(0, 0, [1], 0);
+		var nodeb = new mapObject.MapNode(100, 0, [0], 1);
       var army = new armyObject.Army(dummy,100,nodea,0,0,null);
 
 		var swipeList = [];
