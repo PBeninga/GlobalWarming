@@ -15,7 +15,7 @@ describe('Test moving armies', function(){
 		var nodeb = new mapObject.MapNode(100, 0, [0], 1);
       var army = new armyObject.Army(dummy,100,nodea,0,0,null);
 
-		var swipeList = [];
+		var swipePath = [];
 		swipePath.push({x:nodea.x, y:nodea.y});
 		swipePath.push({x:nodeb.x, y:nodeb.y});
 
