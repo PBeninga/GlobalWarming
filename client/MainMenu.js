@@ -31,7 +31,7 @@ MainMenu.prototype = {
       
       var startButton = createButton(game, "Game Start", 'button1', canvas_width/2, canvas_height/2 - 100, 1, MainMenu, function() {
          boop.play();
-         game.state.start('Main', true, false, [socket,username]);
+         game.state.start('Main', true, false, socket);
       });
       
       var chooseUnitButton = createButton(game, "Change Avatar", 'button1', canvas_width/2, canvas_height/2 + 110, 1, MainMenu, nextUnit);
