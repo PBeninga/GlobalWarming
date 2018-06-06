@@ -1,5 +1,5 @@
-var game = require("../Game.js")
-var app = require("../app.js")
+var game = require("../../Game.js")
+var app = require("../../app.js")
 
 describe("Find game by id", function() {
    //app.games = new Map()
@@ -23,5 +23,5 @@ describe("Find game by id", function() {
       player = game.playerPool.activePlayers[1]
       expect(player.id).toBe("12345")
       app.games.delete(game.roomid)
-   });
+   }); 
 });

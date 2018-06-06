@@ -1,12 +1,12 @@
+var web_app = require("../../app.js");
+var game = require("../../Game.js");
+var playerObject = require('../../Player.js');
 
-describe('Adding Games test', function(){
+describe('unit tests', function(){
 
-   
-   it("Add games", function(){
+   it("Testing app and game", function(){
       
-      var web_app = require("../../app.js");
-      var game = require("../../Game.js");
-      var playerObject = require('../../Player.js');
+      // TEST 1 app.js for adding games
       expect( web_app.games.size == 0 ).toBe(true);
       var game1 = web_app.findGame(000);
       expect( web_app.games.size == 1 ).toBe(true);
@@ -14,40 +14,12 @@ describe('Adding Games test', function(){
       expect( web_app.games.size == 1 ).toBe(true);
       expect( game1 == game2 ).toBe(true);
       
-   });
-   
-   for(var i = 0; i<100000; i++ ){} // Wait for Add games to finish
+      // TEST 2 Player.js for checking active player
+      expect( game1.playerPool.containsActive(000) ).toBe(true);
 
- });
-
-/*
-describe('Check for active Player', function(){
-
-   it("Check for active player", function(){
-      
-      var web_app = require("../../app.js");
-      var game = require("../../Game.js");
-      var playerObject = require('../../Player.js');
-   
-      var game = web_app.findGame(002); // Should return game 1
-      expect( game.playerPool.containsActive(000) ).toBe(true);
-      
-   });
-   
- //  for(var i = 0; i<10000; i++ ){} // Wait for Add games to finish
-
- });
-
-
-*/
-
-
-
-
-
-/*
 
       // TEST 3 Game.js  Ensure the correct State
+      expect( game1.gameState == 0  ).toBe(true);
       
       
       // TEST 4 Game.js Ensure we can start the game
@@ -63,4 +35,7 @@ describe('Check for active Player', function(){
       // TEST 6 app.js removing a game
       game1.removeGame(game1.roomid);
       expect( web_app.games.size == 0 ).toBe(true); 
-      */
+      
+   });
+
+ });
