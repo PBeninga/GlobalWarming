@@ -71,12 +71,13 @@ class Player{
 
    incrementArmies(toAdd,center,radius) {
       for(var i = this.armies.length-1; i >= 0; i--) {
-         var distance_sqrd = (this.armies[i].x - center[0])**2 + (this.armies[i].y - center[1])**2;
-         if(distance_sqrd > radius**2 && this.armies[i].count > 0 ){
+         var distance_sqrd = Math.pow(this.armies[i].x - center[0],2) + Math.pow(this.armies[i].y - center[1],2);
+         if(distance_sqrd > Math.pow(radius,2)){
             this.armies[i].count -= toAdd;
-            if(this.armies[i].count <= 0){
-               this.armies.splice(i,1);
+            if(this.armies[i].count - toAdd < 0){
+               this.armies[i].count = 0;
             }
+            this.armies[i].count > 0
          } else if(this.id != null && this.armies[i].node != null && this.armies[i].buff != null) {
             this.armies[i].count += toAdd;
          }

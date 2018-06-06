@@ -1,30 +1,48 @@
 class Battle {
 	// Should be able to handle the players and nodes completely internally.
-	constructor(army1, player1, swipeList1, army2, player2, swipeList2, x, y, node) {
-		this.army1 = army1;
-		this.player1 = player1;
-		this.swipeList1 = swipeList1;
-		this.army2 = army2;
-		this.player2 = player2;
-		this.swipeList2 = swipeList2;
+	constructor(x, y, node) {
+		this.armies = [];
+		this.armyAttacks = [];
+		this.players = [];
+		this.swipeLists = [];
 		this.x = x;
 		this.y = y;
 		this.node = node; //Node can be null
-		this.moveArmy = 0;
+		this.moveArmy = false;
 	}
 
-	updateLoser(loser) {
-		if(this.player1.id == loser.player) {
-			this.player1.removeArmy(loser.id);
+	addArmy(army, Player, swipeList) {
+		for(var i = 0; i < this.players.length; i++) {
+			if(Player.id == this.players[i].id) {
+				this.armies[i].count += army.count;
+				if(this.armies[i].buff == null) {
+					this.armies[i].updateBuff(army.buff);
+				}
+				this.armyAttacks[i] = this.armies[i].attackModifier * Math.log(this.armies[i].count) * 0.025;
+				console.log("Removing unneccesary army");
+				Player.removeArmy(army.id);
+				return;
+			}
 		}
-		if(this.player2.id == loser.player) {
-			this.player2.removeArmy(loser.id);
-		}
+		this.armies.push(army);
+		this.armyAttacks.push(army.attackModifier * army.count * 0.05);
+		this.players.push(Player);
+		this.swipeLists.push(swipeList);
+	}
+
+	updateLoser(i) {
+		console.log("REMOVED");
+		this.players[i].removeArmy(this.armies[i].id);
+		this.players.splice(i, 1);
+		this.swipeLists.splice(i, 1);
+		this.armies.splice(i, 1);
+		this.armyAttacks.splice(i, 1);
 	}
 
 	// Updates the winner with the spoils of the loser
-	updateWinner(winner, loser) {
+	updateWinner(winner) {
 		if(this.node != null) {
+			console.log("Placing winner " + winner.id + " onto node " + this.node.id);
 			this.node.army = winner;
 			if(this.node.buff != null) {
 				winner.updateBuff(this.node.buff);
@@ -35,49 +53,33 @@ class Battle {
 	}
 
 	attack() {
-		var army1Attack = this.army1.attackModifier * this.army1.count * 0.1;
-		var army2Attack = this.army2.attackModifier * this.army2.count * 0.1;
-		this.army1.count -= army2Attack;
-		this.army2.count -= army1Attack;
+		for(var i = 0; i < this.armies.length; i++) {
+			for(var j = 0; j < this.armies.length; j++) {
+				if(this.armies[i].player != this.armies[j].player) {
+					this.armies[j].count -= this.armyAttacks[i] + (Math.random() * (this.armyAttacks[i] * 0.1));
+				}
+			}
+		}
 	}
 
 	// Returns true if the battle is ongoing, and false if it has finished
 	tick() {
 		this.attack();
-		if(this.army1.count <= 0 || this.army2.count <= 0) {
-			var losers = new Array();
-			// If both armies get destroyed
-			if(this.army1.count <= 0 && this.army2.count <= 0) {
-				losers.push(this.army1);
-				losers.push(this.army2);
-				this.end(null, losers);
+		for(var i = 0; i < this.armies.length; i++) {
+			if(this.armies[i].count <= 0) {
+				this.updateLoser(i);
 			}
-			if(this.army1.count <= 0) {
-				losers.push(this.army1);
-				this.end(this.army2, losers);
-			}
-			if(this.army2.count <= 0) {
-				losers.push(this.army2);
-				this.end(this.army1, losers);
+		}
+		if(this.players.length <= 1) {
+			if(this.armies.length == 1) {
+				this.updateWinner(this.armies[0]);
+				if(this.swipeLists[0] != null) {
+					this.moveArmy = true;
+				}
 			}
 			return false;
 		}
 		return true;
-	}
-
-	end(winner, losers) {
-		if(winner != null) {
-			this.updateWinner(winner, losers[0]);
-			if(this.player1.id == winner.player && this.swipeList1 != null) {
-				this.moveArmy = 1;
-			}
-			if(this.player2.id == winner.player && this.swipeList2 != null) {
-				this.moveArmy = 2;
-			}
-		}
-		for(var i = 0; i < losers.length; i++) {
-			this.updateLoser(losers[i]);
-		}
 	}
 }
 

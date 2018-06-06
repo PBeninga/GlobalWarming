@@ -8,7 +8,7 @@ const fs = require('fs');
 
 // Global Constants
 let tickLength = 50;
-let TIME_TILL_START = 3000;
+let TIME_TILL_START = 10000;
 
 let STATE_WAITING = 0;
 let STATE_COUNT_DOWN = 1;
@@ -156,22 +156,25 @@ class Game{
             var currentNode = this.map.nodes[currentArmy.nodeList[currentArmy.startIndex+1]]; // The ending node of the MovingArmy
             // if the node is occupied, initialize a battle and remove the MovingArmy from the list
             if(currentNode.army != null) {
+               var currentBattle = this.getBattle(currentNode.army);
+               if(currentBattle != null) {
+                  currentBattle.addArmy(currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), null);
+                  this.movingArmies.splice(i,1);
+               }
                // If the current Node's army is the players, don't start a battle.
-               if(currentArmy.army.player == currentNode.army.player) {
+               else if(currentArmy.army.player == currentNode.army.player) {
                   currentNode.army.count += currentArmy.army.count;
                   this.playerPool.getPlayer(currentArmy.army.player).removeArmy(currentArmy.army.id);
-                  console.log("Removed Army");
+                  console.log("Removed MovingArmy Army");
                   this.movingArmies.splice(i,1);
                }
                else {
                   console.log("Battle At Node");
-                  this.battles.push(new battleObject.Battle(
-                     currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), null,
-                     currentNode.army, this.playerPool.getPlayer(currentNode.army.player), null,
-                     currentArmy.army.x, currentArmy.army.y,
-                     currentNode
-                  ));
-                  this.gameSocket.emit('battle_start',{battle:this.battles[this.battles.length-1]});
+                  var newBattle = new battleObject.Battle(currentArmy.army.x, currentArmy.army.y, currentNode);
+                  newBattle.addArmy(currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), null);
+                  newBattle.addArmy(currentNode.army, this.playerPool.getPlayer(currentNode.army.player), null);
+                  this.battles.push(newBattle);
+                  this.gameSocket.emit('battle_start',{battle:newBattle});
                   console.log("Removed Army");
                   this.movingArmies.splice(i,1);
                }
@@ -186,22 +189,43 @@ class Game{
       }
    }
 
+   getBattle(army) {
+      for(var i = 0; i < this.battles.length; i++) {
+         for(var j = 0; j < this.battles[i].armies.length; j++) {
+            if(this.battles[i].armies[j].id == army.id) {
+               return this.battles[i];
+            }
+         }
+      }
+      return null;
+   }
+
    checkCollisions() {
+      var completed = false;
       for(var i = 0; i < this.movingArmies.length; i++) {
          var currentArmy = this.movingArmies[i];
+         for(var j = 0; j < this.battles.length; j++) {
+            if(currentArmy.army.checkCollision(this.battles[j].x, this.battles[j].y)) {
+               this.battles[j].addArmy(currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), currentArmy.nodeList.slice(currentArmy.startIndex));
+               this.movingArmies.splice(i,1);
+               completed = true;
+               break;
+            }
+         }
+         if(completed) {
+            continue;
+         }
          for(var j = 0; j < this.movingArmies.length; j++) {
             //Not counting the army we're checking
             if(this.movingArmies[j].army.player == currentArmy.army.player) {
                continue;
             }
             if(currentArmy.army.checkCollision(this.movingArmies[j].army.x, this.movingArmies[j].army.y)) {
-               this.battles.push(new battleObject.Battle(
-                  currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), currentArmy.nodeList.slice(currentArmy.startIndex),
-                  this.movingArmies[j].army, this.playerPool.getPlayer(this.movingArmies[j].army.player), this.movingArmies[j].nodeList.slice(this.movingArmies[j].startIndex),
-                  currentArmy.army.x, currentArmy.army.y,
-                  null
-               ));
-               this.gameSocket.emit('battle_start',{battle:this.battles[this.battles.length-1]});
+               var newBattle = new battleObject.Battle(currentArmy.army.x, currentArmy.army.y,null);
+               newBattle.addArmy(currentArmy.army, this.playerPool.getPlayer(currentArmy.army.player), currentArmy.nodeList.slice(currentArmy.startIndex));
+               newBattle.addArmy(this.movingArmies[j].army, this.playerPool.getPlayer(this.movingArmies[j].army.player), this.movingArmies[j].nodeList.slice(this.movingArmies[j].startIndex));
+               this.battles.push(newBattle);
+               this.gameSocket.emit('battle_start',{battle:newBattle});
                if(i < j) {
                   this.movingArmies.splice(j,1);
                   this.movingArmies.splice(i,1);
@@ -283,17 +307,14 @@ class Game{
 
    garbageCollection(){
       // Removes
-      // Players, Battles ...
+      // Armies, Players, Battles ...
       // From their respective arrays
 
       for(var i = this.battles.length - 1; i >= 0; i--) {
          if(!(this.battles[i].tick())) {
             var removedBattle = this.battles.splice(i, 1)[0];
-            if(removedBattle.moveArmy == 1) {
-               this.movingArmies.push(new movingArmyObject.MovingArmy(removedBattle.army1, this.map.nodeToXY(removedBattle.swipeList1), removedBattle.swipeList1));
-            }
-            if(removedBattle.moveArmy == 2) {
-               this.movingArmies.push(new movingArmyObject.MovingArmy(removedBattle.army2, this.map.nodeToXY(removedBattle.swipeList2), removedBattle.swipeList2));
+            if(removedBattle.moveArmy) {
+               this.movingArmies.push(new movingArmyObject.MovingArmy(removedBattle.armies[0], this.map.nodeToXY(removedBattle.swipeLists[0]), removedBattle.swipeLists[0]));
             }
             this.gameSocket.emit("battle_end",{x:removedBattle.x,y:removedBattle.y});
             console.log("Removed a battle");
@@ -302,6 +323,13 @@ class Game{
       for(var i = 0; i < this.playerPool.activePlayers.length; i++) {
          if(this.playerPool.activePlayers[i].armies.length == 0) {
             this.playerPool.removePlayer(this.playerPool.activePlayers[i].id);
+         }
+      }
+
+      for(var i = 0; i < this.map.nodes.length; i++){
+         if(this.map.nodes[i].army && this.map.nodes[i].army.count == 0){
+            this.playerPool.getPlayer(this.map.nodes[i].army.player).removeArmy(this.map.nodes[i].army.id);
+            this.map.nodes[i].army = null;
          }
       }
 

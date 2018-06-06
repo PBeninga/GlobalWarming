@@ -10,6 +10,8 @@ describe("Player", function() {
   });
 
   it("should be able to play a Song", function() {
+      
+     console.log("HERE");
     player.play(song);
     expect(player.currentlyPlayingSong).toEqual(song);
 
