@@ -51,7 +51,6 @@ class PlayerPool{
    }
 
    removePlayer(id) {
-      var removedPlayer = null;
       for(var i = 0; i < this.activePlayers.length; i++) {
          if(this.activePlayers[i].id == id) {
             this.inactivePlayers.push(this.activePlayers.splice(i, 1));

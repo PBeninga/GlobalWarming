@@ -12,9 +12,6 @@ class MapFactory{
       this.map.readMap(specifier);
     }
     else{
-      let num = Math.floor(Math.random() * this.mapNames.length);
-      let mapString = this.mapNames[Math.floor(Math.random() * this.mapNames.length)];
-      //this.map.readMap(mapString);
       this.map.readMap("fourPlayer");
     }
     return this.map;
@@ -26,8 +23,6 @@ class Map{
       this.castles = [];//which indicies of nodes are castles;
       this.startingCastles = [];//which of the castles are suitable for starting positions
       this.buffer = [];
-      //this.paths = [];
-      //this.makeMap();
    }
 
    getStartingCastle() {
@@ -45,13 +40,12 @@ class Map{
       this.castles = buffer.castles;
       this.startingCastles = buffer.startingCastles;
       let nodeFactory = new MapNodeFactory();
-      var type = "Intersection";
       for(var i=0; i<buffer.nodes.length; i++){
          var tNode = buffer.nodes[i];
          if(this.castles.indexOf(i) == -1){
-            type = "Intersection";
+            var type = "Intersection";
          }else{
-            type = "Castle";
+            var type = "Castle";
          }
          this.nodes[i] = nodeFactory.getNode(type, tNode.x, tNode.y, tNode.adj, i);
       }
