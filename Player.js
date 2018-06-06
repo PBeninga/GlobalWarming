@@ -76,7 +76,6 @@ class Player{
             if(this.armies[i].count - toAdd < 0){
                this.armies[i].count = 0;
             }
-            this.armies[i].count > 0
          } else if(this.id != null && this.armies[i].node != null && this.armies[i].buff != null) {
             this.armies[i].count += toAdd;
          }
