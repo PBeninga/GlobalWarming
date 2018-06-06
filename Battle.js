@@ -18,7 +18,7 @@ class Battle {
 				if(this.armies[i].buff == null) {
 					this.armies[i].updateBuff(army.buff);
 				}
-				this.armyAttacks[i] = this.armies[i].attackModifier * this.armies[i].count * 0.05;
+				this.armyAttacks[i] = this.armies[i].attackModifier * Math.log(this.armies[i].count) * 0.025;
 				console.log("Removing unneccesary army");
 				Player.removeArmy(army.id);
 				return;
