@@ -30,7 +30,7 @@ describe('Test moving armies', function(){
 			movingArmy.movePercent == (army.movementSpeed / movingArmy.distance) * 100
 		)
 
-      expect(correct).toBe(true));
+      expect(correct).toBe(true);
       //battle should end because one army has 100 while the other has 1;
    });
 });
