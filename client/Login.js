@@ -44,7 +44,7 @@ Login.prototype = {
       game.add.plugin(PhaserInput.Plugin);
       game.stage.backgroundColor = 0xADD8E6;
 
-      titleText = game.add.bitmapText((canvas_width/2) - 255, 100, 'carrier_command', 'Castle Clash', 32);
+      titleText = game.add.bitmapText((canvas_width/2) - 255, 100, 'carrier_command', ' Fort Knight\nBattle Royale', 32);
 
       socket.on('login', loginHandler);
       socket.on('new_account', createAccountHandler);
