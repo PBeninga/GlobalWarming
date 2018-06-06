@@ -14,15 +14,15 @@ function onLogin(playerSocket, data, callback) {
 function onNewAccount(playerSocket, data){
    query = {'username': data.username};
    db.findOne('Player', query).then(function(user) {
-      if(user != null) {
-         console.log("Account already exists");
-         playerSocket.emit('new_account', {'accountExists' : 'true'});
-         return
-      }
-      console.log("New Account Created");
-      db.insertOne('Player', data).then(function() {
+      if(user == null) { // Account doesn't exist. Let's create it.
+         db.insertOne('Player', data);
          playerSocket.emit('new_account', {'accountExists' : 'false'});
-      });
+         console.log("New Account Created");
+      }
+      else { 
+         playerSocket.emit('new_account', {'accountExists' : 'true'});
+         console.log("Account already exists");
+      }
    });
 }
 

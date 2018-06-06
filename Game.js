@@ -8,7 +8,7 @@ const fs = require('fs');
 
 // Global Constants
 let tickLength = 50;
-let TIME_TILL_START = 3000;
+let TIME_TILL_START = 10000;
 
 let STATE_WAITING = 0;
 let STATE_COUNT_DOWN = 1;
@@ -130,7 +130,7 @@ class Game{
       }
 
       if(this.gameState == STATE_RUNNING){
-         this.radius -= 2.5;
+         this.radius -= .5;
          if(this.radius < 5){
             this.radius = 5
          }
@@ -191,7 +191,7 @@ class Game{
 
    getBattle(army) {
       for(var i = 0; i < this.battles.length; i++) {
-         for(var j = 0; j < this.battles.armies.length; j++) {
+         for(var j = 0; j < this.battles[i].armies.length; j++) {
             if(this.battles[i].armies[j].id == army.id) {
                return this.battles[i];
             }

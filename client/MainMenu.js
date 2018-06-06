@@ -27,7 +27,7 @@ MainMenu.prototype = {
       game.add.plugin(PhaserInput.Plugin);
       console.log("Reached main menu");
       game.stage.backgroundColor = 0xADD8E6;
-      titleText = game.add.bitmapText((canvas_width/2) - 255, 100, 'carrier_command', 'Global Warming', 32);
+      titleText = game.add.bitmapText((canvas_width/2) - 255, 100, 'carrier_command', 'Castle Clash', 32);
       
       startButton = createButton(game, "Game Start", 'button1', canvas_width/2, canvas_height/2 - 100, 1, MainMenu, function() {
          boop.play();
