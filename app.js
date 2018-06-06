@@ -174,5 +174,6 @@ function removeGame(gameId){
 module.exports = {
    findGame:findGame,
    onNewClient:onNewClient,
-   games:games
+   games:games,
+   removeGame:removeGame
 };
