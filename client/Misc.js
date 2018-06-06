@@ -55,7 +55,7 @@ function createButton(game, string, ident, x, y, scale, state, callback, anchor 
   return tempButton;
 }
 
-function getInputField(name,type,x,y,width){
+function getInputField(name,type,x,y){
    var width = canvas_width*3/5;
    inputData = {
       font: '18px Arial',

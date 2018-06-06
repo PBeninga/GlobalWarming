@@ -2,7 +2,7 @@ var menu_music;
 var march;
 var battle_music;
 var boop;
-var sounds = [];
+var sounds;
 //List of every sprite in sheet that we want accessible
 units = [6,12,15,18,21,432,435,438,441,444,447,450,453,456,459,462,465,756,762,765,771,774,780]
 
@@ -14,6 +14,7 @@ var Preloader = {
     var battle_sound_vol = .9;
     var march_vol = 1;
     var battle_music_vol = .7;
+    sounds = [];
 
     //saves each sound into a list of sounds paired with volume(for ratio)
     boop = getSound('/client/assets/boop.mp3',boop_vol,false);
