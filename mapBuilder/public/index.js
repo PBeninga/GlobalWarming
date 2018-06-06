@@ -299,10 +299,7 @@ function build_map_payload(){
 }
 
 function getPath(){
-    
-    var path = "/Users/adamb/GlobalWarming/maps/newFile.txt"
-    
-    path = prompt("Enter the file path in the form \'/folder/fileName.txt\'" +
+    var path = prompt("Enter the file path in the form \'/folder/fileName.txt\'" +
                "\nWhere the file path starts at your root directory or C drive");
     
     return path;

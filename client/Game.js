@@ -1,7 +1,7 @@
-canvas_width = window.innerWidth;
-canvas_height = window.innerHeight;
+var canvas_width = window.innerWidth;
+var canvas_height = window.innerHeight;
 
-game = new Phaser.Game(canvas_width,canvas_height, Phaser.CANVAS, 'gameDiv');
+var game = new Phaser.Game(canvas_width,canvas_height, Phaser.CANVAS, 'gameDiv');
 
 game.state.add('Preloader', Preloader);
 game.state.add('Login', Login);
