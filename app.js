@@ -169,3 +169,8 @@ function removeGame(gameId){
 	}
    games.delete(gameId);
 }
+
+module.exports = {
+	findGame:findGame,
+	games:games
+}
