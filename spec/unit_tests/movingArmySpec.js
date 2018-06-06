@@ -21,16 +21,12 @@ describe('Test moving armies', function(){
 
 		var movingArmy = new movingArmyObject.MovingArmy(army, swipePath, null);
 
-		var correct = (
-			movingArmy.angle == Math.atan2(0, 100) &&
-			movingArmy.distance == 100 &&
-			movingArmy.moveX == army.movementSpeed * Math.cos(movingArmy.angle) &&
-			movingArmy.moveY == army.movementSpeed * Math.sin(movingArmy.angle) &&
-			movingArmy.percent == 100 &&
-			movingArmy.movePercent == (army.movementSpeed / movingArmy.distance) * 100
-		)
-
-      expect(correct).toBe(true);
+		expect(movingArmy.angle).toEqual(Math.atan2(0, 100));
+		expect(movingArmy.distance).toEqual(100);
+		expect(movingArmy.moveX).toEqual(army.movementSpeed * Math.cos(movingArmy.angle));
+		expect(movingArmy.moveY).toEqual(army.movementSpeed * Math.sin(movingArmy.angle));
+		expect(movingArmy.percent).toEqual(100);
+		expect(movingArmy.movePercent).toEqual((army.movementSpeed / movingArmy.distance) * 100);
       //battle should end because one army has 100 while the other has 1;
    });
 });
