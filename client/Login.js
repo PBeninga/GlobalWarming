@@ -49,11 +49,12 @@ Login.prototype = {
       socket.on('login', loginHandler);
       socket.on('new_account', createAccountHandler);
       
-      var usernameInput = getInputField('UserName', PhaserInput.InputType.UserName, canvas_width/2, canvas_height/2-50);
-      var passwordInput = getInputField('Password', PhaserInput.InputType.password, canvas_width/2,canvas_height/2);
+      usernameInput = getInputField('UserName', PhaserInput.InputType.UserName, canvas_width/2, canvas_height/2-50);
+      passwordInput = getInputField('Password', PhaserInput.InputType.password, canvas_width/2,canvas_height/2);
       
-      var loginButton = createButton(game, "Login", 'button1', canvas_width*3/8, canvas_height/2 + 100, 1, Login, login);
-      var createAccountButton = createButton(game, "Create Account", 'button1', canvas_width*5/8, canvas_height/2 + 100, 1, Login, createAccount);
+      loginButton = createButton(game, "Login", 'button1', canvas_width*3/8, canvas_height/2 + 100, 1, Login, login);
+      createAccountButton = createButton(game, "Create Account", 'button1', canvas_width*5/8, canvas_height/2 + 100, 1, Login, createAccount);
+      
       var guestButton =  createButton(game, "Play as Guest", 'button1', canvas_width*4/8, canvas_height/2+200, 1, Login, guest);
    }
 }
