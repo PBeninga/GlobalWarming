@@ -1,5 +1,5 @@
 var game = require("../../Game.js")
-var app = require("../../app.js")
+var app = require("../app.js")
 
 describe("Find game by id", function() {
    //app.games = new Map()
@@ -9,9 +9,6 @@ describe("Find game by id", function() {
       expect(app.games.get(game.roomid)).not.toBe(null)
       app.games.delete(game.roomid)
    });
-
-   //game = app.makeNewGame();
-
    it("should find an already made game", function() {
       foundGame = app.findGame("12345");
       expect(foundGame.roomid).toBe(foundGame.roomid)

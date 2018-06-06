@@ -44,7 +44,7 @@ describe("Database insert, fail to find find, and remove test", function() {
 	var database = require('../../server/database/database.js');
 	var db = new database.Database();
 
-	it("should insert then find correctly", function() {
+	it("should insert then not find the user", function() {
 		db.insertOne("Player", {"username": "unitTestPlayer3", "password": "pass"}).then(function(err) {
 	    	console.log("Inserted");
 	    	expect(err).toEqual(null);
@@ -62,11 +62,11 @@ describe("Database insert, give correct hash, and remove", function() {
 	var database = require('../../server/database/database.js');
 	var db = new database.Database();
 
-	it("should insert then find correctly", function() {
+	it("should insert then log in correctly", function() {
 		db.insertOne("Player", {"username": "unitTestPlayer4", "password": "pass"}).then(function(err) {
 	    	console.log("Inserted");
 	    	expect(err).toEqual(null);
-	 	}).then(db.compareHash("Player", {"username": "DNE", "password": "pass"})).then(function(err, docs) {
+	 	}).then(db.compareHash("Player", {"username": "unitTestPlayer4", "password": "pass"})).then(function(err, docs) {
 	    	expect(err).toEqual(null);
 	 	}).then(db.remove("Player", {"username": "unitTestPlayer4"})).then(function(err) {
 	    	console.log("Removed");
@@ -76,16 +76,36 @@ describe("Database insert, give correct hash, and remove", function() {
 });
 
 
-/*describe("Database", function() {
-   var database = require('../server/database/database.js');
-   var db;
+describe("Database insert, give incorrect hash, and remove", function() {
+	var database = require('../../server/database/database.js');
+	var db = new database.Database();
 
-   db = new database.Database();
+	it("should insert then wrong credentials fail to log in", function() {
+		db.insertOne("Player", {"username": "unitTestPlayer5", "password": "pass"}).then(function(err) {
+	    	console.log("Inserted");
+	    	expect(err).toEqual(null);
+	 	}).then(db.compareHash("Player", {"username": "unitTestPlayer5", "password": "WRONG-PASS"})).then(function(err, docs) {
+	    	expect(err).toEqual(null);
+	 	}).then(db.remove("Player", {"username": "unitTestPlayer4"})).then(function(err) {
+	    	console.log("Removed");
+	    	expect(err).toEqual(null);
+	 	});    
+	});
+});
 
-   it("should fail because the model name is wrong", function() {
-      db.insertOne("WrongModelName", {"username": "unitTestPlayer"})
-      .catch(function(err) {
-         expect(err).toEqual('Enter valid model name');
-      });
-   });
-});*/
+describe("Database insert, compareHash with wring username, and remove", function() {
+	var database = require('../../server/database/database.js');
+	var db = new database.Database();
+
+	it("should insert then wrong credentials fail to log in", function() {
+		db.insertOne("Player", {"username": "unitTestPlayer6", "password": "pass"}).then(function(err) {
+	    	console.log("Inserted");
+	    	expect(err).toEqual(null);
+	 	}).then(db.compareHash("Player", {"username": "wrong-name", "password": "pass"})).then(function(err, docs) {
+	    	expect(err).toEqual(null);
+	 	}).then(db.remove("Player", {"username": "unitTestPlayer4"})).then(function(err) {
+	    	console.log("Removed");
+	    	expect(err).toEqual(null);
+	 	});    
+	});
+});

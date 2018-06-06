@@ -51,7 +51,6 @@ class PlayerPool{
    }
 
    removePlayer(id) {
-      var removedPlayer = null;
       for(var i = 0; i < this.activePlayers.length; i++) {
          if(this.activePlayers[i].id == id) {
             this.inactivePlayers.push(this.activePlayers.splice(i, 1));
@@ -77,7 +76,6 @@ class Player{
             if(this.armies[i].count - toAdd < 0){
                this.armies[i].count = 0;
             }
-            this.armies[i].count > 0
          } else if(this.id != null && this.armies[i].node != null && this.armies[i].buff != null) {
             this.armies[i].count += toAdd;
          }

@@ -1,11 +1,11 @@
 //////////////
 // Link other files
 
-var gameObject = require('./Game.js');
-var miscFunc = require('./MiscFunctions.js');
-var playerObject = require('./Player.js');
-var mapObjects = require('./Map.js');
-var lg = require('./server/dbAccess.js');
+var gameObject = require('../Game.js');
+var miscFunc = require('../MiscFunctions.js');
+var playerObject = require('../Player.js');
+var mapObjects = require('../Map.js');
+var lg = require('../server/dbAccess.js');
 
 
 //////////////
@@ -20,8 +20,8 @@ app.get('/',function(req, res) {
 });
 
 app.use('/client',express.static(__dirname + '/client'));
-var port = process.env.PORT || 2000
-serv.listen(process.env.PORT || 2000);
+port = process.env.PORT || 2001
+serv.listen(process.env.PORT || 2001);
 console.log("Server started on port " + port);
 
 
@@ -58,7 +58,7 @@ socket.on('input_fired', onInputFired);
 
 function onNewClient(){
   console.log("testing onNewClient");
-    var game = findGame(this.id);
+    game = findGame(this.id);
     this.join(game.roomid)
     io.of(game.roomid).emit('newPlayer',{id:this.id, starting:game.starting});
     this.emit('connected',{id:this.id, players:game.playerPool.activePlayers, game:game.roomid, timeTillStart:game.timeTillStart, starting:game.starting});//send the players id, the players, and the room id
@@ -117,7 +117,7 @@ function onNewAccount(data){
 }
 
 function onInputFired(data) {
-	var currentGame = games.get(data.game);
+	currentGame = games.get(data.game);
 	if(!(currentGame === undefined)){
 		currentGame.addInput(data.nodes, this.id);
 	}
@@ -138,10 +138,10 @@ function findGame(id){
 		player = new playerObject.Player(id, "Guest" + miscFunc.generateID(10));
 		players.push(player);
 	}
-	var gamesIter = games.values();
+	gamesIter = games.values();
 	element = gamesIter.next();
 	while(!element.done){
-		var game = element.value
+		game = element.value
 		if(!(game.gameState > 1) && game.addPlayer(player)){
 			console.log("returning a game");
 			return game;

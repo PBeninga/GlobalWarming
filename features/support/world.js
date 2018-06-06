@@ -1,4 +1,4 @@
-const { setWorldConstructor } = require('cucumber');
+/*const { setWorldConstructor } = require('cucumber');
 var gameMap = require('../../Map.js');
 var miscFunc = require('../../MiscFunctions.js');
 var armyObject = require('../../Army.js');
@@ -12,13 +12,18 @@ class io {
 
    }
    of(id) {
-
+      return new socket();
    }
+}
+
+class socket {
+   constructor() {} 
+   emit() {}
 }
 
 class CustomWorld {
    constructor() {
-      this.game = new gameObject.Game(new io());
+      this.game = new gameObject.Game(null, new io());
       this.myPlayer = new playerObject.Player(0);
       this.enemy = new playerObject.Player(1);
       this.movingArmy = null;
@@ -43,16 +48,16 @@ class CustomWorld {
    }
 
    commenceBattle() {
-      while(this.battle.tick()) {
-         continue;
-      }
+      //while(this.battle.tick()) {
+      //   continue;
+      //}
    }
 
    moveArmy() {
       this.movingArmy = new movingObject.MovingArmy(
          this.myPlayer.armies[0],
-         {{x:this.map.nodes[0].x,y:this.map.nodes[0].y}, {x:this.map.nodes[1].x,y:this.map.nodes[1].y}},
-         {0, 1}
+         [{x:this.map.nodes[0].x,y:this.map.nodes[0].y}, {x:this.map.nodes[1].x,y:this.map.nodes[1].y}],
+         [0, 1]
       );
    }
 
@@ -63,4 +68,4 @@ class CustomWorld {
    }
 }
 
-setWorldConstructor(CustomWorld);
+setWorldConstructor(CustomWorld);*/
