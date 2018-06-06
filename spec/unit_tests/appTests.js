@@ -4,6 +4,16 @@ var playerObject = require('../../Player.js');
 
 describe('unit tests', function(){
 
+   /* IMPORTANT
+      This test sequence contains 6 individual tests 
+      however the tests needed to be integrated into
+      one 'it' statement because the tests needed to 
+      be executed synchronously.
+      Typically Jasmine will run all 'it' tests
+      asynchronously which creates conflicts in the
+      app.js file.
+   */
+   
    it("Testing app and game", function(){
       
       // TEST 1 app.js for adding games
