@@ -1,6 +1,6 @@
 # GlobalWarming
 *Web and iOS strategy game*
-https://global-warming-rts.herokuapp.com/
+https://fort-knight.herokuapp.com
 
 *CI server*
 https://travis-ci.org/PBeninga/GlobalWarming
