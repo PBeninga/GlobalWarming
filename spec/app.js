@@ -1,7 +1,7 @@
 //////////////
 // Link other files
 
-var gameObject = require('.../Game.js');
+var gameObject = require('../Game.js');
 var miscFunc = require('../MiscFunctions.js');
 var playerObject = require('../Player.js');
 var mapObjects = require('../Map.js');
@@ -20,8 +20,8 @@ app.get('/',function(req, res) {
 });
 
 app.use('/client',express.static(__dirname + '/client'));
-port = process.env.PORT || 2000
-serv.listen(process.env.PORT || 2000);
+port = process.env.PORT || 2001
+serv.listen(process.env.PORT || 2001);
 console.log("Server started on port " + port);
 
 
