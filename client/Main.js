@@ -189,12 +189,8 @@ function addNewPlayer(id) {
    }
    var unit;
    if(id == socket.id){
-      if(username == 'win'){
-         unit = 420
-      } else{
 	 unit = units[chosenUnit];    // WHERE SELECTED UNIT WILL GO
          unitTaken[chosenUnit] = true
-      }
    } else{
       menu_music.pause();
       unit = getUnit();
@@ -465,9 +461,7 @@ Main.prototype = {
    },
 
   init: function(sock) {
-      socket = sock[0];
-      username = sock[1];
-      console.log(username);
+      socket = sock;
   },
 
 	update: function () {

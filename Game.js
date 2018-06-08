@@ -118,7 +118,7 @@ class Game{
  //
 
    tick(){
-
+      
       var tickStartTime = new Date().getTime();
 
       if(this.gameState == STATE_WAITING){
