@@ -15,7 +15,7 @@ let STATE_COUNT_DOWN = 1;
 let STATE_RUNNING = 2;
 let STATE_GAME_OVER = 3;
 
-let MAX_PLAYERS = 4;
+let MAX_PLAYERS = 5;
 
 class Game{
 
