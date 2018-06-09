@@ -44,7 +44,8 @@ Login.prototype = {
       game.add.plugin(PhaserInput.Plugin);
       game.stage.backgroundColor = 0xADD8E6;
 
-      var titleText = game.add.bitmapText((canvas_width/2) - 255, 100, 'carrier_command', ' Fort Knight\nBattle Royale', 32);
+      game.add.sprite(canvas_width/2 - 325,canvas_height/2-250,'title').scale.setTo(.15,.15); 
+      var titleText = game.add.bitmapText((canvas_width/2) - 250, canvas_height/2-100, 'carrier_command', ' Battle Royale', 28);
 
       socket.on('login', loginHandler);
       socket.on('new_account', createAccountHandler);

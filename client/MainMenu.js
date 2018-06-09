@@ -13,7 +13,7 @@ function nextUnit(){
       chosenUnit = 0;
    }
    var unit = units[chosenUnit];
-   army = makeUnit(unit,canvas_width/2,canvas_height/2,10,10);
+   army = makeUnit(unit,canvas_width/2,canvas_height/2+100,10,10);
 }
 
 
@@ -27,14 +27,16 @@ MainMenu.prototype = {
       game.add.plugin(PhaserInput.Plugin);
       console.log("Reached main menu");
       game.stage.backgroundColor = 0xADD8E6;
-      var titleText = game.add.bitmapText((canvas_width/2) - 255, 100, 'carrier_command', ' Fort Knight\nBattle Royale', 32);
+
+      game.add.sprite(canvas_width/2 - 325,canvas_height/2-250,'title').scale.setTo(.15,.15); 
+      var titleText = game.add.bitmapText((canvas_width/2) - 250, canvas_height/2-100, 'carrier_command', ' Battle Royale', 28);
       
-      var startButton = createButton(game, "Game Start", 'button1', canvas_width/2, canvas_height/2 - 100, 1, MainMenu, function() {
+      var startButton = createButton(game, "Game Start", 'button1', canvas_width/2, canvas_height/2, 1, MainMenu, function() {
          boop.play();
          game.state.start('Main', true, false, socket);
       });
       
-      var chooseUnitButton = createButton(game, "Change Avatar", 'button1', canvas_width/2, canvas_height/2 + 110, 1, MainMenu, nextUnit);
+      var chooseUnitButton = createButton(game, "Change Avatar", 'button1', canvas_width/2, canvas_height/2 + 210, 1, MainMenu, nextUnit);
 
       var volumeButton = createButton(game, '0.5', 'tiny_button', 100, canvas_height-100, 1, MainMenu, volumeUpdate);
       //initializes chosen unit graphic
