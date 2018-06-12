@@ -1,3 +1,4 @@
+//1;8R
 //Produces a sound object from audio file
 function getSound(file,volume,loop) {		
 		var tempSound = document.createElement("audio");
@@ -18,16 +19,30 @@ function changeVolume(audios, vol){
 }
 
 //Loops through volume and updates button text to new volume 
-var master_vol = .5;
+var master_vol = .666;
 function volumeUpdate(){
-   if(master_vol > .9){
+   if(master_vol >= .9){
       master_vol=0;
    }else{
-      master_vol+= .1;
+      master_vol+= .333;
    }
+   volumeButton.scale.set(.2,.2);
    master_vol = Math.round(master_vol*10)/10;
+   
+   volumeButton.loadTexture('mute');
+   if(master_vol >= .3){
+      volumeButton.loadTexture('low');
+   }
+   if(master_vol >= .6){
+      volumeButton.scale.set(.05,.05);
+      volumeButton.loadTexture('medium');
+   } 
+   if(master_vol >= .9){
+      volumeButton.scale.set(.2,.2);
+      volumeButton.loadTexture('high');
+   }
+   
    changeVolume(sounds,master_vol);
-   volumeButton.text.text = master_vol
    boop.play();
 }
 
