@@ -172,7 +172,7 @@ function removePlayer(id) {
 		if(players[i].id == id) {
 			clearUnit(players[i].unit);
 			players.splice(i, 1);
-			return true;
+			return true
 		}
 	}
 	return false;
@@ -427,13 +427,17 @@ Main.prototype = {
       game.world.setBounds(-canvas_width*20, -canvas_height*20, canvas_width * 40, canvas_height * 40);
       game.add.image(0, 0, 'background_img');
       game.stage.backgroundColor = 0x68c1d1;
-      volumeButton = createButton(game, master_vol, 'tiny_button', game.camera.x+100, game.camera.y+canvas_height-100, 1, Main, volumeUpdate);
       nodeGroup = game.add.group();
       armyGroup = game.add.group();
       game.world.bringToTop(armyGroup);
       game.world.bringToTop(nodeGroup);
       game.input.onUp.add(endSwipe);
       circle = game.add.graphics(0,0);
+      volumeButton = createButton(game, null, 'medium', 25, 25, .05, MainMenu, volumeUpdate);
+      for(var i = 0; i < 4; i++){
+         volumeUpdate();
+      }
+
       leaveButton = createButton(
          game,
          'Return To Main Menu',
@@ -460,7 +464,8 @@ Main.prototype = {
       socket.on('send_nodes', createNodes);
    },
 
-  init: function(sock) {
+  init: function(sock,button) {
+      console.log(button)
       socket = sock;
   },
 
@@ -494,13 +499,11 @@ Main.prototype = {
 
 		if(bannerGFX != null) {
 			bannerGFX.x = game.camera.x;
-			bannerGFX.y = game.camera.y;
+			bannerGFX.y = game.camera.y+canvas_height-100;
 		}
                 if(volumeButton != null){
-                   volumeButton.x = game.camera.x + 100;
-                   volumeButton.text.x = game.camera.x + 100;
-                   volumeButton.y = game.camera.y + canvas_height - 100;
-                   volumeButton.text.y = game.camera.y + canvas_height - 100;
+                   volumeButton.x = game.camera.x + 50;
+                   volumeButton.y = game.camera.y + 50;
                 }
 	},
 

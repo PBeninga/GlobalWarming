@@ -29,7 +29,6 @@ var Preloader = {
     sounds.push([battle_sound,battle_sound_vol]);
 
     //loads all graphics
-    game.load.spritesheet('win', 'client/assets/win.png', 16, 16);
     game.load.spritesheet('armies', 'client/assets/armies.png', 16, 16, -1, 0, 1);
     game.load.spritesheet('battle', 'client/assets/battle.png', 128, 128);
     game.load.image('castle_img', 'client/assets/castle.png');
@@ -41,6 +40,11 @@ var Preloader = {
     game.load.image('button4', 'client/assets/blue_button03.png');
     game.load.image('button5', 'client/assets/blue_button04.png');
     game.load.image('background_img', 'client/assets/ground.png');
+    game.load.image('mute', 'client/assets/mute.png');
+    game.load.image('low', 'client/assets/low.png');
+    game.load.image('medium', 'client/assets/medium.png');
+    game.load.image('high', 'client/assets/high.png');
+    game.load.image('title', 'client/assets/title.png');
     game.load.bitmapFont('carrier_command', 'client/assets/carrier_command.png', 'client/assets/carrier_command.xml');
   },
 
